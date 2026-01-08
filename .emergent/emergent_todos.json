@@ -5,27 +5,27 @@
   },
   {
     "content": "Phase 1 POC: Implement double-entry ledger engine with invariants",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Phase 1 POC: Implement idempotency store and middleware",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Phase 1 POC: Implement S3 adapter interface with LocalS3 fallback",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Phase 1 POC: Implement JWT and TOTP auth primitives",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Phase 1 POC: Create comprehensive test script (test_core_atlas.py)",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Phase 1 POC: Run tests and fix until all pass",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Phase 1 POC: All user stories validated and working",
