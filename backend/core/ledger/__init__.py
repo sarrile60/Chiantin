@@ -8,7 +8,7 @@ from .models import (
     EntryDirection,
     AccountType
 )
-from .engine import LedgerEngine
+from .engine import LedgerEngine, InvariantViolation, LedgerError
 
 __all__ = [
     "LedgerAccount",
@@ -17,5 +17,7 @@ __all__ = [
     "TransactionStatus",
     "EntryDirection",
     "AccountType",
-    "LedgerEngine"
+    "LedgerEngine",
+    "InvariantViolation",
+    "LedgerError"
 ]
