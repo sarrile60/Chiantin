@@ -61,11 +61,20 @@ class User(BaseModel):
 
 
 class UserCreate(BaseModel):
-    email: EmailStr
+    email: str
     password: str
     first_name: str
     last_name: str
     phone: Optional[str] = None
+    
+    @field_validator('email')
+    @classmethod
+    def validate_email(cls, v):
+        # Allow .local domains for development/demo
+        email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$|^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.local$'
+        if not re.match(email_pattern, v):
+            raise ValueError('Invalid email address')
+        return v.lower()
     
     @field_validator('password')
     @classmethod
