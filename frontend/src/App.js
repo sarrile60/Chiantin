@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, Link, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Link, useNavigate, useParams } from 'react-router-dom';
 import './App.css';
 import api from './api';
 import { APP_NAME } from './config';
 import { SecuritySettings } from './components/Security';
 import { KYCApplication } from './components/KYC';
 import { AdminKYCReview } from './components/AdminKYC';
+import { TransactionsList } from './components/Transactions';
 
 // Auth Context
 const AuthContext = React.createContext(null);
