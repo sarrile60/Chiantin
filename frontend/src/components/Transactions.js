@@ -2,17 +2,29 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api';
 
-export function TransactionsList({ accountId }) {
+export function TransactionsList({ accountId, isAdmin = false }) {
   const [transactions, setTransactions] = useState([]);
+  const [filteredTransactions, setFilteredTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedTxn, setSelectedTxn] = useState(null);
   const [showDetails, setShowDetails] = useState(false);
+  const [filters, setFilters] = useState({
+    type: 'all',
+    status: 'all',
+    dateFrom: '',
+    dateTo: '',
+    search: ''
+  });
 
   useEffect(() => {
     if (accountId) {
       fetchTransactions();
     }
   }, [accountId]);
+
+  useEffect(() => {
+    applyFilters();
+  }, [transactions, filters]);
 
   const fetchTransactions = async () => {
     try {
@@ -23,6 +35,68 @@ export function TransactionsList({ accountId }) {
     } finally {
       setLoading(false);
     }
+  };
+
+  const applyFilters = () => {
+    let filtered = [...transactions];
+
+    // Type filter
+    if (filters.type !== 'all') {
+      filtered = filtered.filter(t => t.transaction_type === filters.type);
+    }
+
+    // Status filter
+    if (filters.status !== 'all') {
+      filtered = filtered.filter(t => t.status === filters.status);
+    }
+
+    // Date range filter
+    if (filters.dateFrom) {
+      const fromDate = new Date(filters.dateFrom);
+      filtered = filtered.filter(t => new Date(t.created_at) >= fromDate);
+    }
+    if (filters.dateTo) {
+      const toDate = new Date(filters.dateTo);
+      toDate.setHours(23, 59, 59);
+      filtered = filtered.filter(t => new Date(t.created_at) <= toDate);
+    }
+
+    // Search filter
+    if (filters.search) {
+      const search = filters.search.toLowerCase();
+      filtered = filtered.filter(t => 
+        t.id.toLowerCase().includes(search) ||
+        (t.reason && t.reason.toLowerCase().includes(search)) ||
+        (t.external_id && t.external_id.toLowerCase().includes(search))
+      );
+    }
+
+    setFilteredTransactions(filtered);
+  };
+
+  const exportToCSV = () => {
+    const headers = ['ID', 'Type', 'Status', 'Date', 'Reason', 'External ID'];
+    const rows = filteredTransactions.map(txn => [
+      txn.id,
+      txn.transaction_type,
+      txn.status,
+      new Date(txn.created_at).toISOString(),
+      txn.reason || '',
+      txn.external_id || ''
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+    ].join('\\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `transactions_${accountId}_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
   };
 
   const formatAmount = (cents) => {
