@@ -19,6 +19,10 @@ import { AdminSidebar, AdminLayout } from './components/AdminLayout';
 import { MobileBottomTabs } from './components/MobileNav';
 import { P2PTransferForm } from './components/P2PTransfer';
 import { AnalyticsDashboard } from './components/Analytics';
+import { AdminSettings } from './components/AdminSettings';
+import { TransfersPage } from './components/TransfersPage';
+import { SpendingInsights } from './components/SpendingInsights';
+import { CardsPage } from './components/CardsPage';
 
 // Auth Context
 const AuthContext = React.createContext(null);
@@ -725,20 +729,36 @@ function AdminDashboard() {
                           onClick={() => {
                             if (window.confirm('Disable this user?')) {
                               api.patch(`/admin/users/${selectedUser.user.id}/status`, { status: 'DISABLED' })
-                                .then(() => { toast.success('User disabled'); viewUserDetails(selectedUser.user.id); })
-                                .catch(() => toast.error('Failed'));
+                                .then(() => { 
+                                  toast.success('User disabled'); 
+                                  fetchUsers();
+                                  viewUserDetails(selectedUser.user.id); 
+                                })
+                                .catch((err) => {
+                                  console.error('Disable error:', err);
+                                  toast.error('Failed to disable user');
+                                });
                             }
                           }}
                           className="px-3 py-1 text-sm border border-red-600 text-red-600 rounded hover:bg-red-50"
+                          data-testid="disable-user-btn"
                         >Disable</button>
                       ) : (
                         <button
                           onClick={() => {
                             api.patch(`/admin/users/${selectedUser.user.id}/status`, { status: 'ACTIVE' })
-                              .then(() => { toast.success('User enabled'); viewUserDetails(selectedUser.user.id); })
-                              .catch(() => toast.error('Failed'));
+                              .then(() => { 
+                                toast.success('User enabled'); 
+                                fetchUsers();
+                                viewUserDetails(selectedUser.user.id); 
+                              })
+                              .catch((err) => {
+                                console.error('Enable error:', err);
+                                toast.error('Failed to enable user');
+                              });
                           }}
                           className="px-3 py-1 text-sm border border-green-600 text-green-600 rounded hover:bg-green-50"
+                          data-testid="enable-user-btn"
                         >Enable</button>
                       )}
                     </div>
@@ -757,7 +777,7 @@ function AdminDashboard() {
                       <div key={acc.id} className="border rounded p-4 mb-4">
                         <div className="flex justify-between">
                           <div><p className="font-mono text-sm">{acc.iban}</p></div>
-                          <div><p className="text-xl font-bold">{formatAmount(acc.balance)}</p></div>
+                          <div><p className="text-xl font-bold">€{(acc.balance / 100).toFixed(2)}</p></div>
                         </div>
                         <EnhancedLedgerTools account={acc} onSuccess={() => viewUserDetails(selectedUser.user.id)} />
                       </div>
@@ -776,6 +796,8 @@ function AdminDashboard() {
         return <SupportTickets isAdmin={true} />;
       case 'audit':
         return <AuditLogViewer />;
+      case 'settings':
+        return <AdminSettings />;
       default:
         return <div className="card p-8 text-center"><p>Section under construction</p></div>;
     }
@@ -912,6 +934,48 @@ function SupportPage() {
   );
 }
 
+// Cards Page Wrapper
+function CardsPageWrapper() {
+  const { user, logout } = useAuth();
+  return <CardsPage user={user} logout={logout} />;
+}
+
+// Transfers Page Wrapper
+function TransfersPageWrapper() {
+  const { user, logout } = useAuth();
+  return <TransfersPage user={user} logout={logout} />;
+}
+
+// Insights Page
+function InsightsPage() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  return (
+    <div className="min-h-screen bg-white">
+      <header className="header-bar">
+        <div className="container-main h-full flex justify-between items-center">
+          <div className="flex items-center space-x-4">
+            <button onClick={() => navigate('/dashboard')} className="text-gray-600 hover:text-gray-900">
+              ← Back
+            </button>
+            <h1 className="text-lg font-semibold text-gray-900">{APP_NAME}</h1>
+          </div>
+          <div className="flex items-center space-x-4">
+            <NotificationBell />
+            <button onClick={logout} className="text-sm text-gray-600 hover:text-gray-900">Logout</button>
+          </div>
+        </div>
+      </header>
+      <div className="container-main py-8">
+        <h2 className="text-2xl font-semibold mb-6">Spending Insights</h2>
+        <SpendingInsights />
+      </div>
+      <MobileBottomTabs />
+    </div>
+  );
+}
+
 // Protected Route
 function ProtectedRoute({ children, adminOnly = false }) {
   const { user, loading } = useAuth();
@@ -981,6 +1045,30 @@ function App() {
             element={
               <ProtectedRoute>
                 <SupportPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/transfers"
+            element={
+              <ProtectedRoute>
+                <TransfersPageWrapper />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/insights"
+            element={
+              <ProtectedRoute>
+                <InsightsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/cards"
+            element={
+              <ProtectedRoute>
+                <CardsPageWrapper />
               </ProtectedRoute>
             }
           />

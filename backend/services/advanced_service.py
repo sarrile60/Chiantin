@@ -71,8 +71,13 @@ class AdvancedBankingService:
         data: CreateScheduledPayment
     ) -> ScheduledPayment:
         """Create a scheduled recurring payment."""
+        # Parse date strings to datetime
+        from datetime import datetime as dt
+        start_dt = dt.fromisoformat(data.start_date) if isinstance(data.start_date, str) else datetime.combine(data.start_date, datetime.min.time())
+        end_dt = dt.fromisoformat(data.end_date) if data.end_date and isinstance(data.end_date, str) else None
+        
         # Calculate next execution
-        next_exec = self._calculate_next_execution(data.start_date, data.frequency)
+        next_exec = self._calculate_next_execution(start_dt.date(), data.frequency)
         
         scheduled = ScheduledPayment(
             user_id=user_id,
@@ -80,8 +85,8 @@ class AdvancedBankingService:
             amount=data.amount,
             reason=data.reason,
             frequency=data.frequency,
-            start_date=data.start_date,
-            end_date=data.end_date,
+            start_date=start_dt,
+            end_date=end_dt,
             next_execution=next_exec
         )
         

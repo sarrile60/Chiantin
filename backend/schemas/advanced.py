@@ -35,8 +35,8 @@ class ScheduledPayment(BaseModel):
     reason: str
     
     frequency: RecurringFrequency
-    start_date: date
-    end_date: Optional[date] = None
+    start_date: datetime  # Changed from date to datetime for MongoDB
+    end_date: Optional[datetime] = None  # Changed from date to datetime
     
     active: bool = True
     last_executed: Optional[datetime] = None
@@ -53,8 +53,8 @@ class CreateScheduledPayment(BaseModel):
     amount: int
     reason: str
     frequency: RecurringFrequency
-    start_date: date
-    end_date: Optional[date] = None
+    start_date: str  # Accept as string (YYYY-MM-DD) from frontend
+    end_date: Optional[str] = None
 
 
 class Beneficiary(BaseModel):

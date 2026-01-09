@@ -124,11 +124,12 @@ export function ProfessionalDashboard({ user, logout }) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
             </svg>
           </div>
-          <div className="stat-tile-number">0</div>
+          <div className="stat-tile-number">1</div>
           <div className="stat-tile-label">Cards</div>
-          <span className="stat-tile-link text-gray-400 cursor-default">
-            <span>Coming soon</span>
-          </span>
+          <button onClick={() => navigate('/cards')} className="stat-tile-link">
+            <span>View</span>
+            <span>→</span>
+          </button>
         </div>
 
         <div className="stat-tile" data-testid="transfers-tile">
@@ -225,9 +226,9 @@ export function ProfessionalDashboard({ user, logout }) {
                     </div>
                     <div className="text-right">
                       <p className={`text-sm font-semibold ${
-                        txn.transaction_type === 'TOP_UP' ? 'amount-positive' : 'amount-negative'
+                        txn.transaction_type === 'TOP_UP' || txn.transaction_type === 'SALARY' ? 'amount-positive' : 'amount-negative'
                       }`}>
-                        {txn.transaction_type === 'TOP_UP' ? '+' : '-'}€100.00
+                        {txn.transaction_type === 'TOP_UP' || txn.transaction_type === 'SALARY' ? '+' : '-'}€100.00
                       </p>
                       <span className={`badge ${
                         txn.status === 'POSTED' ? 'badge-success' : 'badge-gray'
@@ -242,30 +243,107 @@ export function ProfessionalDashboard({ user, logout }) {
           </div>
         </div>
 
-        {/* Right: Transfers, Beneficiaries, Insights */}
+        {/* Right: Cards + Quick Actions */}
         <div className="space-y-6">
-          {/* P2P Transfer Form */}
+          {/* Card Widget */}
           <div>
-            <div className="section-header">Send Money</div>
-            <P2PTransferForm onSuccess={fetchDashboardData} />
+            <div className="section-header">Cards</div>
+            <div className="card p-6">
+              {/* Card Preview */}
+              <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 text-white mb-4" style={{ aspectRatio: '1.586' }}>
+                <div className="flex justify-between items-start mb-8">
+                  <div>
+                    <p className="text-xs font-medium opacity-80">Project Atlas</p>
+                    <p className="text-xs opacity-60 mt-1">Debit Card</p>
+                  </div>
+                  <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="mb-6">
+                  <p className="text-xs opacity-60 mb-2">Card Number</p>
+                  <p className="font-mono text-base tracking-wider">•••• •••• •••• 4321</p>
+                </div>
+                <div className="flex justify-between items-end">
+                  <div>
+                    <p className="text-xs opacity-60 mb-1">Cardholder</p>
+                    <p className="text-sm font-medium">{user?.first_name} {user?.last_name}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs opacity-60 mb-1">Expires</p>
+                    <p className="text-sm font-mono">12/28</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Quick Actions */}
+              <div className="space-y-2">
+                <button className="w-full py-2.5 text-sm font-medium text-gray-700 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                  View Card Details
+                </button>
+                <button className="w-full py-2.5 text-sm font-medium text-gray-700 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                  Freeze Card
+                </button>
+                <button className="w-full py-2.5 text-sm font-medium text-gray-700 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                  Manage Limits
+                </button>
+              </div>
+              
+              <p className="text-xs text-gray-500 text-center mt-4">Virtual debit card • No fees</p>
+            </div>
           </div>
-          
-          {/* Beneficiaries */}
+
+          {/* Quick Transfer Button */}
           <div>
-            <div className="section-header">Saved Recipients</div>
-            <BeneficiaryManager />
+            <div className="section-header">Quick Actions</div>
+            <div className="card p-4 space-y-2">
+              <button
+                onClick={() => navigate('/transfers')}
+                className="w-full btn-primary"
+                data-testid="quick-transfer-btn"
+              >
+                Send Money
+              </button>
+              <button
+                onClick={() => navigate('/kyc')}
+                className="w-full btn-secondary"
+              >
+                Complete Verification
+              </button>
+            </div>
           </div>
-          
-          {/* Scheduled Payments */}
+
+          {/* Spending Insights Preview */}
           <div>
-            <div className="section-header">Scheduled Payments</div>
-            <ScheduledPayments />
-          </div>
-          
-          {/* Spending Insights */}
-          <div>
-            <div className="section-header">Spending Insights</div>
-            <SpendingInsights />
+            <div className="section-header">This Month</div>
+            <div className="card p-4">
+              <div className="flex justify-between items-center mb-3">
+                <span className="text-sm text-gray-600">Total Spending</span>
+                <span className="text-lg font-bold">€850.00</span>
+              </div>
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs">
+                  <span className="text-gray-600">Food & Dining</span>
+                  <span className="font-medium">€250.00</span>
+                </div>
+                <div className="flex justify-between text-xs">
+                  <span className="text-gray-600">Shopping</span>
+                  <span className="font-medium">€350.00</span>
+                </div>
+                <div className="flex justify-between text-xs">
+                  <span className="text-gray-600">Bills</span>
+                  <span className="font-medium">€200.00</span>
+                </div>
+              </div>
+              <button
+                onClick={() => navigate('/insights')}
+                className="mt-3 text-xs text-red-600 hover:text-red-700 font-medium"
+              >
+                View full breakdown →
+              </button>
+            </div>
           </div>
         </div>
       </div>
