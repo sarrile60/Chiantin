@@ -300,10 +300,22 @@ function LoginPage() {
           >
             {loading ? 'Signing in...' : 'Sign in'}
           </button>
-          <div className="text-sm text-center text-gray-600 pt-4 border-t border-gray-200">
-            <p className="font-medium mb-2">Demo credentials:</p>
-            <p className="text-xs">Customer: customer@demo.com / Demo@123456</p>
-            <p className="text-xs">Admin: admin@atlas.local / Admin@123456</p>
+
+          <div className="text-center pt-4 border-t border-gray-200">
+            <p className="text-sm text-gray-600 mb-3">
+              Don't have an account?{' '}
+              <button
+                type="button"
+                onClick={() => navigate('/signup')}
+                className="text-blue-600 hover:text-blue-700 font-medium"
+                data-testid="goto-signup"
+              >
+                Create Account
+              </button>
+            </p>
+            <p className="text-xs font-medium text-gray-700 mb-1">Demo credentials:</p>
+            <p className="text-xs text-gray-600">Customer: customer@demo.com / Demo@123456</p>
+            <p className="text-xs text-gray-600">Admin: admin@atlas.local / Admin@123456</p>
           </div>
         </form>
       </div>
@@ -969,6 +981,7 @@ function App() {
       <AuthProvider>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
           <Route
             path="/dashboard"
             element={
