@@ -38,19 +38,19 @@ class KYCApplication(BaseModel):
     id: str = Field(default_factory=lambda: str(ObjectId()), alias="_id")
     user_id: str
     
-    # Personal details
-    full_name: str
-    date_of_birth: date
-    nationality: str
+    # Personal details (optional for draft state)
+    full_name: Optional[str] = None
+    date_of_birth: Optional[date] = None
+    nationality: Optional[str] = None
     
     # Address
-    street_address: str
-    city: str
-    postal_code: str
-    country: str
+    street_address: Optional[str] = None
+    city: Optional[str] = None
+    postal_code: Optional[str] = None
+    country: Optional[str] = None
     
     # Tax
-    tax_residency: str
+    tax_residency: Optional[str] = None
     tax_id: Optional[str] = None
     
     # Documents
