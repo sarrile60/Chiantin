@@ -744,6 +744,21 @@ class APITester:
             self.test_statement_download()
         print()
         
+        # Support Tickets
+        print("--- Support Tickets ---")
+        if self.customer_token:
+            self.test_create_support_ticket()
+            self.test_get_customer_tickets()
+        if self.admin_token:
+            self.test_admin_get_all_tickets()
+        print()
+        
+        # Notifications
+        print("--- Notifications ---")
+        if self.customer_token:
+            self.test_get_notifications()
+        print()
+        
         # Summary
         print("="*60)
         print("TEST SUMMARY")
