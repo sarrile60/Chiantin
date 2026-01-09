@@ -80,7 +80,8 @@ class KYCService:
         """Submit KYC application for review."""
         app = await self.get_or_create_application(user_id)
         
-        if app.status not in [KYCStatus.DRAFT, KYCStatus.NEEDS_MORE_INFO]:
+        # Allow resubmission for DRAFT, NEEDS_MORE_INFO, and REJECTED statuses
+        if app.status not in [KYCStatus.DRAFT, KYCStatus.NEEDS_MORE_INFO, KYCStatus.REJECTED]:
             raise HTTPException(
                 status_code=400,
                 detail="Application cannot be modified in current status"
@@ -93,7 +94,12 @@ class KYCService:
             "submitted_at": datetime.utcnow(),
             "updated_at": datetime.utcnow(),
             "terms_accepted_at": datetime.utcnow() if data.terms_accepted else None,
-            "privacy_accepted_at": datetime.utcnow() if data.privacy_accepted else None
+            "privacy_accepted_at": datetime.utcnow() if data.privacy_accepted else None,
+            # Clear previous rejection if resubmitting
+            "rejection_reason": None,
+            "review_notes": None,
+            "reviewed_at": None,
+            "reviewed_by": None
         })
         
         await self.db.kyc_applications.update_one(
