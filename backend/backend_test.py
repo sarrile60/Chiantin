@@ -385,7 +385,17 @@ def main():
     tester.test_p2p_transfer()
     
     print("\n" + "=" * 70)
-    print("SECTION 3: ADMIN FEATURES")
+    print("SECTION 3: ADVANCED BANKING FEATURES")
+    print("=" * 70)
+    
+    tester.test_add_beneficiary()
+    tester.test_get_beneficiaries()
+    tester.test_create_scheduled_payment()
+    tester.test_get_scheduled_payments()
+    tester.test_get_spending_insights()
+    
+    print("\n" + "=" * 70)
+    print("SECTION 4: ADMIN FEATURES")
     print("=" * 70)
     
     tester.test_admin_get_users()
