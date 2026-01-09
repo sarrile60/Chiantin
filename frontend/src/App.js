@@ -383,6 +383,7 @@ function CustomerDashboard() {
               {APP_NAME}
             </h1>
             <div className="flex items-center space-x-4">
+              <NotificationBell />
               <span className="text-sm text-gray-600">
                 {user?.first_name} {user?.last_name}
               </span>
