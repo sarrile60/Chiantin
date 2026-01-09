@@ -648,6 +648,73 @@ async def get_user_details(
     }
 
 
+class UpdateUserStatus(BaseModel):
+    status: str  # ACTIVE, DISABLED
+
+
+@app.patch("/api/v1/admin/users/{user_id}/status")
+async def update_user_status(
+    user_id: str,
+    data: UpdateUserStatus,
+    current_user: dict = Depends(require_admin),
+    db: AsyncIOMotorDatabase = Depends(get_database)
+):
+    """Enable or disable a user (admin)."""
+    from bson import ObjectId
+    from bson.errors import InvalidId
+    
+    # Find user
+    user_doc = await db.users.find_one({"_id": user_id})
+    if not user_doc:
+        try:
+            user_doc = await db.users.find_one({"_id": ObjectId(user_id)})
+        except InvalidId:
+            pass
+    
+    if not user_doc:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Update status
+    await db.users.update_one(
+        {"_id": user_doc["_id"]},
+        {"$set": {"status": data.status, "updated_at": datetime.utcnow()}}
+    )
+    
+    return {"success": True, "message": f"User status updated to {data.status}"}
+
+
+@app.post("/api/v1/admin/users/{user_id}/revoke-sessions")
+async def revoke_all_sessions(
+    user_id: str,
+    current_user: dict = Depends(require_admin),
+    db: AsyncIOMotorDatabase = Depends(get_database)
+):
+    """Revoke all sessions for a user (admin)."""
+    from bson import ObjectId
+    from bson.errors import InvalidId
+    
+    # Find user
+    user_doc = await db.users.find_one({"_id": user_id})
+    if not user_doc:
+        try:
+            user_doc = await db.users.find_one({"_id": ObjectId(user_id)})
+        except InvalidId:
+            pass
+    
+    if not user_doc:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    actual_user_id = str(user_doc["_id"])
+    
+    # Revoke all sessions
+    result = await db.sessions.update_many(
+        {"user_id": actual_user_id, "revoked": False},
+        {"$set": {"revoked": True}}
+    )
+    
+    return {"success": True, "revoked_count": result.modified_count}
+
+
 @app.get("/api/v1/admin/audit-logs")
 async def get_audit_logs(
     limit: int = 100,
