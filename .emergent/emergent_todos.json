@@ -1,31 +1,11 @@
 [
   {
-    "content": "Phase 4: Admin KYC review interface complete",
+    "content": "Phase 5: Transaction enhancements complete",
     "status": "completed"
-  },
-  {
-    "content": "Phase 5: Transaction details modal and list",
-    "status": "completed"
-  },
-  {
-    "content": "Phase 5: Transaction reversal backend API",
-    "status": "completed"
-  },
-  {
-    "content": "Phase 5: Transaction reversal UI component",
-    "status": "completed"
-  },
-  {
-    "content": "Phase 5: Internal transfer API and UI",
-    "status": "completed"
-  },
-  {
-    "content": "Phase 5: Advanced transaction filters and CSV export",
-    "status": "in_progress"
   },
   {
     "content": "Phase 6: Comprehensive audit log viewer",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Phase 6: Advanced user search and bulk operations",

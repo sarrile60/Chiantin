@@ -221,7 +221,7 @@ export function TransactionsList({ accountId, isAdmin = false }) {
         </div>
       ) : (
         <div className="bg-white rounded-lg shadow divide-y">
-          {transactions.map((txn) => (
+          {filteredTransactions.map((txn) => (
             <div
               key={txn.id}
               onClick={() => {
