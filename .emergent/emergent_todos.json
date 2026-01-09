@@ -1,22 +1,18 @@
 [
   {
-    "content": "UI REFACTOR: Complete - professional banking UI applied",
+    "content": "BUG FIX: Admin activeTab variable error fixed",
     "status": "completed"
   },
   {
-    "content": "FEATURE: Replace all alert() with toast notifications",
+    "content": "FEATURE: Add P2P customer transfers backend + UI",
     "status": "in_progress"
-  },
-  {
-    "content": "FEATURE: Add P2P customer transfers",
-    "status": "pending"
   },
   {
     "content": "FEATURE: Analytics dashboard",
     "status": "pending"
   },
   {
-    "content": "Final: Comprehensive testing",
+    "content": "Final: Complete testing",
     "status": "pending"
   }
 ]
