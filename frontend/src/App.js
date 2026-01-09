@@ -680,7 +680,7 @@ function AdminDashboard() {
           <button
             onClick={() => setActiveTab('users')}
             className={`py-4 px-1 border-b-2 font-medium text-sm ${
-              activeTab === 'users'
+              activeSection === 'users'
                 ? 'border-blue-600 text-blue-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700'
             }`}
@@ -691,7 +691,7 @@ function AdminDashboard() {
           <button
             onClick={() => setActiveTab('kyc')}
             className={`py-4 px-1 border-b-2 font-medium text-sm ${
-              activeTab === 'kyc'
+              activeSection === 'kyc'
                 ? 'border-blue-600 text-blue-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700'
             }`}
@@ -702,7 +702,7 @@ function AdminDashboard() {
           <button
             onClick={() => setActiveTab('support')}
             className={`py-4 px-1 border-b-2 font-medium text-sm ${
-              activeTab === 'support'
+              activeSection === 'support'
                 ? 'border-blue-600 text-blue-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700'
             }`}
@@ -713,7 +713,7 @@ function AdminDashboard() {
           <button
             onClick={() => setActiveTab('audit')}
             className={`py-4 px-1 border-b-2 font-medium text-sm ${
-              activeTab === 'audit'
+              activeSection === 'audit'
                 ? 'border-blue-600 text-blue-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700'
             }`}
@@ -726,7 +726,7 @@ function AdminDashboard() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {activeTab === 'users' ? (
+        {activeSection === 'users' ? (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Users List */}
           <div className="lg:col-span-1">
@@ -936,9 +936,9 @@ function AdminDashboard() {
             )}
           </div>
         </div>
-        ) : activeTab === 'kyc' ? (
+        ) : activeSection === 'kyc' ? (
           <AdminKYCReview />
-        ) : activeTab === 'support' ? (
+        ) : activeSection === 'support' ? (
           <SupportTickets isAdmin={true} />
         ) : (
           <AuditLogViewer />
