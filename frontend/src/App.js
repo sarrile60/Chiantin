@@ -713,6 +713,50 @@ function AdminDashboard() {
   );
 }
 
+// Support Page
+function SupportPage() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  return (
+    <div className="min-h-screen page-background">
+      <header className="header-gradient">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
+            <h1 className="text-2xl font-bold text-gradient-blue" style={{ fontFamily: 'Space Grotesk' }}>
+              {APP_NAME}
+            </h1>
+            <button onClick={logout} className="text-sm text-gray-600 hover:text-gray-900">
+              Logout
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <div className="border-b border-gray-200 bg-white/80 backdrop-blur">
+        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex space-x-8">
+          <button onClick={() => navigate('/dashboard')} className="tab-inactive">
+            Accounts
+          </button>
+          <button onClick={() => navigate('/kyc')} className="tab-inactive">
+            KYC
+          </button>
+          <button onClick={() => navigate('/security')} className="tab-inactive">
+            Security
+          </button>
+          <button onClick={() => navigate('/support')} className="tab-active">
+            Support
+          </button>
+        </nav>
+      </div>
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <SupportTickets />
+      </main>
+    </div>
+  );
+}
+
 // Protected Route
 function ProtectedRoute({ children, adminOnly = false }) {
   const { user, loading } = useAuth();
