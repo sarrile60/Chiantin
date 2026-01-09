@@ -219,6 +219,9 @@ function TransactionsPage() {
 
             {/* Transactions */}
             <TransactionsList accountId={accountId} />
+
+            {/* Statement Download */}
+            <StatementDownload accountId={accountId} />
           </div>
         ) : (
           <div className="bg-white rounded-lg shadow p-8 text-center">
