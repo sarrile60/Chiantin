@@ -18,6 +18,7 @@ import { ProfessionalDashboard } from './components/ProfessionalDashboard';
 import { AdminSidebar, AdminLayout } from './components/AdminLayout';
 import { MobileBottomTabs } from './components/MobileNav';
 import { P2PTransferForm } from './components/P2PTransfer';
+import { AnalyticsDashboard } from './components/Analytics';
 
 // Auth Context
 const AuthContext = React.createContext(null);
