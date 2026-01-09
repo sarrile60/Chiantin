@@ -372,12 +372,12 @@ function CustomerDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen page-background">
       {/* Header */}
-      <header className="bg-white shadow-sm">
+      <header className="header-gradient">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
-            <h1 className="text-2xl font-bold" style={{ fontFamily: 'Space Grotesk' }}>
+            <h1 className="text-2xl font-bold text-gradient-blue" style={{ fontFamily: 'Space Grotesk' }}>
               {APP_NAME}
             </h1>
             <div className="flex items-center space-x-4">
@@ -396,6 +396,26 @@ function CustomerDashboard() {
         </div>
       </header>
 
+      {/* Navigation Tabs */}
+      <div className="border-b border-gray-200 bg-white/80 backdrop-blur">
+        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex space-x-8" aria-label="Tabs">
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="tab-active"
+            data-testid="accounts-tab"
+          >
+            Accounts
+          </button>
+          <button
+            onClick={() => navigate('/security')}
+            className="tab-inactive"
+            data-testid="security-tab"
+          >
+            Security
+          </button>
+        </nav>
+      </div>
+
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-6">
@@ -404,7 +424,7 @@ function CustomerDashboard() {
             {accounts.length === 0 && (
               <button
                 onClick={createAccount}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                className="btn-primary btn-glow"
                 data-testid="create-account-button"
               >
                 Create Account
@@ -413,25 +433,29 @@ function CustomerDashboard() {
           </div>
 
           {loading ? (
-            <div className="text-center py-8">Loading...</div>
+            <div className="text-center py-8">
+              <div className="skeleton h-32 rounded-lg"></div>
+            </div>
           ) : accounts.length === 0 ? (
-            <div className="bg-white rounded-lg shadow p-8 text-center">
-              <p className="text-gray-600">No accounts yet. Create your first account to get started!</p>
+            <div className="card-blue-accent p-8 text-center animate-card">
+              <div className="circle-pattern">
+                <p className="text-gray-600">No accounts yet. Create your first account to get started!</p>
+              </div>
             </div>
           ) : (
             <div className="grid gap-6">
               {accounts.map((account) => (
-                <div key={account.id} className="bg-white rounded-lg shadow p-6">
+                <div key={account.id} className="balance-card p-6 hover-lift corner-accent animate-card">
                   <div className="flex justify-between items-start">
                     <div>
-                      <p className="text-sm text-gray-600">Account</p>
-                      <p className="text-lg font-semibold font-mono">{account.account_number}</p>
-                      <p className="text-sm text-gray-600 mt-2">IBAN</p>
-                      <p className="text-base font-mono">{account.iban}</p>
+                      <p className="text-sm text-gray-600 font-medium">Account</p>
+                      <p className="text-lg font-semibold font-mono mt-1">{account.account_number}</p>
+                      <p className="text-sm text-gray-600 font-medium mt-3">IBAN</p>
+                      <p className="text-base font-mono mt-1">{account.iban}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm text-gray-600">Balance</p>
-                      <p className="text-3xl font-bold" style={{ color: 'hsl(162, 85%, 27%)' }}>
+                      <p className="text-sm text-gray-600 font-medium">Balance</p>
+                      <p className="text-4xl font-bold balance-display mt-1">
                         {formatAmount(account.balance)}
                       </p>
                       <p className="text-xs text-gray-500 mt-1">{account.currency}</p>
@@ -439,7 +463,7 @@ function CustomerDashboard() {
                   </div>
                   <button
                     onClick={() => navigate(`/accounts/${account.id}/transactions`)}
-                    className="mt-4 text-sm text-blue-600 hover:text-blue-700"
+                    className="mt-6 text-sm text-blue-600 hover:text-blue-700 font-medium"
                     data-testid={`view-transactions-${account.id}`}
                   >
                     View Transactions →
