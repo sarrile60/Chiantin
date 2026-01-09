@@ -2,20 +2,27 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api';
 
-export function SupportTickets() {
+export function SupportTickets({ isAdmin = false }) {
   const [tickets, setTickets] = useState([]);
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [statusFilter, setStatusFilter] = useState('all');
 
   useEffect(() => {
     fetchTickets();
-  }, []);
+  }, [statusFilter]);
 
   const fetchTickets = async () => {
     try {
-      const response = await api.get('/tickets');
-      setTickets(response.data);
+      if (isAdmin) {
+        const params = statusFilter !== 'all' ? `?status=${statusFilter}` : '';
+        const response = await api.get(`/admin/tickets${params}`);
+        setTickets(response.data);
+      } else {
+        const response = await api.get('/tickets');
+        setTickets(response.data);
+      }
     } catch (err) {
       console.error('Failed to fetch tickets:', err);
     } finally {
@@ -28,6 +35,19 @@ export function SupportTickets() {
     fetchTickets();
   };
 
+  const updateTicketStatus = async (ticketId, newStatus) => {
+    try {
+      await api.patch(`/admin/tickets/${ticketId}/status`, { status: newStatus });
+      alert('Ticket status updated');
+      fetchTickets();
+      if (selectedTicket?.id === ticketId) {
+        setSelectedTicket(null);
+      }
+    } catch (err) {
+      alert('Failed to update status');
+    }
+  };
+
   if (loading) {
     return <div className="text-center py-8"><div className="skeleton h-32 rounded-lg"></div></div>;
   }
@@ -35,15 +55,44 @@ export function SupportTickets() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Support Tickets</h2>
-        <button
-          onClick={() => setShowCreateForm(true)}
-          className="btn-primary btn-glow"
-          data-testid="create-ticket-button"
-        >
-          Create New Ticket
-        </button>
+        <div>
+          <h2 className="text-2xl font-bold">Support Tickets</h2>
+          <p className="text-sm text-gray-600 mt-1">
+            {isAdmin ? 'Manage customer support requests' : 'Get help from our support team'}
+          </p>
+        </div>
+        {!isAdmin && (
+          <button
+            onClick={() => setShowCreateForm(true)}
+            className="btn-primary btn-glow"
+            data-testid="create-ticket-button"
+          >
+            Create New Ticket
+          </button>
+        )}
       </div>
+
+      {isAdmin && (
+        <div className="card-enhanced p-4">
+          <div className="flex items-center space-x-4">
+            <label className="text-sm font-medium text-gray-700">Filter by Status:</label>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="input-enhanced"
+              data-testid="admin-ticket-filter"
+            >
+              <option value="all">All Tickets</option>
+              <option value="OPEN">Open</option>
+              <option value="IN_PROGRESS">In Progress</option>
+              <option value="WAITING">Waiting</option>
+              <option value="RESOLVED">Resolved</option>
+              <option value="CLOSED">Closed</option>
+            </select>
+            <span className="text-sm text-gray-600">{tickets.length} ticket(s)</span>
+          </div>
+        </div>
+      )}
 
       {showCreateForm && (
         <CreateTicketForm
@@ -101,6 +150,7 @@ export function SupportTickets() {
               <TicketDetails
                 ticket={selectedTicket}
                 onUpdate={fetchTickets}
+                isAdmin={isAdmin}
               />
             ) : (
               <div className="card-blue-accent p-12 text-center">
@@ -202,7 +252,7 @@ function CreateTicketForm({ onClose, onSuccess }) {
   );
 }
 
-function TicketDetails({ ticket, onUpdate }) {
+function TicketDetails({ ticket, onUpdate, isAdmin = false }) {
   const [newMessage, setNewMessage] = useState('');
   const [sending, setSending] = useState(false);
 
@@ -221,6 +271,16 @@ function TicketDetails({ ticket, onUpdate }) {
     }
   };
 
+  const handleStatusChange = async (newStatus) => {
+    try {
+      await api.patch(`/admin/tickets/${ticket.id}/status`, { status: newStatus });
+      alert('Status updated successfully');
+      onUpdate();
+    } catch (err) {
+      alert('Failed to update status');
+    }
+  };
+
   return (
     <div className="card-enhanced space-y-4">
       {/* Header */}
@@ -231,8 +291,40 @@ function TicketDetails({ ticket, onUpdate }) {
             <p className="text-sm text-gray-600 mt-1">
               Created {new Date(ticket.created_at).toLocaleString()}
             </p>
+            {isAdmin && ticket.user_id && (
+              <p className="text-xs text-gray-500 mt-1">
+                Customer ID: {ticket.user_id}
+              </p>
+            )}
           </div>
-          <TicketStatusBadge status={ticket.status} />
+          <div className="text-right">
+            <TicketStatusBadge status={ticket.status} />
+            {isAdmin && (
+              <div className="mt-2 flex flex-col space-y-1">
+                <button
+                  onClick={() => handleStatusChange('IN_PROGRESS')}
+                  className="text-xs text-blue-600 hover:text-blue-700"
+                  data-testid="mark-in-progress"
+                >
+                  Mark In Progress
+                </button>
+                <button
+                  onClick={() => handleStatusChange('RESOLVED')}
+                  className="text-xs text-green-600 hover:text-green-700"
+                  data-testid="mark-resolved"
+                >
+                  Mark Resolved
+                </button>
+                <button
+                  onClick={() => handleStatusChange('CLOSED')}
+                  className="text-xs text-gray-600 hover:text-gray-700"
+                  data-testid="mark-closed"
+                >
+                  Close Ticket
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

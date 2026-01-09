@@ -1,22 +1,14 @@
 [
   {
-    "content": "Feature: Advanced admin controls & user search complete",
+    "content": "Feature: Admin controls, search & support tickets complete",
     "status": "completed"
   },
   {
-    "content": "Feature: Admin support ticket management tab",
+    "content": "Feature: Customer profile page",
     "status": "in_progress"
   },
   {
-    "content": "Feature: Customer profile page with edit capability",
-    "status": "pending"
-  },
-  {
-    "content": "Feature: Admin analytics dashboard",
-    "status": "pending"
-  },
-  {
-    "content": "Final testing: All new features",
+    "content": "Final: Comprehensive testing of all features",
     "status": "pending"
   }
 ]
