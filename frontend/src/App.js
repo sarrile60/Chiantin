@@ -11,6 +11,7 @@ import { EnhancedLedgerTools } from './components/AdminLedger';
 import { AuditLogViewer } from './components/AuditLogs';
 import { StatementDownload } from './components/Statements';
 import { SupportTickets } from './components/Support';
+import { NotificationBell } from './components/Notifications';
 
 // Auth Context
 const AuthContext = React.createContext(null);

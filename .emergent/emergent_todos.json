@@ -1,22 +1,22 @@
 [
   {
-    "content": "Design Enhancement: Light blue accents complete",
+    "content": "Design: Light blue accents complete",
     "status": "completed"
   },
   {
-    "content": "Feature: Support ticket system complete",
+    "content": "Feature: Support tickets complete",
     "status": "completed"
   },
   {
-    "content": "Feature: Notifications center",
+    "content": "Feature: Notifications center complete",
+    "status": "completed"
+  },
+  {
+    "content": "Feature: Advanced admin controls & user search",
     "status": "in_progress"
   },
   {
-    "content": "Feature: Advanced admin controls",
-    "status": "pending"
-  },
-  {
-    "content": "Testing: All enhanced features",
+    "content": "Final: Comprehensive testing",
     "status": "pending"
   }
 ]
