@@ -1,11 +1,11 @@
 [
   {
     "content": "Design Enhancement: Add light blue accents and visual elements",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Feature: Support ticket system (customer + admin)",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Feature: Notifications center",
