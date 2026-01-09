@@ -1,7 +1,7 @@
 // Security & Settings Components
 import React, { useState, useEffect } from 'react';
 import api from '../api';
-import QRCode from 'qrcode.react';
+import { QRCodeSVG } from 'qrcode.react';
 
 export function MFAEnrollment({ onComplete }) {
   const [step, setStep] = useState('setup'); // setup, verify, complete
@@ -71,7 +71,7 @@ export function MFAEnrollment({ onComplete }) {
       <div className="bg-white p-6 rounded-lg border text-center">
         {qrUri ? (
           <div className="inline-block p-4 bg-white">
-            <QRCode value={qrUri} size={200} data-testid="mfa-qr-code" />
+            <QRCodeSVG value={qrUri} size={200} data-testid="mfa-qr-code" />
           </div>
         ) : (
           <div className="h-[200px] flex items-center justify-center">
