@@ -3,6 +3,9 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
 import { P2PTransferForm } from './P2PTransfer';
+import { BeneficiaryManager } from './Beneficiaries';
+import { ScheduledPayments } from './ScheduledPayments';
+import { SpendingInsights } from './SpendingInsights';
 
 export function ProfessionalDashboard({ user, logout }) {
   const navigate = useNavigate();
@@ -239,7 +242,7 @@ export function ProfessionalDashboard({ user, logout }) {
           </div>
         </div>
 
-        {/* Right: Cards Widget + P2P Transfer */}
+        {/* Right: Transfers, Beneficiaries, Insights */}
         <div className="space-y-6">
           {/* P2P Transfer Form */}
           <div>
@@ -247,39 +250,24 @@ export function ProfessionalDashboard({ user, logout }) {
             <P2PTransferForm onSuccess={fetchDashboardData} />
           </div>
           
-          {/* Cards Widget */}
+          {/* Beneficiaries */}
           <div>
-            <div className="section-header">Cards</div>
-          <div className="card p-6">
-            <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg p-6 text-white mb-4" style={{ aspectRatio: '1.586' }}>
-              <div className="flex justify-between items-start mb-8">
-                <span className="text-xs font-medium">Project Atlas</span>
-                <span className="text-xs">Debit</span>
-              </div>
-              <div className="mb-4">
-                <p className="text-xs text-gray-400 mb-1">Card Number</p>
-                <p className="font-mono text-sm">•••• •••• •••• ••••</p>
-              </div>
-              <div className="flex justify-between items-end">
-                <div>
-                  <p className="text-xs text-gray-400 mb-1">Cardholder</p>
-                  <p className="text-sm font-medium">{user?.first_name} {user?.last_name}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-xs text-gray-400 mb-1">Expires</p>
-                  <p className="text-sm font-mono">••/••</p>
-                </div>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <button className="w-full py-2 text-sm font-medium text-gray-700 bg-gray-50 rounded-lg hover:bg-gray-100">View Card</button>
-              <button className="w-full py-2 text-sm font-medium text-gray-700 bg-gray-50 rounded-lg hover:bg-gray-100">Freeze Card</button>
-              <button className="w-full py-2 text-sm font-medium text-gray-700 bg-gray-50 rounded-lg hover:bg-gray-100">Manage Limits</button>
-            </div>
-            <p className="text-xs text-gray-500 text-center mt-4">Virtual cards coming soon</p>
+            <div className="section-header">Saved Recipients</div>
+            <BeneficiaryManager />
+          </div>
+          
+          {/* Scheduled Payments */}
+          <div>
+            <div className="section-header">Scheduled Payments</div>
+            <ScheduledPayments />
+          </div>
+          
+          {/* Spending Insights */}
+          <div>
+            <div className="section-header">Spending Insights</div>
+            <SpendingInsights />
           </div>
         </div>
-      </div>
       </div>
     </div>
   );
