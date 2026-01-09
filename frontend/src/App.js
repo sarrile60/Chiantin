@@ -816,6 +816,17 @@ function AdminDashboard() {
             KYC Review
           </button>
           <button
+            onClick={() => setActiveTab('support')}
+            className={`py-4 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'support'
+                ? 'border-blue-600 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+            }`}
+            data-testid="admin-support-tab"
+          >
+            Support Tickets
+          </button>
+          <button
             onClick={() => setActiveTab('audit')}
             className={`py-4 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'audit'
