@@ -7,6 +7,8 @@ import { SecuritySettings } from './components/Security';
 import { KYCApplication } from './components/KYC';
 import { AdminKYCReview } from './components/AdminKYC';
 import { TransactionsList } from './components/Transactions';
+import { EnhancedLedgerTools } from './components/AdminLedger';
+import { AuditLogViewer } from './components/AuditLogs';
 
 // Auth Context
 const AuthContext = React.createContext(null);
@@ -451,7 +453,7 @@ function CustomerDashboard() {
 // Admin Dashboard
 function AdminDashboard() {
   const { user, logout } = useAuth();
-  const [activeTab, setActiveTab] = useState('users'); // users, kyc
+  const [activeTab, setActiveTab] = useState('users'); // users, kyc, audit
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [loading, setLoading] = useState(true);
