@@ -21,11 +21,13 @@ from services.statement_service import StatementService
 from services.ticket_service import TicketService
 from services.notification_service import NotificationService
 from services.transfer_service import TransferService
+from services.advanced_service import AdvancedBankingService
 from schemas.users import UserCreate, UserLogin, TokenResponse, UserResponse, MFASetupResponse, MFAVerifyRequest
 from schemas.kyc import KYCSubmitRequest, KYCReviewRequest, DocumentType
 from schemas.banking import AccountResponse
 from schemas.tickets import TicketCreate, MessageCreate, TicketStatus
 from schemas.transfers import P2PTransferRequest
+from schemas.advanced import CreateBeneficiary, CreateScheduledPayment
 from providers import LocalS3Storage
 from pydantic import BaseModel
 from core.ledger import EntryDirection
@@ -902,6 +904,101 @@ async def create_p2p_transfer(
     )
     
     return result
+
+
+# ==================== BENEFICIARIES ====================
+
+@app.post("/api/v1/beneficiaries")
+async def add_beneficiary(
+    data: CreateBeneficiary,
+    current_user: dict = Depends(get_current_user),
+    db: AsyncIOMotorDatabase = Depends(get_database)
+):
+    """Add a beneficiary."""
+    ledger_engine = LedgerEngine(db)
+    advanced_service = AdvancedBankingService(db, ledger_engine)
+    beneficiary = await advanced_service.add_beneficiary(current_user["id"], data)
+    return beneficiary.model_dump()
+
+
+@app.get("/api/v1/beneficiaries")
+async def get_beneficiaries(
+    current_user: dict = Depends(get_current_user),
+    db: AsyncIOMotorDatabase = Depends(get_database)
+):
+    """Get user's beneficiaries."""
+    ledger_engine = LedgerEngine(db)
+    advanced_service = AdvancedBankingService(db, ledger_engine)
+    beneficiaries = await advanced_service.get_beneficiaries(current_user["id"])
+    return [b.model_dump() for b in beneficiaries]
+
+
+@app.delete("/api/v1/beneficiaries/{beneficiary_id}")
+async def delete_beneficiary(
+    beneficiary_id: str,
+    current_user: dict = Depends(get_current_user),
+    db: AsyncIOMotorDatabase = Depends(get_database)
+):
+    """Delete a beneficiary."""
+    ledger_engine = LedgerEngine(db)
+    advanced_service = AdvancedBankingService(db, ledger_engine)
+    success = await advanced_service.delete_beneficiary(beneficiary_id, current_user["id"])
+    return {"success": success}
+
+
+# ==================== SCHEDULED PAYMENTS ====================
+
+@app.post("/api/v1/scheduled-payments")
+async def create_scheduled_payment(
+    data: CreateScheduledPayment,
+    current_user: dict = Depends(get_current_user),
+    db: AsyncIOMotorDatabase = Depends(get_database)
+):
+    """Create a scheduled recurring payment."""
+    ledger_engine = LedgerEngine(db)
+    advanced_service = AdvancedBankingService(db, ledger_engine)
+    payment = await advanced_service.create_scheduled_payment(current_user["id"], data)
+    return payment.model_dump()
+
+
+@app.get("/api/v1/scheduled-payments")
+async def get_scheduled_payments(
+    current_user: dict = Depends(get_current_user),
+    db: AsyncIOMotorDatabase = Depends(get_database)
+):
+    """Get user's scheduled payments."""
+    ledger_engine = LedgerEngine(db)
+    advanced_service = AdvancedBankingService(db, ledger_engine)
+    payments = await advanced_service.get_scheduled_payments(current_user["id"])
+    return [p.model_dump() for p in payments]
+
+
+@app.delete("/api/v1/scheduled-payments/{payment_id}")
+async def cancel_scheduled_payment(
+    payment_id: str,
+    current_user: dict = Depends(get_current_user),
+    db: AsyncIOMotorDatabase = Depends(get_database)
+):
+    """Cancel a scheduled payment."""
+    ledger_engine = LedgerEngine(db)
+    advanced_service = AdvancedBankingService(db, ledger_engine)
+    success = await advanced_service.cancel_scheduled_payment(payment_id, current_user["id"])
+    return {"success": success}
+
+
+# ==================== SPENDING INSIGHTS ====================
+
+@app.get("/api/v1/insights/spending")
+async def get_spending_insights(
+    days: int = 30,
+    current_user: dict = Depends(get_current_user),
+    db: AsyncIOMotorDatabase = Depends(get_database)
+):
+    """Get spending breakdown by category."""
+    ledger_engine = LedgerEngine(db)
+    advanced_service = AdvancedBankingService(db, ledger_engine)
+    breakdown = await advanced_service.get_spending_by_category(current_user["id"], days)
+    return breakdown
 
 
 @app.get("/api/health")
