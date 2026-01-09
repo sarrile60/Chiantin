@@ -2,6 +2,118 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api';
 import { QRCodeSVG } from 'qrcode.react';
+import { useToast } from './Toast';
+
+// Password Change Modal Component (defined first)
+function PasswordChangeModal({ onClose }) {
+  const toast = useToast();
+  const [formData, setFormData] = useState({
+    current_password: '',
+    new_password: '',
+    confirm_password: ''
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    if (formData.new_password !== formData.confirm_password) {
+      setError('New passwords do not match');
+      return;
+    }
+
+    if (formData.new_password.length < 8) {
+      setError('Password must be at least 8 characters');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await api.post('/auth/change-password', {
+        current_password: formData.current_password,
+        new_password: formData.new_password
+      });
+      toast.success('Password changed! Please login again.');
+      setTimeout(() => {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+      }, 2000);
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Failed to change password');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg p-6 max-w-md w-full">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-semibold">Change Password</h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">✕</button>
+        </div>
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-800 rounded p-3 text-sm mb-4">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Current Password</label>
+            <input
+              type="password"
+              value={formData.current_password}
+              onChange={(e) => setFormData({...formData, current_password: e.target.value})}
+              required
+              className="input-field"
+              data-testid="current-password"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">New Password</label>
+            <input
+              type="password"
+              value={formData.new_password}
+              onChange={(e) => setFormData({...formData, new_password: e.target.value})}
+              required
+              className="input-field"
+              placeholder="Minimum 8 characters"
+              data-testid="new-password"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
+            <input
+              type="password"
+              value={formData.confirm_password}
+              onChange={(e) => setFormData({...formData, confirm_password: e.target.value})}
+              required
+              className="input-field"
+              data-testid="confirm-password"
+            />
+          </div>
+          <div className="flex space-x-3 pt-4">
+            <button type="button" onClick={onClose} className="flex-1 btn-secondary">
+              Cancel
+            </button>
+            <button type="submit" disabled={loading} className="flex-1 btn-primary" data-testid="submit-password-change">
+              {loading ? 'Changing...' : 'Change Password'}
+            </button>
+          </div>
+        </form>
+
+        <p className="text-xs text-gray-500 mt-4">
+          Note: Changing your password will log you out from all devices for security.
+        </p>
+      </div>
+    </div>
+  );
+}
 
 export function MFAEnrollment({ onComplete }) {
   const [step, setStep] = useState('setup'); // setup, verify, complete
@@ -211,6 +323,7 @@ export function DeviceManagement() {
 export function SecuritySettings({ user }) {
   const [showMFASetup, setShowMFASetup] = useState(false);
   const [showDevices, setShowDevices] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
 
   return (
     <div className="space-y-6">
@@ -289,13 +402,16 @@ export function SecuritySettings({ user }) {
           Change your password regularly to keep your account secure
         </p>
         <button
-          onClick={() => alert('Password change flow to be implemented')}
+          onClick={() => setShowPasswordModal(true)}
           className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
           data-testid="change-password-button"
         >
           Change Password
         </button>
       </div>
+
+      {/* Change Password Modal */}
+      {showPasswordModal && <PasswordChangeModal onClose={() => setShowPasswordModal(false)} />}
 
       {/* Security Activity */}
       <div className="bg-white rounded-lg shadow p-6">

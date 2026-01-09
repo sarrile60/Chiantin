@@ -280,13 +280,22 @@ export function ProfessionalDashboard({ user, logout }) {
 
               {/* Quick Actions */}
               <div className="space-y-2">
-                <button className="w-full py-2.5 text-sm font-medium text-gray-700 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                <button 
+                  onClick={() => navigate('/cards')}
+                  className="w-full py-2.5 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition"
+                >
                   View Card Details
                 </button>
-                <button className="w-full py-2.5 text-sm font-medium text-gray-700 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                <button 
+                  onClick={() => navigate('/cards')}
+                  className="w-full py-2.5 text-sm font-medium text-gray-700 bg-gray-50 rounded-lg hover:bg-gray-100 transition"
+                >
                   Freeze Card
                 </button>
-                <button className="w-full py-2.5 text-sm font-medium text-gray-700 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                <button 
+                  onClick={() => navigate('/cards')}
+                  className="w-full py-2.5 text-sm font-medium text-gray-700 bg-gray-50 rounded-lg hover:bg-gray-100 transition"
+                >
                   Manage Limits
                 </button>
               </div>

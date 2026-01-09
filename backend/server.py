@@ -29,8 +29,9 @@ from schemas.tickets import TicketCreate, MessageCreate, TicketStatus
 from schemas.transfers import P2PTransferRequest
 from schemas.advanced import CreateBeneficiary, CreateScheduledPayment
 from providers import LocalS3Storage
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from core.ledger import EntryDirection
+from core.auth import hash_password, verify_password
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -250,6 +251,56 @@ async def enable_mfa(
     auth_service = AuthService(db)
     await auth_service.enable_mfa(current_user["id"], data.token)
     return {"success": True, "message": "MFA enabled successfully"}
+
+
+class PasswordChangeRequest(BaseModel):
+    current_password: str
+    new_password: str
+
+
+@app.post("/api/v1/auth/change-password")
+async def change_password(
+    data: PasswordChangeRequest,
+    current_user: dict = Depends(get_current_user),
+    db: AsyncIOMotorDatabase = Depends(get_database)
+):
+    """Change user password."""
+    from bson import ObjectId
+    from bson.errors import InvalidId
+    
+    # Get user
+    user_doc = await db.users.find_one({"_id": current_user["id"]})
+    if not user_doc:
+        try:
+            user_doc = await db.users.find_one({"_id": ObjectId(current_user["id"])})
+        except InvalidId:
+            pass
+    
+    if not user_doc:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Verify current password
+    if not verify_password(data.current_password, user_doc["password_hash"]):
+        raise HTTPException(status_code=400, detail="Current password is incorrect")
+    
+    # Validate new password
+    if len(data.new_password) < 8:
+        raise HTTPException(status_code=400, detail="New password must be at least 8 characters")
+    
+    # Hash and update
+    new_hash = hash_password(data.new_password)
+    await db.users.update_one(
+        {"_id": user_doc["_id"]},
+        {"$set": {"password_hash": new_hash, "updated_at": datetime.utcnow()}}
+    )
+    
+    # Revoke all sessions for security
+    await db.sessions.update_many(
+        {"user_id": str(user_doc["_id"]), "revoked": False},
+        {"$set": {"revoked": True}}
+    )
+    
+    return {"success": True, "message": "Password changed successfully. Please login again."}
 
 
 # ==================== KYC ====================
