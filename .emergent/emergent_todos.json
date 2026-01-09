@@ -1,22 +1,18 @@
 [
   {
-    "content": "BUG FIX: JSX compilation error fixed",
+    "content": "CRITICAL FIX: App.js corrupted code removed (277 lines deleted)",
     "status": "completed"
   },
   {
-    "content": "FEATURE: Add transaction categorization",
+    "content": "FEATURE: Transaction categorization + spending insights",
     "status": "in_progress"
   },
   {
-    "content": "FEATURE: Add scheduled payments",
+    "content": "FEATURE: Scheduled payments",
     "status": "pending"
   },
   {
-    "content": "FEATURE: Add spending insights with charts",
-    "status": "pending"
-  },
-  {
-    "content": "FEATURE: Add beneficiary management",
+    "content": "FEATURE: Beneficiary management",
     "status": "pending"
   },
   {
