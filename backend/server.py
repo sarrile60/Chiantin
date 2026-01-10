@@ -22,6 +22,7 @@ from services.ticket_service import TicketService
 from services.notification_service import NotificationService
 from services.transfer_service import TransferService
 from services.advanced_service import AdvancedBankingService
+from services.email_service import EmailService
 from schemas.users import UserCreate, UserLogin, TokenResponse, UserResponse, MFASetupResponse, MFAVerifyRequest
 from schemas.kyc import KYCSubmitRequest, KYCReviewRequest, DocumentType
 from schemas.banking import AccountResponse
@@ -32,6 +33,7 @@ from providers import LocalS3Storage
 from pydantic import BaseModel, Field
 from core.ledger import EntryDirection
 from core.auth import hash_password, verify_password
+from bson import ObjectId
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -820,6 +822,71 @@ async def revoke_all_sessions(
     )
     
     return {"success": True, "revoked_count": result.modified_count}
+
+
+@app.post("/api/v1/admin/users/{user_id}/reset-password")
+async def admin_reset_password(
+    user_id: str,
+    current_user: dict = Depends(require_admin),
+    db: AsyncIOMotorDatabase = Depends(get_database)
+):
+    """Force password reset for a user (admin) - generates temp password."""
+    from bson import ObjectId
+    from bson.errors import InvalidId
+    
+    # Find user
+    user_doc = await db.users.find_one({"_id": user_id})
+    if not user_doc:
+        try:
+            user_doc = await db.users.find_one({"_id": ObjectId(user_id)})
+        except InvalidId:
+            pass
+    
+    if not user_doc:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Generate temporary password
+    email_service = EmailService()
+    temp_password = email_service.generate_temp_password()
+    
+    # Hash and update
+    new_hash = hash_password(temp_password)
+    await db.users.update_one(
+        {"_id": user_doc["_id"]},
+        {"$set": {"password_hash": new_hash, "updated_at": datetime.utcnow()}}
+    )
+    
+    # Revoke all sessions
+    await db.sessions.update_many(
+        {"user_id": str(user_doc["_id"]), "revoked": False},
+        {"$set": {"revoked": True}}
+    )
+    
+    # Send email (mock)
+    email_service.send_password_reset(
+        to_email=user_doc["email"],
+        reset_token="N/A",
+        temp_password=temp_password
+    )
+    
+    # Create audit log
+    await db.audit_logs.insert_one({
+        "_id": str(ObjectId()),
+        "performed_by": current_user["id"],
+        "performed_by_role": current_user["role"],
+        "performed_by_email": current_user["email"],
+        "action": "PASSWORD_RESET_FORCED",
+        "entity_type": "user",
+        "entity_id": str(user_doc["_id"]),
+        "description": f"Admin forced password reset for {user_doc['email']}",
+        "created_at": datetime.utcnow()
+    })
+    
+    return {
+        "success": True,
+        "temp_password": temp_password,
+        "message": f"Password reset. Temp password: {temp_password} (also sent to {user_doc['email']})"
+    }
 
 
 @app.get("/api/v1/admin/audit-logs")

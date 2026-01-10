@@ -1,8 +1,10 @@
 // Enhanced Admin Ledger Tools
 import React, { useState } from 'react';
 import api from '../api';
+import { useToast } from './Toast';
 
 export function EnhancedLedgerTools({ account, onSuccess }) {
+  const toast = useToast();
   const [activeOperation, setActiveOperation] = useState(null);
   const [formData, setFormData] = useState({
     amount: '',
@@ -27,12 +29,12 @@ export function EnhancedLedgerTools({ account, onSuccess }) {
         amount: parseInt(formData.amount),
         reason: formData.reason
       });
-      alert('Top-up successful!');
+      toast.success(`€${(parseInt(formData.amount) / 100).toFixed(2)} added to account`);
       setFormData({ amount: '', reason: '', toAccountId: '' });
       setActiveOperation(null);
       onSuccess && onSuccess();
     } catch (err) {
-      setError(err.response?.data?.detail || 'Top-up failed');
+      toast.error(err.response?.data?.detail || 'Top-up failed');
     } finally {
       setLoading(false);
     }
@@ -53,12 +55,12 @@ export function EnhancedLedgerTools({ account, onSuccess }) {
         amount: parseInt(formData.amount),
         reason: formData.reason
       });
-      alert('Withdrawal successful!');
+      toast.success(`€${(parseInt(formData.amount) / 100).toFixed(2)} withdrawn from account`);
       setFormData({ amount: '', reason: '', toAccountId: '' });
       setActiveOperation(null);
       onSuccess && onSuccess();
     } catch (err) {
-      setError(err.response?.data?.detail || 'Withdrawal failed');
+      toast.error(err.response?.data?.detail || 'Withdrawal failed');
     } finally {
       setLoading(false);
     }
@@ -79,12 +81,12 @@ export function EnhancedLedgerTools({ account, onSuccess }) {
         amount: parseInt(formData.amount),
         reason: formData.reason
       });
-      alert('Fee charged successfully!');
+      toast.success(`€${(parseInt(formData.amount) / 100).toFixed(2)} fee charged`);
       setFormData({ amount: '', reason: '', toAccountId: '' });
       setActiveOperation(null);
       onSuccess && onSuccess();
     } catch (err) {
-      setError(err.response?.data?.detail || 'Fee charge failed');
+      toast.error(err.response?.data?.detail || 'Fee charge failed');
     } finally {
       setLoading(false);
     }
@@ -106,12 +108,12 @@ export function EnhancedLedgerTools({ account, onSuccess }) {
         amount: parseInt(formData.amount),
         reason: formData.reason
       });
-      alert('Transfer successful!');
+      toast.success('Transfer successful!');
       setFormData({ amount: '', reason: '', toAccountId: '' });
       setActiveOperation(null);
       onSuccess && onSuccess();
     } catch (err) {
-      setError(err.response?.data?.detail || 'Transfer failed');
+      toast.error(err.response?.data?.detail || 'Transfer failed');
     } finally {
       setLoading(false);
     }
@@ -268,10 +270,10 @@ export function TransactionReversal({ transaction, onSuccess }) {
         transaction_id: transaction.id,
         reason
       });
-      alert('Transaction reversed successfully!');
+      toast.success('Transaction reversed successfully!');
       onSuccess && onSuccess();
     } catch (err) {
-      setError(err.response?.data?.detail || 'Reversal failed');
+      toast.error(err.response?.data?.detail || 'Reversal failed');
     } finally {
       setLoading(false);
     }
