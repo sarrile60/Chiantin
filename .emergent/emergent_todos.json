@@ -1,10 +1,22 @@
 [
   {
-    "content": "FEATURE: Beneficiaries, Scheduled Payments, Spending Insights - Backend + UI COMPLETE",
-    "status": "completed"
+    "content": "FIX: Wire admin ledger tools properly (top-up, withdraw visible and working)",
+    "status": "in_progress"
   },
   {
-    "content": "FINAL: Run comprehensive end-to-end testing of ALL features",
-    "status": "in_progress"
+    "content": "ADD: Admin force password reset for users",
+    "status": "pending"
+  },
+  {
+    "content": "ADD: Email-based 2FA / Email verification",
+    "status": "pending"
+  },
+  {
+    "content": "FIX: Ensure all admin controls are visible in UI",
+    "status": "pending"
+  },
+  {
+    "content": "TEST: Verify all admin → user operations work",
+    "status": "pending"
   }
 ]
