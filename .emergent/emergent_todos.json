@@ -1,26 +1,10 @@
 [
   {
-    "content": "PHASE 2: Banking workflows service created",
+    "content": "PHASE 2: APIs complete",
     "status": "completed"
   },
   {
-    "content": "PHASE 2: Add all API endpoints to server.py",
+    "content": "PHASE 3: Admin UI complete workflows",
     "status": "in_progress"
-  },
-  {
-    "content": "PHASE 2: Test endpoints and create API contract",
-    "status": "pending"
-  },
-  {
-    "content": "PHASE 3: Admin UI - Accounts, Transfers, Cards",
-    "status": "pending"
-  },
-  {
-    "content": "PHASE 4: User UI - Cards modal, Transfers modal",
-    "status": "pending"
-  },
-  {
-    "content": "PHASE 5: Final acceptance tests",
-    "status": "pending"
   }
 ]
