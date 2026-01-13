@@ -23,6 +23,9 @@ import { AdminSettings } from './components/AdminSettings';
 import { TransfersPage } from './components/TransfersPage';
 import { SpendingInsights } from './components/SpendingInsights';
 import { CardsPage } from './components/CardsPage';
+import { AdminCardRequestsQueue } from './components/AdminCardRequestsQueue';
+import { AdminTransfersQueue } from './components/AdminTransfersQueue';
+import { AdminAccountsControl } from './components/AdminAccountsControl';
 
 // Auth Context
 const AuthContext = React.createContext(null);
