@@ -981,6 +981,23 @@ class APITester:
             self.test_get_notifications()
         print()
         
+        # Card Requests & Transfers (NEW)
+        print("--- Card Requests & Transfers ---")
+        if self.customer_token and self.customer_accounts:
+            self.test_create_card_request()
+            self.test_get_card_requests()
+            self.test_get_cards()
+            self.test_create_transfer()
+            self.test_get_transfers()
+        print()
+        
+        # Admin Card Requests & Transfers (NEW)
+        print("--- Admin Card Requests & Transfers ---")
+        if self.admin_token:
+            self.test_admin_get_card_requests()
+            self.test_admin_get_transfers()
+        print()
+        
         # Summary
         print("="*60)
         print("TEST SUMMARY")
