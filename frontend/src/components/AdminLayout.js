@@ -10,8 +10,8 @@ export function AdminSidebar({ activeSection, onSectionChange, user, logout }) {
     { id: 'users', label: 'Users', icon: 'users' },
     { id: 'kyc', label: 'KYC Queue', icon: 'clipboard' },
     { id: 'accounts', label: 'Accounts', icon: 'credit-card' },
-    { id: 'ledger', label: 'Ledger Tools', icon: 'tool' },
-    { id: 'transactions', label: 'Transactions', icon: 'repeat' },
+    { id: 'card_requests', label: 'Card Requests', icon: 'credit-card' },
+    { id: 'ledger', label: 'Transfers Queue', icon: 'repeat' },
     { id: 'support', label: 'Support Tickets', icon: 'message' },
     { id: 'audit', label: 'Audit Logs', icon: 'file-text' },
     { id: 'settings', label: 'Settings', icon: 'settings' }

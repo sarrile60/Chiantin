@@ -1,10 +1,34 @@
 [
   {
-    "content": "PHASE 2: APIs complete",
-    "status": "completed"
+    "content": "FIX 1: Update CardsPage to table layout with Order Card button",
+    "status": "in_progress"
   },
   {
-    "content": "PHASE 3: Admin UI complete workflows",
-    "status": "in_progress"
+    "content": "FIX 2: Wire CardOrderingModal to CardsPage",
+    "status": "pending"
+  },
+  {
+    "content": "FIX 3: Wire NewTransferModal to TransfersPage",
+    "status": "pending"
+  },
+  {
+    "content": "FIX 4: Add AdminCardRequestsQueue to admin sidebar",
+    "status": "pending"
+  },
+  {
+    "content": "FIX 5: Add AdminTransfersQueue to admin sidebar",
+    "status": "pending"
+  },
+  {
+    "content": "FIX 6: Fix notifications endpoint",
+    "status": "pending"
+  },
+  {
+    "content": "FIX 7: Add rejected transfer red display",
+    "status": "pending"
+  },
+  {
+    "content": "TEST: Complete end-to-end testing",
+    "status": "pending"
   }
 ]
