@@ -1015,6 +1015,7 @@ class APITester:
             self.test_admin_get_users()
             if self.admin_users:
                 self.test_admin_get_user_details()
+                self.test_admin_update_user_status()  # BUG FIX TEST
         print()
         
         # Admin KYC
