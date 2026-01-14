@@ -50,9 +50,15 @@ class BankingWorkflowsService:
             requests.append(CardRequest(**serialize_doc(doc)))
         return requests
     
-    async def get_pending_card_requests(self) -> List[CardRequest]:
-        """Admin: Get all pending card requests."""
-        cursor = self.db.card_requests.find({"status": "PENDING"}).sort("created_at", 1)
+    async def get_pending_card_requests(self, status_filter: str = None) -> List[CardRequest]:
+        """Admin: Get card requests by status."""
+        query = {}
+        if status_filter:
+            query["status"] = status_filter
+        else:
+            query["status"] = "PENDING"  # Default to PENDING if no filter
+        
+        cursor = self.db.card_requests.find(query).sort("created_at", 1)
         requests = []
         async for doc in cursor:
             requests.append(CardRequest(**serialize_doc(doc)))
@@ -95,7 +101,7 @@ class BankingWorkflowsService:
         card_dict = card.model_dump(by_alias=True)
         await self.db.cards.insert_one(card_dict)
         
-        # Update request
+        # Update request status to FULFILLED
         await self.db.card_requests.update_one(
             {"_id": request_id},
             {"$set": {

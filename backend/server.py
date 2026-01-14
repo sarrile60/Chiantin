@@ -10,6 +10,7 @@ from typing import Optional, List
 from io import BytesIO
 import jwt
 import logging
+import uuid
 
 from config import settings
 from database import connect_db, disconnect_db, get_database
@@ -780,7 +781,7 @@ async def update_user_status(
     from bson import ObjectId
     from bson.errors import InvalidId
     
-    # Find user
+    # Find user (handle both string and ObjectId)
     user_doc = await db.users.find_one({"_id": user_id})
     if not user_doc:
         try:
@@ -792,12 +793,12 @@ async def update_user_status(
         raise HTTPException(status_code=404, detail="User not found")
     
     # Update status
-    await db.users.update_one(
+    result = await db.users.update_one(
         {"_id": user_doc["_id"]},
         {"$set": {"status": data.status, "updated_at": datetime.utcnow()}}
     )
     
-    return {"success": True, "message": f"User status updated to {data.status}"}
+    return {"success": True, "message": f"User status updated to {data.status}", "modified_count": result.modified_count}
 
 
 @app.post("/api/v1/admin/users/{user_id}/revoke-sessions")
@@ -1307,13 +1308,13 @@ async def get_transfer_detail(
 
 @app.get("/api/v1/admin/card-requests")
 async def admin_get_card_requests(
-    status: str = "PENDING",
+    status: str = None,
     current_user: dict = Depends(require_admin),
     db: AsyncIOMotorDatabase = Depends(get_database)
 ):
-    """Admin: Get card requests."""
+    """Admin: Get card requests filtered by status."""
     workflows = BankingWorkflowsService(db)
-    requests = await workflows.get_pending_card_requests()
+    requests = await workflows.get_pending_card_requests(status)
     return {"ok": True, "data": [r.model_dump() for r in requests]}
 
 

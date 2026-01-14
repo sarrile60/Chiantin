@@ -13,7 +13,9 @@ export function AdminKYCReview() {
   const [reviewData, setReviewData] = useState({
     status: '',
     review_notes: '',
-    rejection_reason: ''
+    rejection_reason: '',
+    assigned_iban: '',
+    assigned_bic: ''
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -56,7 +58,7 @@ export function AdminKYCReview() {
       await api.post(`/admin/kyc/${selectedApp.id}/review`, reviewData);
       toast.success('KYC review submitted successfully');
       setSelectedApp(null);
-      setReviewData({ status: '', review_notes: '', rejection_reason: '' });
+      setReviewData({ status: '', review_notes: '', rejection_reason: '', assigned_iban: '', assigned_bic: '' });
       fetchApplications();
     } catch (err) {
       toast.error(err.response?.data?.detail || 'Failed to submit review');
@@ -215,6 +217,21 @@ export function AdminKYCReview() {
                   <p className="text-xs text-gray-500 mt-1">Enter the IBAN to assign to this user</p>
                 </div>
 
+                {/* BIC/SWIFT Assignment Field - REQUIRED */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Assign BIC/SWIFT * (Required for Approval)
+                  </label>
+                  <input
+                    type="text"
+                    value={reviewData.assigned_bic || ''}
+                    onChange={(e) => setReviewData({ ...reviewData, assigned_bic: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    placeholder="e.g., ATLASLT21XXX"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Enter the BIC/SWIFT code (required)</p>
+                </div>
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Decision *
@@ -290,7 +307,7 @@ export function AdminKYCReview() {
                   <button
                     onClick={() => {
                       setSelectedApp(null);
-                      setReviewData({ status: '', review_notes: '', rejection_reason: '' });
+                      setReviewData({ status: '', review_notes: '', rejection_reason: '', assigned_iban: '', assigned_bic: '' });
                     }}
                     className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
                   >

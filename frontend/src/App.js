@@ -24,6 +24,7 @@ import { TransfersPage } from './components/TransfersPage';
 import { SpendingInsights } from './components/SpendingInsights';
 import { CardsPage } from './components/CardsPage';
 import { AdminCardRequestsQueue } from './components/AdminCardRequestsQueue';
+import { KYCReviewPage } from './components/KYCReviewPage';
 import { AdminTransfersQueue } from './components/AdminTransfersQueue';
 import { AdminAccountsControl } from './components/AdminAccountsControl';
 
@@ -413,20 +414,43 @@ function TransactionsPage() {
           <div className="text-center">Loading...</div>
         ) : account ? (
           <div className="space-y-6">
-            {/* Account Summary */}
-            <div className="bg-white rounded-lg shadow p-6">
+            {/* Account Summary - Professional */}
+            <div className="card p-6">
               <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-sm text-gray-600">Account</p>
-                  <p className="text-lg font-semibold font-mono">{account.account_number}</p>
-                  <p className="text-sm text-gray-600 mt-2">IBAN</p>
-                  <p className="font-mono">{account.iban}</p>
+                <div className="flex-1">
+                  <p className="text-sm text-gray-600 mb-1">Account</p>
+                  <h2 className="text-xl font-semibold text-gray-900 mb-3">Atlas EUR Current Account</h2>
+                  {account.iban && (
+                    <div className="space-y-1">
+                      <div className="flex items-center space-x-2">
+                        <p className="text-sm text-gray-700">IBAN:</p>
+                        <p className="font-mono text-sm text-gray-900">{account.iban.match(/.{1,4}/g)?.join(' ')}</p>
+                        <button
+                          onClick={() => {
+                            navigator.clipboard.writeText(account.iban);
+                            alert('IBAN copied!');
+                          }}
+                          className="text-gray-400 hover:text-red-600 transition"
+                          title="Copy IBAN"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                          </svg>
+                        </button>
+                      </div>
+                      {account.bic && (
+                        <p className="text-sm text-gray-700">BIC: {account.bic}</p>
+                      )}
+                      <details className="mt-2">
+                        <summary className="text-xs text-gray-500 cursor-pointer hover:text-gray-700">Account reference (for support)</summary>
+                        <p className="text-xs text-gray-500 mt-1 font-mono">{account.account_number}</p>
+                      </details>
+                    </div>
+                  )}
                 </div>
                 <div className="text-right">
                   <p className="text-sm text-gray-600">Current Balance</p>
-                  <p className="text-3xl font-bold" style={{ color: 'hsl(162, 85%, 27%)' }}>
-                    {formatAmount(account.balance)}
-                  </p>
+                  <p className="text-3xl font-bold text-gray-900">{formatAmount(account.balance)}</p>
                 </div>
               </div>
             </div>
@@ -735,6 +759,19 @@ function AdminDashboard() {
           <div className="space-y-6">
             {selectedUser ? (
               <div className="space-y-6">
+                {/* Back Button */}
+                <div className="mb-4">
+                  <button
+                    onClick={() => setSelectedUser(null)}
+                    className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    <span className="font-medium">Back to Users</span>
+                  </button>
+                </div>
+
                 <div className="card p-6">
                   <div className="flex justify-between items-start mb-4">
                     <h2 className="text-lg font-semibold">User Details</h2>

@@ -49,8 +49,9 @@ export function AdminAccountsControl() {
     }
 
     try {
+      const amountInCents = Math.round(parseFloat(formData.amount) * 100);
       const endpoint = operation === 'topup' ? 'topup' : 'withdraw';
-      await api.post(`/admin/accounts/${selectedAccount.id}/${endpoint}?amount=${formData.amount}&reason=${encodeURIComponent(formData.reason)}`);
+      await api.post(`/admin/accounts/${selectedAccount.id}/${endpoint}?amount=${amountInCents}&reason=${encodeURIComponent(formData.reason)}`);
       toast.success(`${operation === 'topup' ? 'Top-up' : 'Withdrawal'} successful!`);
       setShowModal(false);
       setFormData({ amount: '', reason: '' });
@@ -103,14 +104,20 @@ export function AdminAccountsControl() {
           <div className="bg-white rounded-lg p-6 max-w-md w-full">
             <h3 className="text-lg font-semibold mb-4">{operation === 'topup' ? 'Top Up Account' : 'Withdraw from Account'}</h3>
             <div className="mb-4">
-              <p className="text-sm text-gray-600">Account: {selectedAccount.account_number}</p>
+              <p className="text-sm text-gray-600">Account: {selectedAccount.iban || selectedAccount.account_number}</p>
               <p className="text-sm text-gray-600">Current: €{(selectedAccount.balance / 100).toFixed(2)}</p>
             </div>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-2">Amount (cents)</label>
-                <input type="number" value={formData.amount} onChange={(e) => setFormData({...formData, amount: e.target.value})} className="input-field" placeholder="10000" />
-                {formData.amount && <p className="text-xs text-gray-500 mt-1">€{(parseInt(formData.amount)/100).toFixed(2)}</p>}
+                <label className="block text-sm font-medium mb-2">Amount (€)</label>
+                <input 
+                  type="number" 
+                  step="0.01"
+                  value={formData.amount} 
+                  onChange={(e) => setFormData({...formData, amount: e.target.value})} 
+                  className="input-field" 
+                  placeholder="100.00" 
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-2">Reason</label>

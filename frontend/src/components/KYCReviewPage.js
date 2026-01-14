@@ -3,9 +3,12 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { NotificationBell } from './Notifications';
 import { APP_NAME } from '../config';
+import { useToast } from './Toast';
+import api from '../api';
 
 export function KYCReviewPage({ user, logout }) {
   const navigate = useNavigate();
+  const toast = useToast();
 
   return (
     <div className="min-h-screen bg-white">
@@ -63,7 +66,24 @@ export function KYCReviewPage({ user, logout }) {
             </ul>
           </div>
 
-          <button onClick={() => window.location.reload()} className="btn-secondary">
+          <button 
+            onClick={async () => {
+              try {
+                const response = await api.get('/kyc/application');
+                const status = response.data?.status;
+                
+                if (status === 'APPROVED') {
+                  // Refresh the page to go to dashboard
+                  window.location.href = '/dashboard';
+                } else {
+                  toast.info(`KYC status: ${status}`);
+                }
+              } catch (err) {
+                toast.error('Failed to check status');
+              }
+            }}
+            className="btn-secondary"
+          >
             Check Status
           </button>
         </div>
@@ -71,3 +91,4 @@ export function KYCReviewPage({ user, logout }) {
     </div>
   );
 }
+

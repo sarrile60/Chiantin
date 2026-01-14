@@ -9,6 +9,7 @@ export function AdminCardRequestsQueue() {
   const [requests, setRequests] = useState([]);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [usersMap, setUsersMap] = useState({});
   const [fulfillData, setFulfillData] = useState({
     cardholder_name: '',
     pan: '',
@@ -22,14 +23,37 @@ export function AdminCardRequestsQueue() {
   });
 
   useEffect(() => {
+    setSelectedRequest(null); // Clear selection when tab changes
     fetchRequests();
   }, [activeTab]);
 
   const fetchRequests = async () => {
     setLoading(true);
     try {
-      const response = await api.get('/admin/card-requests');
-      setRequests(response.data.data.filter(r => r.status === activeTab));
+      const response = await api.get(`/admin/card-requests?status=${activeTab}`);
+      console.log('Card requests response:', response.data);
+      const reqs = response.data.data || [];
+      console.log(`${activeTab} requests:`, reqs);
+      setRequests(reqs);
+      
+      // Fetch user names for all requests
+      const userIds = [...new Set(reqs.map(r => r.user_id))];
+      const usersData = {};
+      
+      for (const userId of userIds) {
+        try {
+          const userRes = await api.get(`/admin/users/${userId}`);
+          if (userRes.data && userRes.data.user) {
+            usersData[userId] = `${userRes.data.user.first_name} ${userRes.data.user.last_name}`;
+          } else {
+            usersData[userId] = userId.substring(0, 8);
+          }
+        } catch {
+          usersData[userId] = userId.substring(0, 8);
+        }
+      }
+      
+      setUsersMap(usersData);
     } catch (err) {
       toast.error('Failed to load requests');
     } finally {
@@ -42,6 +66,17 @@ export function AdminCardRequestsQueue() {
       await api.post(`/admin/card-requests/${selectedRequest.id}/fulfill`, fulfillData);
       toast.success('Card fulfilled!');
       setSelectedRequest(null);
+      setFulfillData({
+        cardholder_name: '',
+        pan: '',
+        exp_month: '',
+        exp_year: '',
+        cvv: '',
+        billing_address_line1: '',
+        city: '',
+        postal_code: '',
+        country: 'Germany'
+      });
       fetchRequests();
     } catch (err) {
       toast.error('Failed to fulfill');
@@ -95,6 +130,38 @@ export function AdminCardRequestsQueue() {
             </div>
           </div>
         </div>
+      ) : selectedRequest && activeTab === 'FULFILLED' ? (
+        <div className="card p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-semibold">Fulfilled Card Details</h3>
+            <button onClick={() => setSelectedRequest(null)} className="text-gray-600 hover:text-gray-900">×</button>
+          </div>
+          <div className="space-y-3">
+            <div><span className="text-sm text-gray-600">Request ID:</span> <span className="text-sm font-mono">{selectedRequest.id}</span></div>
+            <div><span className="text-sm text-gray-600">User:</span> <span className="text-sm font-medium">{usersMap[selectedRequest.user_id] || selectedRequest.user_id}</span></div>
+            <div><span className="text-sm text-gray-600">Card Type:</span> <span className="text-sm">{selectedRequest.card_type.replace('_', ' ')}</span></div>
+            <div><span className="text-sm text-gray-600">Status:</span> <span className="badge bg-green-100 text-green-800 border border-green-200">FULFILLED</span></div>
+            <div><span className="text-sm text-gray-600">Fulfilled At:</span> <span className="text-sm">{selectedRequest.decided_at ? new Date(selectedRequest.decided_at).toLocaleString() : 'N/A'}</span></div>
+            <div><span className="text-sm text-gray-600">Fulfilled By:</span> <span className="text-sm">{selectedRequest.decided_by_admin_id || 'N/A'}</span></div>
+          </div>
+          <button onClick={() => setSelectedRequest(null)} className="w-full btn-secondary mt-4">Close</button>
+        </div>
+      ) : selectedRequest && activeTab === 'REJECTED' ? (
+        <div className="card p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-semibold">Rejected Card Request</h3>
+            <button onClick={() => setSelectedRequest(null)} className="text-gray-600 hover:text-gray-900">×</button>
+          </div>
+          <div className="space-y-3">
+            <div><span className="text-sm text-gray-600">Request ID:</span> <span className="text-sm font-mono">{selectedRequest.id}</span></div>
+            <div><span className="text-sm text-gray-600">User:</span> <span className="text-sm font-medium">{usersMap[selectedRequest.user_id] || selectedRequest.user_id}</span></div>
+            <div><span className="text-sm text-gray-600">Card Type:</span> <span className="text-sm">{selectedRequest.card_type.replace('_', ' ')}</span></div>
+            <div><span className="text-sm text-gray-600">Status:</span> <span className="badge bg-red-100 text-red-800 border border-red-200">REJECTED</span></div>
+            <div><span className="text-sm text-gray-600">Rejected At:</span> <span className="text-sm">{selectedRequest.decided_at ? new Date(selectedRequest.decided_at).toLocaleString() : 'N/A'}</span></div>
+            <div><span className="text-sm text-gray-600">Reject Reason:</span> <span className="text-sm text-red-600">{selectedRequest.reject_reason || 'N/A'}</span></div>
+          </div>
+          <button onClick={() => setSelectedRequest(null)} className="w-full btn-secondary mt-4">Close</button>
+        </div>
       ) : (
         <div className="table-wrapper">
           <table className="table-main">
@@ -103,12 +170,19 @@ export function AdminCardRequestsQueue() {
             </thead>
             <tbody>
               {requests.map(r => (
-                <tr key={r.id} className="cursor-pointer hover:bg-gray-50" onClick={() => activeTab === 'PENDING' && setSelectedRequest(r)}>
-                  <td className="text-xs">{new Date(r.created_at).toLocaleDateString()}</td>
-                  <td>{r.user_id}</td>
+                <tr key={r.id} className="cursor-pointer hover:bg-gray-50" onClick={() => setSelectedRequest(r)}>
+                  <td className="text-xs">{new Date(r.created_at).toLocaleString()}</td>
+                  <td>{usersMap[r.user_id] || r.user_id}</td>
                   <td>{r.card_type}</td>
-                  <td><span className="badge badge-warning">{r.status}</span></td>
-                  <td>{activeTab === 'PENDING' && <button className="btn-text text-xs">Process</button>}</td>
+                  <td>
+                    <span className={`badge ${
+                      r.status === 'FULFILLED' ? 'bg-green-100 text-green-700 border border-green-300' :
+                      r.status === 'REJECTED' ? 'badge-error' : 'badge-warning'
+                    }`}>
+                      {r.status}
+                    </span>
+                  </td>
+                  <td><button className="btn-text text-xs">View</button></td>
                 </tr>
               ))}
             </tbody>

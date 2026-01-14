@@ -145,7 +145,7 @@ export function CardOrderingModal({ onClose, onSuccess }) {
                 <option value="">Select account...</option>
                 {accounts.map(acc => (
                   <option key={acc.id} value={acc.id}>
-                    {`${acc.account_number} - €${(acc.balance/100).toFixed(2)}`}
+                    {acc.iban ? `${acc.iban} - €${(acc.balance/100).toFixed(2)}` : `Account ${acc.account_number.slice(-4)} - €${(acc.balance/100).toFixed(2)}`}
                   </option>
                 ))}
               </select>

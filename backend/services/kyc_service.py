@@ -179,9 +179,11 @@ class KYCService:
                 from services.ledger_service import LedgerEngine
                 from schemas.banking import BankAccount
                 
-                # MUST have admin-provided IBAN - no fallback!
+                # STRICT: Require both IBAN and BIC for approval
                 if not review.assigned_iban:
                     raise HTTPException(status_code=400, detail="IBAN is required to approve KYC")
+                if not review.assigned_bic:
+                    raise HTTPException(status_code=400, detail="BIC/SWIFT is required to approve KYC")
                 
                 # Create ledger account
                 ledger_acc_id = f"ledger_acc_{user_id}"
@@ -194,30 +196,32 @@ class KYCService:
                     "created_at": datetime.utcnow()
                 })
                 
-                # Create bank account WITH admin-provided IBAN
+                # Create bank account WITH both IBAN and BIC
                 bank_acc_id = f"bank_acc_{user_id}"
                 await self.db.bank_accounts.insert_one({
                     "_id": bank_acc_id,
                     "user_id": user_id,
                     "account_number": generate_account_number(),
-                    "iban": review.assigned_iban,  # Use admin's IBAN only
-                    "bic": generate_bic(),
+                    "iban": review.assigned_iban,
+                    "bic": review.assigned_bic,
                     "currency": "EUR",
                     "status": "ACTIVE",
                     "ledger_account_id": ledger_acc_id,
                     "opened_at": datetime.utcnow()
                 })
             else:
-                # Account exists but no IBAN - assign admin-provided IBAN (REQUIRED!)
+                # Account exists but no IBAN - assign both IBAN and BIC
                 if not account.get("iban"):
                     if not review.assigned_iban:
                         raise HTTPException(status_code=400, detail="IBAN is required to approve KYC")
+                    if not review.assigned_bic:
+                        raise HTTPException(status_code=400, detail="BIC/SWIFT is required to approve KYC")
                     
                     await self.db.bank_accounts.update_one(
                         {"_id": account["_id"]},
                         {"$set": {
-                            "iban": review.assigned_iban,  # Use admin's IBAN only
-                            "bic": generate_bic()
+                            "iban": review.assigned_iban,
+                            "bic": review.assigned_bic
                         }}
                     )
         

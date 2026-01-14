@@ -193,7 +193,15 @@ export function KYCApplication() {
             {application.submitted_at && (
               <div>
                 <span className="text-sm text-gray-600">Submitted:</span>
-                <p className="text-sm">{new Date(application.submitted_at).toLocaleString()}</p>
+                <p className="text-sm">{new Date(application.submitted_at).toLocaleString(undefined, { 
+                  year: 'numeric',
+                  month: '2-digit', 
+                  day: '2-digit',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  second: '2-digit',
+                  hour12: true
+                })}</p>
               </div>
             )}
           </div>
