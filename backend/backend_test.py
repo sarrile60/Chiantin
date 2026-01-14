@@ -349,6 +349,74 @@ class AtlasBankingAPITester:
             return True
         return False
 
+    def test_admin_disable_user(self, user_id):
+        """Test admin disabling a user"""
+        success, response = self.run_test(
+            "Admin - Disable User",
+            "PATCH",
+            f"/api/v1/admin/users/{user_id}/status",
+            200,
+            data={"status": "DISABLED"},
+            token=self.admin_token,
+            description="Admin disables a user account"
+        )
+        if success:
+            print(f"   ✓ User disabled successfully")
+            return True
+        return False
+
+    def test_admin_enable_user(self, user_id):
+        """Test admin enabling a user"""
+        success, response = self.run_test(
+            "Admin - Enable User",
+            "PATCH",
+            f"/api/v1/admin/users/{user_id}/status",
+            200,
+            data={"status": "ACTIVE"},
+            token=self.admin_token,
+            description="Admin enables a user account"
+        )
+        if success:
+            print(f"   ✓ User enabled successfully")
+            return True
+        return False
+
+    def test_disabled_user_login(self, email, password):
+        """Test that disabled user cannot login"""
+        success, response = self.run_test(
+            "Disabled User Login (Should Fail)",
+            "POST",
+            "/api/v1/auth/login",
+            403,
+            data={"email": email, "password": password},
+            description="Attempt to login with disabled account - should return 403"
+        )
+        if success:
+            # Check the error message
+            if response.get('detail') == "Account is disabled. Please contact support.":
+                print(f"   ✓ Correct error message: '{response.get('detail')}'")
+                return True
+            else:
+                print(f"   ⚠️  Wrong error message: '{response.get('detail')}'")
+                print(f"   Expected: 'Account is disabled. Please contact support.'")
+                return False
+        return False
+
+    def test_active_user_login(self, email, password):
+        """Test that active user can login"""
+        success, response = self.run_test(
+            "Active User Login (Should Succeed)",
+            "POST",
+            "/api/v1/auth/login",
+            200,
+            data={"email": email, "password": password},
+            description="Login with active account - should succeed"
+        )
+        if success and 'access_token' in response:
+            print(f"   ✓ Login successful, token obtained")
+            return True
+        return False
+
 
 def main():
     print("=" * 70)
