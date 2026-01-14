@@ -129,24 +129,169 @@ class AdvancedBankingService:
     # ==================== SPENDING INSIGHTS ====================
     
     async def get_spending_by_category(self, user_id: str, days: int = 30):
-        """Get spending breakdown by category."""
-        # Get user's accounts
-        accounts = []
+        """Get spending breakdown by category from real ledger data."""
+        # Get user's bank accounts and their ledger account IDs
+        ledger_account_ids = []
         async for acc in self.db.bank_accounts.find({"user_id": user_id}):
-            accounts.append(acc)
+            if acc.get("ledger_account_id"):
+                ledger_account_ids.append(acc["ledger_account_id"])
         
-        if not accounts:
-            return {}
+        if not ledger_account_ids:
+            return {"total": 0, "categories": {}}
         
-        # Get transactions from last N days
+        # Calculate date range
         from_date = datetime.utcnow() - timedelta(days=days)
         
-        # For now, return mock data (real implementation would analyze transaction metadata)
-        # In production, you'd store category in transaction metadata
+        # Query all DEBIT entries (money going out) for user's ledger accounts
+        # DEBIT on a user's asset account means money leaving their account
+        pipeline = [
+            {
+                "$match": {
+                    "account_id": {"$in": ledger_account_ids},
+                    "direction": "DEBIT",
+                    "created_at": {"$gte": from_date}
+                }
+            },
+            {
+                "$lookup": {
+                    "from": "ledger_transactions",
+                    "localField": "transaction_id",
+                    "foreignField": "_id",
+                    "as": "transaction"
+                }
+            },
+            {
+                "$unwind": "$transaction"
+            },
+            {
+                "$group": {
+                    "_id": "$transaction.transaction_type",
+                    "total": {"$sum": "$amount"}
+                }
+            }
+        ]
+        
+        # Execute aggregation
+        results = await self.db.ledger_entries.aggregate(pipeline).to_list(100)
+        
+        # Map transaction types to user-friendly categories
+        category_mapping = {
+            "WITHDRAW": "WITHDRAWALS",
+            "TRANSFER": "TRANSFERS",
+            "P2P_TRANSFER": "TRANSFERS",
+            "FEE": "FEES",
+            "INTERNAL_TRANSFER": "TRANSFERS",
+            "REVERSAL": "REVERSALS",
+            "PAYMENT": "PAYMENTS",
+            "CARD_PAYMENT": "CARD_PAYMENTS"
+        }
+        
+        # Build category breakdown
+        categories = {}
+        total_spending = 0
+        
+        for result in results:
+            txn_type = result["_id"]
+            amount = result["total"]
+            
+            # Map to category
+            category = category_mapping.get(txn_type, "OTHER")
+            
+            if category in categories:
+                categories[category] += amount
+            else:
+                categories[category] = amount
+            
+            total_spending += amount
+        
         return {
-            "FOOD_DINING": 25000,  # €250
-            "TRANSPORT": 15000,     # €150
-            "SHOPPING": 35000,      # €350
-            "BILLS_UTILITIES": 20000, # €200
-            "OTHER": 5000           # €50
+            "total": total_spending,
+            "categories": categories
+        }
+    
+    async def get_monthly_spending(self, user_id: str):
+        """Get spending for the current calendar month from real ledger data."""
+        # Get user's bank accounts and their ledger account IDs
+        ledger_account_ids = []
+        async for acc in self.db.bank_accounts.find({"user_id": user_id}):
+            if acc.get("ledger_account_id"):
+                ledger_account_ids.append(acc["ledger_account_id"])
+        
+        if not ledger_account_ids:
+            return {"total": 0, "transaction_count": 0, "categories": {}}
+        
+        # Calculate first day of current month
+        now = datetime.utcnow()
+        first_of_month = datetime(now.year, now.month, 1)
+        
+        # Query all DEBIT entries for current month
+        pipeline = [
+            {
+                "$match": {
+                    "account_id": {"$in": ledger_account_ids},
+                    "direction": "DEBIT",
+                    "created_at": {"$gte": first_of_month}
+                }
+            },
+            {
+                "$lookup": {
+                    "from": "ledger_transactions",
+                    "localField": "transaction_id",
+                    "foreignField": "_id",
+                    "as": "transaction"
+                }
+            },
+            {
+                "$unwind": "$transaction"
+            },
+            {
+                "$group": {
+                    "_id": "$transaction.transaction_type",
+                    "total": {"$sum": "$amount"},
+                    "count": {"$sum": 1}
+                }
+            }
+        ]
+        
+        results = await self.db.ledger_entries.aggregate(pipeline).to_list(100)
+        
+        # Category mapping
+        category_mapping = {
+            "WITHDRAW": "WITHDRAWALS",
+            "TRANSFER": "TRANSFERS",
+            "P2P_TRANSFER": "TRANSFERS",
+            "FEE": "FEES",
+            "INTERNAL_TRANSFER": "TRANSFERS",
+            "REVERSAL": "REVERSALS",
+            "PAYMENT": "PAYMENTS",
+            "CARD_PAYMENT": "CARD_PAYMENTS"
+        }
+        
+        categories = {}
+        total_spending = 0
+        total_transactions = 0
+        
+        for result in results:
+            txn_type = result["_id"]
+            amount = result["total"]
+            count = result["count"]
+            
+            category = category_mapping.get(txn_type, "OTHER")
+            
+            if category in categories:
+                categories[category] += amount
+            else:
+                categories[category] = amount
+            
+            total_spending += amount
+            total_transactions += count
+        
+        return {
+            "total": total_spending,
+            "transaction_count": total_transactions,
+            "categories": categories,
+            "period": {
+                "start": first_of_month.isoformat(),
+                "end": now.isoformat()
+            }
         }
