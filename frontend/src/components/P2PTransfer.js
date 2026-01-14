@@ -182,37 +182,20 @@ export function P2PTransferForm({ onSuccess }) {
           />
           {validating && <p className="text-xs text-gray-500 mt-1">Validating...</p>}
           {recipientValid === true && <p className="text-xs text-green-600 mt-1">✓ Recipient verified</p>}
-          {recipientValid === false && <p className="text-xs text-red-600 mt-1">✗ Recipient not found</p>}
+          {recipientValid === false && <p className="text-xs text-red-600 mt-1">✗ Invalid email format</p>}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Recipient IBAN</label>
-          <input
-            type="text"
-            value={formData.to_iban}
-            onChange={(e) => {
-              setFormData({...formData, to_iban: e.target.value});
-              setRecipientValid(null);
-            }}
-            onBlur={validateRecipient}
-            required
-            className={`input-field ${recipientValid === true ? 'border-green-500' : recipientValid === false ? 'border-red-500' : ''}`}
-            placeholder="Insert IBAN"
-            data-testid="transfer-iban"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Amount</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Amount (in cents)</label>
           <div className="relative">
-            <span className="absolute left-3 top-2.5 text-gray-500">€</span>
             <input
               type="number"
               value={formData.amount}
               onChange={(e) => setFormData({...formData, amount: e.target.value})}
               required
               min="1"
-              className="input-field pl-8"
-              placeholder="0.00"
+              className="input-field"
+              placeholder="100 = €1.00"
               data-testid="transfer-amount"
             />
           </div>
@@ -241,7 +224,7 @@ export function P2PTransferForm({ onSuccess }) {
         </div>
         <button
           type="submit"
-          disabled={loading || !recipientValid || !hasEnoughBalance || !formData.amount || !formData.to_email || !formData.to_iban}
+          disabled={loading || !recipientValid || !hasEnoughBalance || !formData.amount || !formData.to_email}
           className="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
           data-testid="submit-transfer"
         >
