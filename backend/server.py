@@ -1178,24 +1178,23 @@ async def get_spending_insights(
     current_user: dict = Depends(get_current_user),
     db: AsyncIOMotorDatabase = Depends(get_database)
 ):
-    """Get spending breakdown by category."""
+    """Get spending breakdown by category from real ledger data."""
     ledger_engine = LedgerEngine(db)
     advanced_service = AdvancedBankingService(db, ledger_engine)
     breakdown = await advanced_service.get_spending_by_category(current_user["id"], days)
     return breakdown
 
 
-@app.get("/api/v1/insights/spending")
-async def get_spending_insights(
-    days: int = 30,
+@app.get("/api/v1/insights/monthly-spending")
+async def get_monthly_spending(
     current_user: dict = Depends(get_current_user),
     db: AsyncIOMotorDatabase = Depends(get_database)
 ):
-    """Get spending breakdown by category."""
+    """Get spending for the current calendar month from real ledger data."""
     ledger_engine = LedgerEngine(db)
     advanced_service = AdvancedBankingService(db, ledger_engine)
-    breakdown = await advanced_service.get_spending_by_category(current_user["id"], days)
-    return breakdown
+    spending = await advanced_service.get_monthly_spending(current_user["id"])
+    return spending
 
 
 # ==================== BANKING WORKFLOWS - CARDS ====================
