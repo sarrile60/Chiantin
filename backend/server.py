@@ -1186,10 +1186,17 @@ async def create_ticket(
     auth_service = AuthService(db)
     user = await auth_service.get_user(current_user["id"])
     
+    # Handle case where user object couldn't be fetched
+    if user:
+        user_name = f"{user.first_name} {user.last_name}"
+    else:
+        # Fall back to current_user dict or email
+        user_name = current_user.get("email", "Customer")
+    
     ticket_service = TicketService(db)
     ticket = await ticket_service.create_ticket(
         user_id=current_user["id"],
-        user_name=f"{user.first_name} {user.last_name}",
+        user_name=user_name,
         data=data
     )
     return ticket.model_dump()
