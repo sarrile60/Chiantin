@@ -185,18 +185,44 @@ export function ProfessionalDashboard({ user, logout }) {
               </div>
             ) : (
               <div className="card p-4">
-                {transactions.map((txn) => (
-                  <div key={txn.id} className="transaction-item">
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">{txn.transaction_type.replace('_', ' ')}</p>
-                      <p className="text-xs text-gray-500">{formatDate(txn.created_at)}</p>
+                {transactions.map((txn) => {
+                  // Professional display from metadata
+                  const metadata = txn.metadata || {};
+                  const displayType = metadata.display_type || txn.transaction_type?.replace(/_/g, ' ') || 'Transaction';
+                  const senderName = metadata.sender_name;
+                  const reference = metadata.reference;
+                  const description = metadata.description;
+                  
+                  // Determine if credit or debit
+                  const isCredit = ['TOP_UP', 'CREDIT', 'REFUND', 'INTEREST'].includes(txn.transaction_type) || txn.direction === 'CREDIT';
+                  const amount = txn.amount || 0;
+                  
+                  return (
+                    <div key={txn.id} className="transaction-item" data-testid="transaction-item">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">{displayType}</p>
+                        {senderName && (
+                          <p className="text-xs text-gray-600">From: {senderName}</p>
+                        )}
+                        {description && (
+                          <p className="text-xs text-gray-500 truncate">{description}</p>
+                        )}
+                        {reference && (
+                          <p className="text-xs text-gray-400 font-mono">Ref: {reference}</p>
+                        )}
+                        {!senderName && !description && (
+                          <p className="text-xs text-gray-500">{formatDate(txn.created_at)}</p>
+                        )}
+                      </div>
+                      <div className="text-right flex-shrink-0 ml-4">
+                        <p className={`text-sm font-semibold ${isCredit ? 'text-green-600' : 'text-red-600'}`}>
+                          {isCredit ? '+' : '-'}€{formatAmount(amount)}
+                        </p>
+                        <span className="badge badge-success text-xs">{txn.status || 'POSTED'}</span>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-sm font-semibold amount-positive">€100.00</p>
-                      <span className="badge badge-success">{txn.status}</span>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
