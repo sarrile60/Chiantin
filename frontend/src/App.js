@@ -674,6 +674,13 @@ function AdminDashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [roleFilter, setRoleFilter] = useState('all');
+  
+  // Tax Hold Modal State
+  const [showTaxHoldModal, setShowTaxHoldModal] = useState(false);
+  const [taxHoldAmount, setTaxHoldAmount] = useState('');
+  const [taxHoldReason, setTaxHoldReason] = useState('Outstanding tax obligations');
+  const [userTaxHold, setUserTaxHold] = useState(null);
+  const [taxHoldLoading, setTaxHoldLoading] = useState(false);
 
   useEffect(() => {
     fetchUsers();
