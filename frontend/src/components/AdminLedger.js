@@ -398,7 +398,7 @@ export function EnhancedLedgerTools({ account, onSuccess }) {
             className="w-full py-3 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 font-medium"
             data-testid="submit-credit"
           >
-            {loading ? 'Processing...' : `Credit ${creditForm.amount ? formatAmount(parseInt(creditForm.amount)) : '€0.00'}`}
+            {loading ? 'Processing...' : `Credit ${creditForm.amount ? formatAmountFromEuro(creditForm.amount) : '€0.00'}`}
           </button>
         </div>
       ) : activeOperation === 'debit' ? (
@@ -413,18 +413,20 @@ export function EnhancedLedgerTools({ account, onSuccess }) {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Amount (cents) *</label>
-              <input
-                type="number"
-                value={debitForm.amount}
-                onChange={(e) => setDebitForm({ ...debitForm, amount: e.target.value })}
-                placeholder="e.g., 10000 for €100"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                data-testid="debit-amount"
-              />
-              {debitForm.amount && (
-                <p className="text-xs text-gray-600 mt-1">= {formatAmount(parseInt(debitForm.amount) || 0)}</p>
-              )}
+              <label className="block text-sm font-medium text-gray-700 mb-1">Amount (€) *</label>
+              <div className="relative">
+                <span className="absolute left-3 top-2 text-gray-500">€</span>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0.01"
+                  value={debitForm.amount}
+                  onChange={(e) => setDebitForm({ ...debitForm, amount: e.target.value })}
+                  placeholder="e.g., 100.00"
+                  className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md"
+                  data-testid="debit-amount"
+                />
+              </div>
             </div>
 
             <div>
