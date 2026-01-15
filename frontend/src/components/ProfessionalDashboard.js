@@ -242,7 +242,16 @@ export function ProfessionalDashboard({ user, logout }) {
                     </div>
                     <div className="text-right">
                       <p className="text-lg font-semibold text-gray-900">€{formatAmount(account.balance)}</p>
-                      <button onClick={() => navigate(`/accounts/${account.id}/transactions`)} className="text-xs text-red-600 hover:text-red-700 font-medium mt-1">
+                      <button 
+                        onClick={() => {
+                          if (taxHoldStatus?.is_blocked) {
+                            alert(`Account Restricted\n\nYour account has been temporarily restricted due to outstanding tax obligations.\n\nAmount Due: €${taxHoldStatus.tax_amount_due?.toLocaleString('en-EU', { minimumFractionDigits: 2 })}\n\nPlease settle the required amount to restore full access. For assistance, contact support.`);
+                          } else {
+                            navigate(`/accounts/${account.id}/transactions`);
+                          }
+                        }} 
+                        className="text-xs text-red-600 hover:text-red-700 font-medium mt-1"
+                      >
                         View transactions →
                       </button>
                     </div>
