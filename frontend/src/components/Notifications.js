@@ -172,7 +172,8 @@ export function NotificationBell() {
             className="fixed inset-0 z-10"
             onClick={() => setShowDropdown(false)}
           />
-          <div className="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-blue border border-blue-100 z-20 overflow-hidden">
+          {/* Desktop: absolute right-0, Mobile: fixed centered */}
+          <div className="hidden sm:block absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-blue border border-blue-100 z-20 overflow-hidden">
             <div className="p-4 border-b bg-blue-50/50 flex justify-between items-center">
               <h3 className="font-semibold">Notifications</h3>
               {unreadCount > 0 && (
