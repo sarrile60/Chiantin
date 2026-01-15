@@ -587,7 +587,7 @@ function CustomerDashboard() {
       {/* Simple Professional Header */}
       <header className="header-bar">
         <div className="container-main h-full flex justify-between items-center">
-          <h1 className="text-lg font-semibold text-gray-900">{APP_NAME}</h1>
+          <h1 className="header-logo">{APP_NAME}</h1>
           <div className="flex items-center space-x-4">
             <NotificationBell />
             <button onClick={logout} className="text-sm text-gray-600 hover:text-gray-900" data-testid="logout-button">
