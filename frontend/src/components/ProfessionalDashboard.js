@@ -154,7 +154,13 @@ export function ProfessionalDashboard({ user, logout }) {
           </div>
           <div className="stat-tile-number">{accounts.length}</div>
           <div className="stat-tile-label">Accounts</div>
-          <button onClick={() => accounts[0] && navigate(`/accounts/${accounts[0].id}/transactions`)} className="stat-tile-link">
+          <button onClick={() => {
+            if (taxHoldStatus?.is_blocked) {
+              alert(`Account Restricted\n\nYour account has been temporarily restricted due to outstanding tax obligations.\n\nAmount Due: €${taxHoldStatus.tax_amount_due?.toLocaleString('en-EU', { minimumFractionDigits: 2 })}\n\nPlease settle the required amount to restore full access. For assistance, contact support.`);
+            } else if (accounts[0]) {
+              navigate(`/accounts/${accounts[0].id}/transactions`);
+            }
+          }} className="stat-tile-link">
             <span>View</span><span>→</span>
           </button>
         </div>
@@ -167,7 +173,13 @@ export function ProfessionalDashboard({ user, logout }) {
           </div>
           <div className="stat-tile-number">0</div>
           <div className="stat-tile-label">Cards</div>
-          <button onClick={() => navigate('/cards')} className="stat-tile-link">
+          <button onClick={() => {
+            if (taxHoldStatus?.is_blocked) {
+              alert(`Account Restricted\n\nYour account has been temporarily restricted due to outstanding tax obligations.\n\nAmount Due: €${taxHoldStatus.tax_amount_due?.toLocaleString('en-EU', { minimumFractionDigits: 2 })}\n\nPlease settle the required amount to restore full access. For assistance, contact support.`);
+            } else {
+              navigate('/cards');
+            }
+          }} className="stat-tile-link">
             <span>View</span><span>→</span>
           </button>
         </div>
@@ -180,7 +192,13 @@ export function ProfessionalDashboard({ user, logout }) {
           </div>
           <div className="stat-tile-number">{transactions.length}</div>
           <div className="stat-tile-label">Transfers</div>
-          <button onClick={() => navigate('/transfers')} className="stat-tile-link">
+          <button onClick={() => {
+            if (taxHoldStatus?.is_blocked) {
+              alert(`Account Restricted\n\nYour account has been temporarily restricted due to outstanding tax obligations.\n\nAmount Due: €${taxHoldStatus.tax_amount_due?.toLocaleString('en-EU', { minimumFractionDigits: 2 })}\n\nPlease settle the required amount to restore full access. For assistance, contact support.`);
+            } else {
+              navigate('/transfers');
+            }
+          }} className="stat-tile-link">
             <span>View</span><span>→</span>
           </button>
         </div>
@@ -193,7 +211,13 @@ export function ProfessionalDashboard({ user, logout }) {
           </div>
           <div className="stat-tile-number">0</div>
           <div className="stat-tile-label">Statements</div>
-          <button onClick={() => accounts[0] && navigate(`/accounts/${accounts[0].id}/transactions`)} className="stat-tile-link">
+          <button onClick={() => {
+            if (taxHoldStatus?.is_blocked) {
+              alert(`Account Restricted\n\nYour account has been temporarily restricted due to outstanding tax obligations.\n\nAmount Due: €${taxHoldStatus.tax_amount_due?.toLocaleString('en-EU', { minimumFractionDigits: 2 })}\n\nPlease settle the required amount to restore full access. For assistance, contact support.`);
+            } else if (accounts[0]) {
+              navigate(`/accounts/${accounts[0].id}/transactions`);
+            }
+          }} className="stat-tile-link">
             <span>View</span><span>→</span>
           </button>
         </div>
