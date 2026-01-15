@@ -197,21 +197,8 @@ export function EnhancedLedgerTools({ account, onSuccess }) {
       setLoading(false);
     }
   };
-        amount: parseInt(simpleForm.amount),
-        reason: simpleForm.reason
-      });
-      toast.success('Transfer successful!');
-      setSimpleForm({ amount: '', reason: '', toAccountId: '' });
-      setActiveOperation(null);
-      onSuccess && onSuccess();
-    } catch (err) {
-      toast.error(err.response?.data?.detail || 'Transfer failed');
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  const formatAmount = (cents) => `€${(cents / 100).toFixed(2)}`;
+  const formatAmountFromEuro = (euros) => `€${parseFloat(euros || 0).toFixed(2)}`;
 
   const resetAndClose = () => {
     setActiveOperation(null);
