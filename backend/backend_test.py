@@ -719,6 +719,49 @@ def main():
     tester.test_admin_get_kyc_pending()
     tester.test_admin_get_audit_logs()
     
+    print("\n" + "=" * 70)
+    print("SECTION 7: TAX HOLD MANAGEMENT")
+    print("=" * 70)
+    print("Testing the new feature: Admin can place/remove tax holds on users")
+    
+    if customer_user_id:
+        # Test 1: Admin places tax hold
+        print("\n--- Test 1: Admin Places Tax Hold ---")
+        if not tester.test_admin_place_tax_hold(customer_user_id, tax_amount=2000.00):
+            print("❌ Failed to place tax hold")
+        
+        # Test 2: Admin checks tax hold status
+        print("\n--- Test 2: Admin Checks Tax Hold Status ---")
+        if not tester.test_admin_get_tax_hold(customer_user_id):
+            print("❌ Failed to get tax hold status")
+        
+        # Test 3: Customer checks their own tax status
+        print("\n--- Test 3: Customer Checks Own Tax Status ---")
+        if not tester.test_customer_get_tax_status():
+            print("❌ Failed to get customer tax status")
+        
+        # Test 4: Customer tries to make transfer (should be blocked)
+        print("\n--- Test 4: Customer Attempts Transfer (Should Be Blocked) ---")
+        if not tester.test_p2p_transfer_blocked_by_tax_hold():
+            print("❌ Transfer blocking test failed")
+        
+        # Test 5: Admin removes tax hold
+        print("\n--- Test 5: Admin Removes Tax Hold ---")
+        if not tester.test_admin_remove_tax_hold(customer_user_id):
+            print("❌ Failed to remove tax hold")
+        
+        # Test 6: Verify tax hold is removed
+        print("\n--- Test 6: Verify Tax Hold Removed ---")
+        if not tester.test_admin_get_tax_hold(customer_user_id):
+            print("❌ Failed to verify tax hold removal")
+        
+        # Test 7: Customer can now make transfer
+        print("\n--- Test 7: Customer Transfer After Hold Removed ---")
+        if not tester.test_p2p_transfer_after_hold_removed():
+            print("❌ Transfer after hold removal failed")
+    else:
+        print("\n⚠️  Skipping tax hold tests - customer user ID not found")
+    
     # Print final results
     print("\n" + "=" * 70)
     print("TEST RESULTS SUMMARY")
