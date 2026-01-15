@@ -891,6 +891,83 @@ function AdminDashboard() {
                     <div><dt className="text-sm text-gray-600">KYC</dt><dd className="font-medium">{selectedUser.kyc_status || 'Not submitted'}</dd></div>
                   </dl>
                 </div>
+
+                {/* Tax Hold Management Card */}
+                <div className="card p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h3 className="font-semibold text-lg">Tax Hold Management</h3>
+                      <p className="text-sm text-gray-500 mt-1">Restrict user from performing banking operations due to tax obligations</p>
+                    </div>
+                    {userTaxHold?.is_blocked ? (
+                      <span className="px-3 py-1 text-sm font-medium bg-red-100 text-red-800 rounded-full">
+                        BLOCKED
+                      </span>
+                    ) : (
+                      <span className="px-3 py-1 text-sm font-medium bg-green-100 text-green-800 rounded-full">
+                        CLEAR
+                      </span>
+                    )}
+                  </div>
+
+                  {userTaxHold?.is_blocked ? (
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                      <div className="flex items-start space-x-3">
+                        <svg className="w-6 h-6 text-red-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-red-800">Account Restricted</h4>
+                          <p className="text-sm text-red-700 mt-1">
+                            Tax Amount Due: <span className="font-bold">€{userTaxHold.tax_amount_due?.toLocaleString('en-EU', { minimumFractionDigits: 2 })}</span>
+                          </p>
+                          <p className="text-sm text-red-600 mt-1">Reason: {userTaxHold.reason || 'Outstanding tax obligations'}</p>
+                          {userTaxHold.blocked_at && (
+                            <p className="text-xs text-red-500 mt-2">
+                              Blocked since: {new Date(userTaxHold.blocked_at).toLocaleString()}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="mt-4 flex space-x-3">
+                        <button
+                          onClick={handleRemoveTaxHold}
+                          disabled={taxHoldLoading}
+                          className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 disabled:opacity-50 transition"
+                          data-testid="remove-tax-hold-btn"
+                        >
+                          {taxHoldLoading ? 'Processing...' : 'Remove Tax Hold'}
+                        </button>
+                        <button
+                          onClick={() => setShowTaxHoldModal(true)}
+                          className="px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition"
+                        >
+                          Update Amount
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
+                      <div className="flex items-center space-x-3">
+                        <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <div>
+                          <h4 className="font-semibold text-gray-800">No Active Tax Hold</h4>
+                          <p className="text-sm text-gray-600">This user can perform all banking operations normally.</p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => setShowTaxHoldModal(true)}
+                        className="mt-4 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition"
+                        data-testid="set-tax-hold-btn"
+                      >
+                        Place Tax Hold
+                      </button>
+                    </div>
+                  )}
+                </div>
+
                 {selectedUser.accounts.length > 0 && (
                   <div className="card p-6">
                     <h3 className="font-semibold mb-4">Accounts</h3>
