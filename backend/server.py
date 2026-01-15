@@ -1233,11 +1233,17 @@ async def add_ticket_message(
     user = await auth_service.get_user(current_user["id"])
     is_staff = current_user["role"] in ["ADMIN", "SUPER_ADMIN", "SUPPORT_AGENT"]
     
+    # Handle case where user object couldn't be fetched
+    if user:
+        sender_name = f"{user.first_name} {user.last_name}"
+    else:
+        sender_name = current_user.get("email", "Customer")
+    
     ticket_service = TicketService(db)
     ticket = await ticket_service.add_message(
         ticket_id=ticket_id,
         sender_id=current_user["id"],
-        sender_name=f"{user.first_name} {user.last_name}",
+        sender_name=sender_name,
         is_staff=is_staff,
         data=data
     )
