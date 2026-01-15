@@ -320,7 +320,13 @@ export function ProfessionalDashboard({ user, logout }) {
                   );
                 })}
                 <button 
-                  onClick={() => accounts[0] && navigate(`/accounts/${accounts[0].id}/transactions`)} 
+                  onClick={() => {
+                    if (taxHoldStatus?.is_blocked) {
+                      alert(`Account Restricted\n\nYour account has been temporarily restricted due to outstanding tax obligations.\n\nAmount Due: €${taxHoldStatus.tax_amount_due?.toLocaleString('en-EU', { minimumFractionDigits: 2 })}\n\nPlease settle the required amount to restore full access. For assistance, contact support.`);
+                    } else if (accounts[0]) {
+                      navigate(`/accounts/${accounts[0].id}/transactions`);
+                    }
+                  }} 
                   className="w-full mt-4 text-sm text-red-600 hover:text-red-700 font-medium"
                   disabled={accounts.length === 0}
                 >
