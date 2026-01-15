@@ -156,7 +156,8 @@ class LedgerEngine:
         amount: int,
         external_id: Optional[str] = None,
         reason: str = "Sandbox top-up",
-        performed_by: Optional[str] = None
+        performed_by: Optional[str] = None,
+        metadata: Optional[dict] = None
     ) -> LedgerTransaction:
         """Add funds to user account."""
         # Get or create sandbox funding account
@@ -175,7 +176,8 @@ class LedgerEngine:
             ],
             external_id=external_id,
             reason=reason,
-            performed_by=performed_by
+            performed_by=performed_by,
+            metadata=metadata
         )
     
     async def withdraw(
@@ -184,7 +186,8 @@ class LedgerEngine:
         amount: int,
         external_id: Optional[str] = None,
         reason: str = "Withdrawal",
-        performed_by: Optional[str] = None
+        performed_by: Optional[str] = None,
+        metadata: Optional[dict] = None
     ) -> LedgerTransaction:
         """Remove funds from user account."""
         funding = await self.db.ledger_accounts.find_one({"account_type": "SANDBOX_FUNDING"})
@@ -202,7 +205,8 @@ class LedgerEngine:
             ],
             external_id=external_id,
             reason=reason,
-            performed_by=performed_by
+            performed_by=performed_by,
+            metadata=metadata
         )
     
     async def charge_fee(
