@@ -211,6 +211,42 @@
     @apply bg-gray-50 text-gray-700 border border-gray-200;
   }
   
+  /* Account Item - Mobile Optimized */
+  .account-item {
+    @apply card p-4 flex justify-between items-start;
+  }
+  
+  @media (max-width: 640px) {
+    .account-item {
+      @apply flex-col gap-3;
+    }
+    
+    .account-item .text-right {
+      @apply text-left w-full flex justify-between items-center;
+    }
+  }
+  
+  /* Touch-friendly targets */
+  .touch-manipulation {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  @media (max-width: 640px) {
+    /* Larger touch targets on mobile */
+    .btn-primary, .btn-secondary {
+      @apply py-3 text-base;
+      min-height: 48px;
+    }
+    
+    .stat-tile-link {
+      @apply py-2 text-sm;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+    }
+  }
+  
   /* Tables */
   .table-wrapper {
     @apply card overflow-hidden;
