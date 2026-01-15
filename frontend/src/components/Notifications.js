@@ -127,6 +127,7 @@ export function NotificationBell() {
   // Helper to determine if notification is clickable
   const getClickHint = (notif) => {
     const entityType = notif.entity_type?.toLowerCase() || '';
+    const notifType = notif.notification_type?.toLowerCase() || '';
     const title = notif.title?.toLowerCase() || '';
     
     if (entityType === 'card' || entityType === 'card_request' || title.includes('card')) {
@@ -140,6 +141,10 @@ export function NotificationBell() {
     }
     if (entityType === 'ticket' || title.includes('support')) {
       return 'View support tickets →';
+    }
+    // Security/restriction notifications
+    if (notifType === 'security' || title.includes('restriction') || title.includes('restricted') || title.includes('tax') || title.includes('blocked')) {
+      return 'Contact support →';
     }
     return 'View details →';
   };
