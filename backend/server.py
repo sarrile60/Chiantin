@@ -1394,12 +1394,11 @@ async def admin_reject_transfer(
 @app.post("/api/v1/admin/accounts/{account_id}/topup")
 async def admin_topup_account(
     account_id: str,
-    amount: int,
-    reason: str,
+    data: AdminCreditRequest,
     current_user: dict = Depends(require_admin),
     db: AsyncIOMotorDatabase = Depends(get_database)
 ):
-    """Admin tops up account."""
+    """Admin tops up account with professional transaction display."""
     workflows = BankingWorkflowsService(db)
     ledger_engine = LedgerEngine(db)
     
@@ -1407,29 +1406,44 @@ async def admin_topup_account(
     if not account:
         raise HTTPException(status_code=404, detail="Account not found")
     
+    # Build professional metadata for customer display
+    metadata = {
+        "display_type": data.display_type.value if hasattr(data.display_type, 'value') else data.display_type,
+        "sender_name": data.sender_name,
+        "sender_iban": data.sender_iban,
+        "sender_bic": data.sender_bic,
+        "reference": data.reference,
+        "description": data.description,
+        "admin_note": data.admin_note,
+        "admin_id": current_user["id"]
+    }
+    
+    # Clean None values
+    metadata = {k: v for k, v in metadata.items() if v is not None}
+    
     await ledger_engine.top_up(
         user_account_id=account["ledger_account_id"],
-        amount=amount,
+        amount=data.amount,
         external_id=f"admin_topup_{uuid.uuid4()}",
-        reason=reason,
-        performed_by=current_user["id"]
+        reason=data.description or data.display_type.value if hasattr(data.display_type, 'value') else str(data.display_type),
+        performed_by=current_user["id"],
+        metadata=metadata
     )
     
-    await workflows.topup_account(account_id, current_user["id"], amount, reason)
+    await workflows.topup_account(account_id, current_user["id"], data.amount, data.description or "Admin credit")
     new_balance = await ledger_engine.get_balance(account["ledger_account_id"])
     
-    return {"ok": True, "message": "Top-up successful", "new_balance": new_balance}
+    return {"ok": True, "message": "Credit successful", "new_balance": new_balance}
 
 
 @app.post("/api/v1/admin/accounts/{account_id}/withdraw")
 async def admin_withdraw_account(
     account_id: str,
-    amount: int,
-    reason: str,
+    data: AdminDebitRequest,
     current_user: dict = Depends(require_admin),
     db: AsyncIOMotorDatabase = Depends(get_database)
 ):
-    """Admin withdraws from account."""
+    """Admin withdraws from account with professional transaction display."""
     workflows = BankingWorkflowsService(db)
     ledger_engine = LedgerEngine(db)
     
@@ -1437,18 +1451,33 @@ async def admin_withdraw_account(
     if not account:
         raise HTTPException(status_code=404, detail="Account not found")
     
+    # Build professional metadata for customer display
+    metadata = {
+        "display_type": data.display_type,
+        "recipient_name": data.recipient_name,
+        "recipient_iban": data.recipient_iban,
+        "reference": data.reference,
+        "description": data.description,
+        "admin_note": data.admin_note,
+        "admin_id": current_user["id"]
+    }
+    
+    # Clean None values
+    metadata = {k: v for k, v in metadata.items() if v is not None}
+    
     await ledger_engine.withdraw(
         user_account_id=account["ledger_account_id"],
-        amount=amount,
+        amount=data.amount,
         external_id=f"admin_withdraw_{uuid.uuid4()}",
-        reason=reason,
-        performed_by=current_user["id"]
+        reason=data.description or data.display_type,
+        performed_by=current_user["id"],
+        metadata=metadata
     )
     
-    await workflows.withdraw_account(account_id, current_user["id"], amount, reason)
+    await workflows.withdraw_account(account_id, current_user["id"], data.amount, data.description or "Admin debit")
     new_balance = await ledger_engine.get_balance(account["ledger_account_id"])
     
-    return {"ok": True, "message": "Withdrawal successful", "new_balance": new_balance}
+    return {"ok": True, "message": "Debit successful", "new_balance": new_balance}
 
 
 @app.get("/api/health")
