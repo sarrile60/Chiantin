@@ -546,6 +546,19 @@ async def create_account(
     
     balance = await ledger_engine.get_balance(account.ledger_account_id)
     
+    # Audit: Account creation
+    await create_audit_log(
+        db=db,
+        action="ACCOUNT_CREATED",
+        entity_type="account",
+        entity_id=account.id,
+        description=f"New bank account created for user {current_user['email']}",
+        performed_by=current_user["id"],
+        performed_by_role=current_user["role"],
+        performed_by_email=current_user["email"],
+        metadata={"iban": account.iban, "account_number": account.account_number, "currency": account.currency}
+    )
+    
     return AccountResponse(
         id=account.id,
         account_number=account.account_number,
