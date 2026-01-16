@@ -1398,14 +1398,14 @@ function ProtectedRoute({ children, adminOnly = false }) {
   if (!adminOnly && user.role === 'CUSTOMER') {
     const kycStatus = localStorage.getItem('kyc_status');
     
-    // Force KYC if not completed
-    if (!kycStatus || kycStatus === 'NONE' || kycStatus === 'DRAFT') {
+    // Force KYC if not completed, needs more info, or was rejected
+    if (!kycStatus || kycStatus === 'NONE' || kycStatus === 'DRAFT' || kycStatus === 'NEEDS_MORE_INFO' || kycStatus === 'REJECTED') {
       if (window.location.pathname !== '/kyc') {
         return <Navigate to="/kyc" replace />;
       }
     }
     
-    // Show review page if submitted
+    // Show review page if submitted and waiting for admin review
     if (kycStatus === 'SUBMITTED' || kycStatus === 'UNDER_REVIEW') {
       if (window.location.pathname !== '/kyc-review') {
         return <Navigate to="/kyc-review" replace />;
