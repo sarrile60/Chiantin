@@ -463,6 +463,126 @@ export function ProfessionalDashboard({ user, logout }) {
             </div>
           </div>
 
+          {/* My Cards Section */}
+          {cards.filter(c => c.status === 'ACTIVE').length > 0 && (
+            <div>
+              <div className="section-header">My Cards</div>
+              <div className="space-y-4">
+                {cards.filter(c => c.status === 'ACTIVE').slice(0, 2).map((card) => (
+                  <div key={card.id} className="relative">
+                    {/* Visual Card */}
+                    <div 
+                      className="relative w-full aspect-[1.586/1] rounded-xl overflow-hidden cursor-pointer transform transition-transform hover:scale-[1.02]"
+                      style={{
+                        background: card.card_type === 'VIRTUAL' 
+                          ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)'
+                          : 'linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 50%, #0d0d0d 100%)'
+                      }}
+                      onClick={() => setShowCardDetails(showCardDetails === card.id ? null : card.id)}
+                      data-testid={`card-visual-${card.id}`}
+                    >
+                      {/* Card Chip */}
+                      <div className="absolute top-6 left-6">
+                        <div className="w-10 h-8 rounded bg-gradient-to-br from-yellow-300 via-yellow-400 to-yellow-600 opacity-90">
+                          <div className="w-full h-full grid grid-cols-3 gap-px p-1">
+                            {[...Array(6)].map((_, i) => (
+                              <div key={i} className="bg-yellow-600/30 rounded-sm"></div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Contactless Icon */}
+                      <div className="absolute top-6 right-6">
+                        <svg className="w-8 h-8 text-white/60" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z" opacity="0.3"/>
+                          <path d="M7.5 12c0-2.48 2.02-4.5 4.5-4.5v-2c-3.58 0-6.5 2.92-6.5 6.5s2.92 6.5 6.5 6.5v-2c-2.48 0-4.5-2.02-4.5-4.5z"/>
+                          <path d="M12 7.5c2.48 0 4.5 2.02 4.5 4.5s-2.02 4.5-4.5 4.5v2c3.58 0 6.5-2.92 6.5-6.5s-2.92-6.5-6.5-6.5v2z"/>
+                        </svg>
+                      </div>
+
+                      {/* Card Number */}
+                      <div className="absolute bottom-16 left-6 right-6">
+                        <p className="text-white/90 font-mono text-lg tracking-widest">
+                          {showCardDetails === card.id 
+                            ? (card.pan || '').match(/.{1,4}/g)?.join(' ') || '•••• •••• •••• ••••'
+                            : `•••• •••• •••• ${card.pan?.slice(-4) || '••••'}`
+                          }
+                        </p>
+                      </div>
+
+                      {/* Card Holder & Expiry */}
+                      <div className="absolute bottom-4 left-6 right-6 flex justify-between items-end">
+                        <div>
+                          <p className="text-white/50 text-[10px] uppercase tracking-wider mb-0.5">Card Holder</p>
+                          <p className="text-white/90 text-sm font-medium uppercase tracking-wide">
+                            {user?.first_name} {user?.last_name}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-white/50 text-[10px] uppercase tracking-wider mb-0.5">Expires</p>
+                          <p className="text-white/90 text-sm font-mono">
+                            {String(card.exp_month).padStart(2, '0')}/{String(card.exp_year).slice(-2)}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Card Type Badge */}
+                      <div className="absolute top-14 left-6">
+                        <span className="text-white/70 text-xs font-medium uppercase tracking-wider">
+                          {card.card_type === 'VIRTUAL' ? 'Virtual Card' : 'Physical Card'}
+                        </span>
+                      </div>
+
+                      {/* Mastercard Logo */}
+                      <div className="absolute bottom-4 right-6">
+                        <div className="flex">
+                          <div className="w-6 h-6 rounded-full bg-red-500 opacity-90"></div>
+                          <div className="w-6 h-6 rounded-full bg-yellow-500 opacity-90 -ml-2"></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Card Details Dropdown */}
+                    {showCardDetails === card.id && (
+                      <div className="mt-2 p-4 bg-gray-50 rounded-lg border border-gray-200 animate-fadeIn">
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div>
+                            <p className="text-gray-500 text-xs mb-1">Card Number</p>
+                            <p className="font-mono text-gray-900">{(card.pan || '').match(/.{1,4}/g)?.join(' ') || 'N/A'}</p>
+                          </div>
+                          <div>
+                            <p className="text-gray-500 text-xs mb-1">CVV</p>
+                            <p className="font-mono text-gray-900">{card.cvv || '•••'}</p>
+                          </div>
+                          <div>
+                            <p className="text-gray-500 text-xs mb-1">Expiry Date</p>
+                            <p className="font-mono text-gray-900">{String(card.exp_month).padStart(2, '0')}/{card.exp_year}</p>
+                          </div>
+                          <div>
+                            <p className="text-gray-500 text-xs mb-1">Status</p>
+                            <span className="badge badge-success text-xs">{card.status}</span>
+                          </div>
+                        </div>
+                        <button 
+                          onClick={() => navigate('/cards')}
+                          className="w-full mt-4 text-sm text-red-600 hover:text-red-700 font-medium"
+                        >
+                          View all cards →
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Click hint */}
+                    <p className="text-center text-xs text-gray-400 mt-2">
+                      {showCardDetails === card.id ? 'Click card to hide details' : 'Click card to show details'}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div>
             <div className="section-header">This Month</div>
             <div className="card p-4">
