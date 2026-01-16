@@ -75,7 +75,7 @@ export function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16 sm:h-20">
             {/* Logo */}
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
               <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center">
                 <span className="text-white font-bold text-lg">A</span>
               </div>
@@ -84,9 +84,24 @@ export function LandingPage() {
 
             {/* Desktop Menu */}
             <div className="hidden md:flex items-center space-x-8">
-              <a href="#features" className="text-gray-600 hover:text-gray-900 font-medium transition">Features</a>
-              <a href="#about" className="text-gray-600 hover:text-gray-900 font-medium transition">About</a>
-              <a href="#security" className="text-gray-600 hover:text-gray-900 font-medium transition">Security</a>
+              <button
+                onClick={() => scrollToSection('features')}
+                className={`font-medium transition-all duration-300 ${activeSection === 'features' ? 'text-red-600 scale-105' : 'text-gray-600 hover:text-gray-900'}`}
+              >
+                Features
+              </button>
+              <button
+                onClick={() => scrollToSection('about')}
+                className={`font-medium transition-all duration-300 ${activeSection === 'about' ? 'text-red-600 scale-105' : 'text-gray-600 hover:text-gray-900'}`}
+              >
+                About
+              </button>
+              <button
+                onClick={() => scrollToSection('security')}
+                className={`font-medium transition-all duration-300 ${activeSection === 'security' ? 'text-red-600 scale-105' : 'text-gray-600 hover:text-gray-900'}`}
+              >
+                Security
+              </button>
               <button
                 onClick={() => navigate('/login')}
                 className="text-gray-700 hover:text-gray-900 font-medium transition"
@@ -120,11 +135,26 @@ export function LandingPage() {
 
           {/* Mobile Menu */}
           {mobileMenuOpen && (
-            <div className="md:hidden py-4 border-t border-gray-100">
+            <div className="md:hidden py-4 border-t border-gray-100 animate-slideDown">
               <div className="flex flex-col space-y-4">
-                <a href="#features" className="text-gray-600 hover:text-gray-900 font-medium">Features</a>
-                <a href="#about" className="text-gray-600 hover:text-gray-900 font-medium">About</a>
-                <a href="#security" className="text-gray-600 hover:text-gray-900 font-medium">Security</a>
+                <button
+                  onClick={() => scrollToSection('features')}
+                  className="text-left text-gray-600 hover:text-red-600 font-medium transition-colors"
+                >
+                  Features
+                </button>
+                <button
+                  onClick={() => scrollToSection('about')}
+                  className="text-left text-gray-600 hover:text-red-600 font-medium transition-colors"
+                >
+                  About
+                </button>
+                <button
+                  onClick={() => scrollToSection('security')}
+                  className="text-left text-gray-600 hover:text-red-600 font-medium transition-colors"
+                >
+                  Security
+                </button>
                 <button
                   onClick={() => navigate('/login')}
                   className="text-left text-gray-700 hover:text-gray-900 font-medium"
