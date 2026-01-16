@@ -511,6 +511,20 @@ async def review_kyc(
     """Review KYC application (admin)."""
     kyc_service = KYCService(db, storage)
     app = await kyc_service.review_application(application_id, review, current_user["id"])
+    
+    # Audit: KYC review
+    await create_audit_log(
+        db=db,
+        action=f"KYC_{review.decision.upper()}",
+        entity_type="kyc",
+        entity_id=application_id,
+        description=f"KYC application {review.decision} for user {app.user_id}",
+        performed_by=current_user["id"],
+        performed_by_role=current_user["role"],
+        performed_by_email=current_user["email"],
+        metadata={"decision": review.decision, "notes": review.notes, "user_id": app.user_id}
+    )
+    
     return app.model_dump()
 
 
