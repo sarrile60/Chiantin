@@ -14,6 +14,9 @@ export function ProfessionalDashboard({ user, logout }) {
   const [taxHoldStatus, setTaxHoldStatus] = useState(null);
   const [cards, setCards] = useState([]);
   const [showCardDetails, setShowCardDetails] = useState(null);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
+  const [cryptoTxHash, setCryptoTxHash] = useState('');
 
   useEffect(() => {
     fetchDashboardData();
