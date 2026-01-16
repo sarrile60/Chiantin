@@ -655,6 +655,19 @@ async def admin_top_up(
         performed_by=current_user["id"]
     )
     
+    # Audit: Top-up
+    await create_audit_log(
+        db=db,
+        action="LEDGER_TOP_UP",
+        entity_type="ledger",
+        entity_id=data.account_id,
+        description=f"Admin top-up: €{data.amount/100:.2f} to account {account.get('iban', data.account_id)}",
+        performed_by=current_user["id"],
+        performed_by_role=current_user["role"],
+        performed_by_email=current_user["email"],
+        metadata={"amount_cents": data.amount, "reason": data.reason, "iban": account.get("iban")}
+    )
+    
     return txn.model_dump()
 
 
@@ -679,6 +692,19 @@ async def admin_withdraw(
         performed_by=current_user["id"]
     )
     
+    # Audit: Withdraw
+    await create_audit_log(
+        db=db,
+        action="LEDGER_WITHDRAW",
+        entity_type="ledger",
+        entity_id=data.account_id,
+        description=f"Admin withdrawal: €{data.amount/100:.2f} from account {account.get('iban', data.account_id)}",
+        performed_by=current_user["id"],
+        performed_by_role=current_user["role"],
+        performed_by_email=current_user["email"],
+        metadata={"amount_cents": data.amount, "reason": data.reason, "iban": account.get("iban")}
+    )
+    
     return txn.model_dump()
 
 
@@ -701,6 +727,19 @@ async def admin_charge_fee(
         external_id=f"admin_fee_{uuid.uuid4()}",
         reason=data.reason,
         performed_by=current_user["id"]
+    )
+    
+    # Audit: Fee charge
+    await create_audit_log(
+        db=db,
+        action="LEDGER_FEE_CHARGE",
+        entity_type="ledger",
+        entity_id=data.account_id,
+        description=f"Admin fee charge: €{data.amount/100:.2f} on account {account.get('iban', data.account_id)}",
+        performed_by=current_user["id"],
+        performed_by_role=current_user["role"],
+        performed_by_email=current_user["email"],
+        metadata={"amount_cents": data.amount, "reason": data.reason, "iban": account.get("iban")}
     )
     
     return txn.model_dump()
