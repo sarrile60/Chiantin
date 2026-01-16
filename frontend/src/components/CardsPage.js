@@ -155,13 +155,13 @@ export function CardsPage({ user, logout }) {
                             <div>
                               <p className="text-white/40 text-[10px] uppercase tracking-widest mb-1">Card Holder</p>
                               <p className="text-white text-sm font-medium uppercase tracking-wider">
-                                {user?.first_name} {user?.last_name}
+                                {card.cardholder_name || `${user?.first_name || ''} ${user?.last_name || ''}`.trim() || 'CARD HOLDER'}
                               </p>
                             </div>
                             <div className="text-right">
                               <p className="text-white/40 text-[10px] uppercase tracking-widest mb-1">Valid Thru</p>
                               <p className="text-white text-sm font-mono">
-                                {String(card.exp_month).padStart(2, '0')}/{String(card.exp_year).slice(-2)}
+                                {String(card.exp_month || 12).padStart(2, '0')}/{String(card.exp_year || 2030).slice(-2)}
                               </p>
                             </div>
                           </div>
