@@ -454,22 +454,28 @@ export function LandingPage() {
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
               <h2 className="text-3xl sm:text-4xl font-bold mb-6">
-                This is Project Atlas
+                {language === 'it' ? 'Questo è Project Atlas' : 'This is Project Atlas'}
               </h2>
               <p className="text-lg text-gray-300 mb-6">
-                Project Atlas represents the new age of fintech, revolutionizing the way businesses and individuals handle their global transactions.
+                {language === 'it' 
+                  ? 'Project Atlas rappresenta la nuova era del fintech, rivoluzionando il modo in cui aziende e privati gestiscono le loro transazioni globali.'
+                  : 'Project Atlas represents the new age of fintech, revolutionizing the way businesses and individuals handle their global transactions.'}
               </p>
               <p className="text-gray-400 mb-6">
-                We specialize in e-account management, cross-border payments, personal & business cards, and multi-currency conversions — all through a single, innovative and intuitive platform that gives you instant access to all of our services.
+                {language === 'it'
+                  ? 'Siamo specializzati in gestione di conti elettronici, pagamenti transfrontalieri, carte personali e aziendali e conversioni multivaluta — tutto attraverso un\'unica piattaforma innovativa e intuitiva che ti dà accesso istantaneo a tutti i nostri servizi.'
+                  : 'We specialize in e-account management, cross-border payments, personal & business cards, and multi-currency conversions — all through a single, innovative and intuitive platform that gives you instant access to all of our services.'}
               </p>
               <p className="text-gray-400 mb-8">
-                Our service model is based on four cornerstones: cutting-edge technology designed for the global banking industry; customized connections with banking partners around the world; stringent security; and maximum operational speed.
+                {language === 'it'
+                  ? 'Il nostro modello di servizio si basa su quattro pilastri: tecnologia all\'avanguardia progettata per il settore bancario globale; connessioni personalizzate con partner bancari in tutto il mondo; sicurezza rigorosa; e massima velocità operativa.'
+                  : 'Our service model is based on four cornerstones: cutting-edge technology designed for the global banking industry; customized connections with banking partners around the world; stringent security; and maximum operational speed.'}
               </p>
               <button
                 onClick={() => navigate('/signup')}
                 className="px-8 py-4 bg-white text-gray-900 font-semibold rounded-full hover:bg-gray-100 transition"
               >
-                Open Your Account
+                {t('openAccount')}
               </button>
             </div>
             <div className="relative">
@@ -477,23 +483,23 @@ export function LandingPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-white/10 backdrop-blur rounded-2xl p-6">
                     <div className="text-3xl mb-2">🌍</div>
-                    <p className="text-lg font-semibold">Global Reach</p>
-                    <p className="text-sm text-gray-400">150+ countries</p>
+                    <p className="text-lg font-semibold">{language === 'it' ? 'Portata Globale' : 'Global Reach'}</p>
+                    <p className="text-sm text-gray-400">{language === 'it' ? '150+ paesi' : '150+ countries'}</p>
                   </div>
                   <div className="bg-white/10 backdrop-blur rounded-2xl p-6">
                     <div className="text-3xl mb-2">💱</div>
-                    <p className="text-lg font-semibold">Multi-Currency</p>
-                    <p className="text-sm text-gray-400">30+ currencies</p>
+                    <p className="text-lg font-semibold">{language === 'it' ? 'Multivaluta' : 'Multi-Currency'}</p>
+                    <p className="text-sm text-gray-400">{language === 'it' ? '30+ valute' : '30+ currencies'}</p>
                   </div>
                   <div className="bg-white/10 backdrop-blur rounded-2xl p-6">
                     <div className="text-3xl mb-2">⚡</div>
-                    <p className="text-lg font-semibold">Instant</p>
-                    <p className="text-sm text-gray-400">Real-time transfers</p>
+                    <p className="text-lg font-semibold">{language === 'it' ? 'Istantaneo' : 'Instant'}</p>
+                    <p className="text-sm text-gray-400">{language === 'it' ? 'Trasferimenti in tempo reale' : 'Real-time transfers'}</p>
                   </div>
                   <div className="bg-white/10 backdrop-blur rounded-2xl p-6">
                     <div className="text-3xl mb-2">🛡️</div>
-                    <p className="text-lg font-semibold">Secure</p>
-                    <p className="text-sm text-gray-400">Bank-grade security</p>
+                    <p className="text-lg font-semibold">{language === 'it' ? 'Sicuro' : 'Secure'}</p>
+                    <p className="text-sm text-gray-400">{language === 'it' ? 'Sicurezza bancaria' : 'Bank-grade security'}</p>
                   </div>
                 </div>
               </div>
