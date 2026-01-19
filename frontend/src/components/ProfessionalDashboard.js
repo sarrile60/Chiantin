@@ -662,7 +662,7 @@ export function ProfessionalDashboard({ user, logout }) {
                     if (typeLower === 'standing order') return t('standingOrder');
                     if (typeLower === 'instant payment') return t('instantPayment');
                     if (typeLower === 'top up' || typeLower === 'top_up') return t('topUpDisplay');
-                    if (typeLower === 'withdraw') return t('withdrawDisplay');
+                    if (typeLower === 'withdraw' || typeLower === 'withdrawal') return t('withdrawDisplay');
                     if (typeLower === 'fee') return t('feeDisplay');
                     if (typeLower === 'refund') return t('refund');
                     if (typeLower === 'interest') return t('interest');
@@ -671,6 +671,12 @@ export function ProfessionalDashboard({ user, logout }) {
                     if (typeLower === 'transfer') return t('transfer');
                     if (typeLower === 'reversal') return t('reversal');
                     if (typeLower === 'transaction') return t('transaction');
+                    if (typeLower === 'salary payment') return t('salaryPayment');
+                    if (typeLower === 'cash deposit') return t('cashDeposit');
+                    if (typeLower === 'interest payment') return t('interestPayment');
+                    if (typeLower === 'bonus') return t('bonus');
+                    if (typeLower === 'account correction') return t('accountCorrection');
+                    if (typeLower === 'other') return t('other');
                     return type;
                   };
                   
