@@ -150,14 +150,14 @@ export function KYCApplication() {
 
     try {
       await api.post('/kyc/submit', formData);
-      alert('KYC application submitted successfully! Our team will review it shortly.');
+      alert(t('kycSubmittedSuccess'));
       fetchApplication();
     } catch (err) {
       const errorMsg = err.response?.data?.detail 
         ? (typeof err.response.data.detail === 'string' 
             ? err.response.data.detail 
-            : 'Validation error - please check all fields')
-        : 'Failed to submit KYC application';
+            : t('kycValidationError'))
+        : t('kycSubmitFailed');
       setError(errorMsg);
     } finally {
       setLoading(false);
