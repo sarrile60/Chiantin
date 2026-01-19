@@ -105,8 +105,8 @@ function SignupPage() {
   const { signup } = useAuth();
   const navigate = useNavigate();
   const toast = useToast();
-  const { t } = useLanguage();
-  const { isDark } = useTheme();
+  const { t, language, setLanguage } = useLanguage();
+  const { isDark, toggleTheme } = useTheme();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
