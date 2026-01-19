@@ -2101,6 +2101,16 @@ function App() {
             }
           />
           <Route
+            path="/transactions"
+            element={
+              <ProtectedRoute>
+                <TaxHoldRestrictedRoute>
+                  <AccountsPage />
+                </TaxHoldRestrictedRoute>
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/kyc"
             element={
               <ProtectedRoute>
