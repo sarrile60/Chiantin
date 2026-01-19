@@ -431,6 +431,8 @@ function TransactionsPage() {
   const { accountId } = useParams();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { t, language, setLanguage } = useLanguage();
+  const { isDark, toggleTheme } = useTheme();
   const [account, setAccount] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -455,54 +457,81 @@ function TransactionsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm">
+    <div className={`min-h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
+      <header className={`shadow-sm ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-4">
               <button
                 onClick={() => navigate('/dashboard')}
-                className="text-gray-600 hover:text-gray-900"
+                className={`${isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-900'}`}
               >
-                ← Back
+                ← {t('back')}
               </button>
-              <h1 className="text-2xl font-bold" style={{ fontFamily: 'Space Grotesk' }}>
+              <h1 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`} style={{ fontFamily: 'Space Grotesk' }}>
                 {APP_NAME}
               </h1>
             </div>
-            <button onClick={logout} className="text-sm text-gray-600 hover:text-gray-900">
-              Logout
-            </button>
+            <div className="flex items-center space-x-4">
+              {/* Language Toggle */}
+              <button
+                onClick={() => setLanguage(language === 'en' ? 'it' : 'en')}
+                className={`flex items-center space-x-1 px-3 py-1.5 rounded-md text-sm font-medium transition ${isDark ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-100 text-gray-700'}`}
+                title={language === 'en' ? 'Switch to Italian' : 'Passa a Inglese'}
+              >
+                <span className="text-base">{language === 'en' ? '🇬🇧' : '🇮🇹'}</span>
+                <span className="hidden sm:inline">{language === 'en' ? 'EN' : 'IT'}</span>
+              </button>
+              {/* Theme Toggle */}
+              <button
+                onClick={toggleTheme}
+                className={`p-2 rounded-md transition ${isDark ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-100 text-gray-700'}`}
+                title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+              >
+                {isDark ? (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                ) : (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                  </svg>
+                )}
+              </button>
+              <button onClick={logout} className={`text-sm ${isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-900'}`}>
+                {t('logout')}
+              </button>
+            </div>
           </div>
         </div>
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {loading ? (
-          <div className="text-center">Loading...</div>
+          <div className={`text-center ${isDark ? 'text-gray-400' : ''}`}>{t('loading')}</div>
         ) : account ? (
           <div className="space-y-6">
             {/* Account Summary - Professional */}
-            <div className="card p-6">
+            <div className={`card p-6 ${isDark ? 'bg-gray-800 border-gray-700' : ''}`}>
               <div className="flex justify-between items-start">
                 <div className="flex-1">
-                  <p className="text-sm text-gray-600 mb-1">Account</p>
-                  <h2 className="text-xl font-semibold text-gray-900 mb-3">Atlas EUR Current Account</h2>
+                  <p className={`text-sm mb-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{t('accountPage')}</p>
+                  <h2 className={`text-xl font-semibold mb-3 ${isDark ? 'text-white' : 'text-gray-900'}`}>{t('atlasEurCurrentAccount')}</h2>
                   {account.iban && (
                     <div className="space-y-1">
                       <div className="flex items-center space-x-2">
-                        <p className="text-sm text-gray-700">IBAN:</p>
-                        <p className="font-mono text-sm text-gray-900">{account.iban.match(/.{1,4}/g)?.join(' ')}</p>
+                        <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-700'}`}>IBAN:</p>
+                        <p className={`font-mono text-sm ${isDark ? 'text-gray-200' : 'text-gray-900'}`}>{account.iban.match(/.{1,4}/g)?.join(' ')}</p>
                         <button
                           onClick={() => {
                             try {
                               navigator.clipboard.writeText(account.iban);
-                              alert('IBAN copied!');
+                              alert(t('ibanCopied'));
                             } catch (err) {
                               console.log('Clipboard write failed:', err);
                             }
                           }}
-                          className="text-gray-400 hover:text-red-600 transition"
+                          className={`transition ${isDark ? 'text-gray-500 hover:text-red-400' : 'text-gray-400 hover:text-red-600'}`}
                           title="Copy IBAN"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -511,18 +540,18 @@ function TransactionsPage() {
                         </button>
                       </div>
                       {account.bic && (
-                        <p className="text-sm text-gray-700">BIC: {account.bic}</p>
+                        <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-700'}`}>BIC: {account.bic}</p>
                       )}
                       <details className="mt-2">
-                        <summary className="text-xs text-gray-500 cursor-pointer hover:text-gray-700">Account reference (for support)</summary>
-                        <p className="text-xs text-gray-500 mt-1 font-mono">{account.account_number}</p>
+                        <summary className={`text-xs cursor-pointer ${isDark ? 'text-gray-500 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'}`}>{t('accountReference')}</summary>
+                        <p className={`text-xs mt-1 font-mono ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>{account.account_number}</p>
                       </details>
                     </div>
                   )}
                 </div>
                 <div className="text-right">
-                  <p className="text-sm text-gray-600">Current Balance</p>
-                  <p className="text-3xl font-bold text-gray-900">{formatAmount(account.balance)}</p>
+                  <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{t('currentBalance')}</p>
+                  <p className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>{formatAmount(account.balance)}</p>
                 </div>
               </div>
             </div>
@@ -534,8 +563,8 @@ function TransactionsPage() {
             <StatementDownload accountId={accountId} />
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow p-8 text-center">
-            <p className="text-gray-600">Account not found</p>
+          <div className={`rounded-lg shadow p-8 text-center ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
+            <p className={`${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{t('accountNotFound')}</p>
           </div>
         )}
       </main>
