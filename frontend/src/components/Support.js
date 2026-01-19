@@ -174,6 +174,8 @@ function CreateTicketForm({ onClose, onSuccess }) {
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const { t } = useLanguage();
+  const { isDark } = useTheme();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -196,12 +198,12 @@ function CreateTicketForm({ onClose, onSuccess }) {
   };
 
   return (
-    <div className="card-enhanced p-6 animate-card">
+    <div className={`card-enhanced p-6 animate-card ${isDark ? 'bg-gray-800 border-gray-700' : ''}`}>
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold">Create Support Ticket</h3>
+        <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{t('createSupportTicket')}</h3>
         <button
           onClick={onClose}
-          className="text-gray-400 hover:text-gray-600"
+          className={`${isDark ? 'text-gray-500 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'}`}
         >
           ✕
         </button>
