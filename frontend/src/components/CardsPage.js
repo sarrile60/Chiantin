@@ -254,25 +254,25 @@ export function CardsPage({ user, logout }) {
               {/* Pending Card Requests */}
               {pendingRequests.length > 0 && (
                 <div>
-                  <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-4">Pending Requests</h2>
+                  <h2 className={`text-sm font-medium uppercase tracking-wider mb-4 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{t('pendingRequests')}</h2>
                   <div className="space-y-3">
                     {pendingRequests.map((request) => (
-                      <div key={request.id} className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 flex items-center justify-between">
+                      <div key={request.id} className={`rounded-xl p-4 flex items-center justify-between ${isDark ? 'bg-yellow-900/20 border border-yellow-800/30' : 'bg-yellow-50 border border-yellow-200'}`}>
                         <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center">
-                            <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <div className={`w-12 h-12 rounded-full flex items-center justify-center ${isDark ? 'bg-yellow-900/30' : 'bg-yellow-100'}`}>
+                            <svg className={`w-6 h-6 ${isDark ? 'text-yellow-500' : 'text-yellow-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                           </div>
                           <div>
-                            <p className="font-medium text-gray-900">
-                              {request.card_type === 'VIRTUAL' ? 'Virtual Card' : 'Physical Card'} Request
+                            <p className={`font-medium ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
+                              {request.card_type === 'VIRTUAL' ? t('virtualCardRequest') : t('physicalCardRequest')}
                             </p>
-                            <p className="text-sm text-gray-500">Waiting for approval</p>
+                            <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{t('waitingForApproval')}</p>
                           </div>
                         </div>
-                        <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">
-                          Pending
+                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${isDark ? 'bg-yellow-900/40 text-yellow-400' : 'bg-yellow-100 text-yellow-800'}`}>
+                          {t('pending')}
                         </span>
                       </div>
                     ))}
