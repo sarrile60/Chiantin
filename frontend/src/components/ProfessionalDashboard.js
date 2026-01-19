@@ -555,8 +555,8 @@ export function ProfessionalDashboard({ user, logout }) {
                     <div className="flex-1 min-w-0">
                       <p className={`text-sm font-medium mb-1 ${isDark ? 'text-white' : 'text-gray-900'}`}>{t('eurEAccount')}</p>
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-xs text-gray-500 font-medium">IBAN:</span>
-                        <span className="text-xs sm:text-xs text-gray-700 font-mono break-all">{account.iban ? account.iban.match(/.{1,4}/g)?.join(' ') : 'N/A'}</span>
+                        <span className={`text-xs font-medium ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>IBAN:</span>
+                        <span className={`text-xs sm:text-xs font-mono break-all ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{account.iban ? account.iban.match(/.{1,4}/g)?.join(' ') : 'N/A'}</span>
                         {account.iban && (
                           <button
                             onClick={async (e) => {
