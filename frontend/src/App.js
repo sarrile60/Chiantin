@@ -485,6 +485,7 @@ function TransactionsPage() {
 function KYCPage() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -499,7 +500,7 @@ function KYCPage() {
                 {user?.first_name} {user?.last_name}
               </span>
               <button onClick={logout} className="text-sm text-gray-600 hover:text-gray-900">
-                Logout
+                {t('logout')}
               </button>
             </div>
           </div>
@@ -509,19 +510,19 @@ function KYCPage() {
       <div className="border-b border-gray-200 bg-white">
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex space-x-8">
           <button onClick={() => navigate('/dashboard')} className="py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700">
-            Accounts
+            {t('accounts')}
           </button>
           <button onClick={() => navigate('/kyc')} className="py-4 px-1 border-b-2 border-blue-600 font-medium text-sm text-blue-600">
             KYC
           </button>
           <button onClick={() => navigate('/security')} className="py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700">
-            Security
+            {t('securitySettings')}
           </button>
         </nav>
       </div>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h2 className="text-2xl font-bold mb-6">Identity Verification (KYC)</h2>
+        <h2 className="text-2xl font-bold mb-6">{t('identityVerification')}</h2>
         <KYCApplication />
       </main>
     </div>
