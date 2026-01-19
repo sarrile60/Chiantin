@@ -142,6 +142,9 @@ const translations = {
     totalSpending: 'Total Spending',
     viewFullBreakdown: 'View full breakdown →',
     viewTransactions: 'View transactions →',
+    viewAllTransactions: 'View all transactions →',
+    clickCardToShow: 'Click card to show details',
+    clickCardToHide: 'Click card to hide details',
     
     // Account Restricted / Tax Hold
     accountRestricted: 'Account Restricted',
