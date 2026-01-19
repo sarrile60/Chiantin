@@ -820,7 +820,7 @@ const translations = {
     // Landing Page
     heroTitle: 'Una piattaforma per',
     heroTitleHighlight: 'governarle tutte',
-    heroSubtitle: 'Project Atlas rappresenta la nuova era del fintech, rivoluzionando il modo in cui gestisci le transazioni globali con conti multivaluta, trasferimenti istantanei e sicurezza bancaria.',
+    heroSubtitle: 'ecommbx rappresenta la nuova era del fintech, rivoluzionando il modo in cui gestisci le transazioni globali con conti multivaluta, trasferimenti istantanei e sicurezza bancaria.',
     getStarted: 'Inizia Ora',
     joinTheFuture: 'Unisciti al Futuro',
     learnMore: 'Scopri di Più',
