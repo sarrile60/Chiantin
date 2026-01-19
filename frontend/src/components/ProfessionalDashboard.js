@@ -414,7 +414,7 @@ export function ProfessionalDashboard({ user, logout }) {
 
                 <button 
                   onClick={() => { 
-                    alert('Payment submission received. Our compliance team will verify your transaction within 24-48 hours. You will receive an email confirmation once your account restrictions are lifted.');
+                    alert(t('cryptoConfirmation'));
                     setShowPaymentModal(false); 
                     setSelectedPaymentMethod(null);
                     setCryptoTxHash('');
