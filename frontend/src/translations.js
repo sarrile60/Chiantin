@@ -1052,7 +1052,7 @@ const translations = {
     
     // Account Page
     accountPage: 'Conto',
-    atlasEurCurrentAccount: 'Conto Corrente Atlas EUR',
+    atlasEurCurrentAccount: 'Conto Corrente ecommbx EUR',
     currentBalance: 'Saldo Attuale',
     accountReference: 'Riferimento conto (per assistenza)',
     ibanCopied: 'IBAN copiato!',
