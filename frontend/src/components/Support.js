@@ -76,23 +76,23 @@ export function SupportTickets({ isAdmin = false }) {
       </div>
 
       {isAdmin && (
-        <div className="card-enhanced p-4">
+        <div className={`card-enhanced p-4 ${isDark ? 'bg-gray-800 border-gray-700' : ''}`}>
           <div className="flex items-center space-x-4">
-            <label className="text-sm font-medium text-gray-700">Filter by Status:</label>
+            <label className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{t('filterByStatus')}:</label>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="input-enhanced"
+              className={`input-enhanced ${isDark ? 'bg-gray-700 border-gray-600 text-white' : ''}`}
               data-testid="admin-ticket-filter"
             >
-              <option value="all">All Tickets</option>
-              <option value="OPEN">Open</option>
-              <option value="IN_PROGRESS">In Progress</option>
-              <option value="WAITING">Waiting</option>
-              <option value="RESOLVED">Resolved</option>
-              <option value="CLOSED">Closed</option>
+              <option value="all">{t('allTickets')}</option>
+              <option value="OPEN">{t('open')}</option>
+              <option value="IN_PROGRESS">{t('inProgress')}</option>
+              <option value="WAITING">{t('waiting')}</option>
+              <option value="RESOLVED">{t('resolved')}</option>
+              <option value="CLOSED">{t('closed')}</option>
             </select>
-            <span className="text-sm text-gray-600">{tickets.length} ticket(s)</span>
+            <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{tickets.length} {t('ticketCount')}</span>
           </div>
         </div>
       )}
@@ -105,19 +105,19 @@ export function SupportTickets({ isAdmin = false }) {
       )}
 
       {tickets.length === 0 ? (
-        <div className="card-blue-accent p-8 text-center animate-card">
+        <div className={`card-blue-accent p-8 text-center animate-card ${isDark ? 'bg-gray-800 border-gray-700' : ''}`}>
           <div className="circle-pattern">
-            <p className="text-gray-600">No support tickets yet. Create one if you need help!</p>
+            <p className={isDark ? 'text-gray-400' : 'text-gray-600'}>{t('noSupportTicketsYet')}</p>
           </div>
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Tickets List */}
           <div className="lg:col-span-1">
-            <div className="card-enhanced">
-              <div className="p-4 border-b bg-blue-50/30">
-                <h3 className="font-semibold">Your Tickets</h3>
-                <p className="text-sm text-gray-600 mt-1">{tickets.length} ticket(s)</p>
+            <div className={`card-enhanced ${isDark ? 'bg-gray-800 border-gray-700' : ''}`}>
+              <div className={`p-4 border-b ${isDark ? 'bg-gray-700/50 border-gray-600' : 'bg-blue-50/30'}`}>
+                <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{t('yourTickets')}</h3>
+                <p className={`text-sm mt-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{tickets.length} {t('ticketCount')}</p>
               </div>
               <div className="divide-y max-h-[600px] overflow-y-auto">
                 {tickets.map((ticket) => (
