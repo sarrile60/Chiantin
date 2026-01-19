@@ -428,20 +428,20 @@ export function ProfessionalDashboard({ user, logout }) {
 
       {/* Welcome + KYC Status */}
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900">Welcome back, {user?.first_name}</h1>
-        {kycStatus === 'APPROVED' && <span className="badge badge-success">Verified</span>}
+        <h1 className={`text-2xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{t('welcomeBack')}, {user?.first_name}</h1>
+        {kycStatus === 'APPROVED' && <span className="badge badge-success">{t('verified')}</span>}
       </div>
 
       {/* Overview Card */}
-      <div className="overview-card">
-        <div className="overview-label">overview</div>
+      <div className={`overview-card ${isDark ? 'bg-gray-800 border-gray-700' : ''}`}>
+        <div className="overview-label">{t('overview')}</div>
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
           <div>
-            <div className="balance-large text-3xl sm:text-5xl">€{formatAmount(getTotalBalance())}</div>
-            <div className="balance-small">Available balance</div>
+            <div className={`balance-large text-3xl sm:text-5xl ${isDark ? 'text-white' : ''}`}>€{formatAmount(getTotalBalance())}</div>
+            <div className={`balance-small ${isDark ? 'text-gray-400' : ''}`}>{t('availableBalance')}</div>
           </div>
           <button onClick={() => accounts[0] && navigate(`/accounts/${accounts[0].id}/transactions`)} className="btn-primary w-full sm:w-auto" disabled={accounts.length === 0}>
-            View Account
+            {t('viewAccount')}
           </button>
         </div>
       </div>
