@@ -1339,6 +1339,13 @@ const translations = {
     interest: 'Interessi',
     credit: 'Accredito',
     debit: 'Addebito',
+    salaryPayment: 'Pagamento Stipendio',
+    cashDeposit: 'Deposito Contanti',
+    interestPayment: 'Pagamento Interessi',
+    bonus: 'Bonus',
+    accountCorrection: 'Correzione Conto',
+    other: 'Altro',
+    withdrawal: 'Prelievo',
     
     // Time formatting
     justNow: 'Adesso',
