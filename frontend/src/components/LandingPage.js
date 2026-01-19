@@ -1,11 +1,14 @@
 // Project Atlas - Professional Landing Page (Inspired by ECOMMBANX)
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage, useTheme } from '../contexts/AppContext';
 
 export function LandingPage() {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('');
+  const { t, language, setLanguage } = useLanguage();
+  const { isDark, toggleTheme } = useTheme();
 
   // Smooth scroll to section with animation
   const scrollToSection = (sectionId) => {
@@ -31,41 +34,41 @@ export function LandingPage() {
   const features = [
     {
       icon: '💳',
-      title: 'Personal e-Accounts',
-      description: 'Multi-currency accounts with EU IBAN, instant setup and full control',
+      title: t('personalAccounts'),
+      description: t('personalAccountsDesc'),
     },
     {
       icon: '🏢',
-      title: 'Business Accounts',
-      description: 'Dedicated business banking with treasury management tools',
+      title: t('businessAccounts'),
+      description: t('businessAccountsDesc'),
     },
     {
       icon: '💸',
-      title: 'Instant Transfers',
-      description: 'SEPA and international transfers with competitive rates',
+      title: t('instantTransfers'),
+      description: t('instantTransfersDesc'),
     },
     {
       icon: '🎴',
-      title: 'Virtual & Physical Cards',
-      description: 'Visa debit cards for seamless payments worldwide',
+      title: t('virtualPhysicalCards'),
+      description: t('virtualPhysicalCardsDesc'),
     },
     {
       icon: '🔒',
-      title: 'Bank-Grade Security',
-      description: 'Multi-factor authentication and real-time fraud protection',
+      title: t('bankGradeSecurity'),
+      description: t('bankGradeSecurityDesc'),
     },
     {
       icon: '📊',
-      title: 'Smart Analytics',
-      description: 'Track spending, set budgets and gain financial insights',
+      title: t('smartAnalytics'),
+      description: t('smartAnalyticsDesc'),
     },
   ];
 
   const stats = [
-    { value: '50K+', label: 'Active Users' },
-    { value: '€2B+', label: 'Processed Annually' },
-    { value: '99.9%', label: 'Uptime' },
-    { value: '24/7', label: 'Support' },
+    { value: '50K+', label: t('activeUsers') },
+    { value: '€2B+', label: t('processedAnnually') },
+    { value: '99.9%', label: t('uptime') },
+    { value: '24/7', label: t('support') },
   ];
 
   return (
