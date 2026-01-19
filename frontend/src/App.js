@@ -413,11 +413,6 @@ function LoginPage() {
                 {t('createAccount')}
               </button>
             </p>
-            <div className={`text-xs space-y-1 ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
-              <p className="font-medium mb-1">{t('demoCredentials')}:</p>
-              <p>{t('customer')}: customer@demo.com / Demo@123456</p>
-              <p>{t('admin')}: admin@atlas.local / Admin@123456</p>
-            </div>
           </div>
         </div>
       </div>
