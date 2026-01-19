@@ -589,6 +589,8 @@ function CustomerDashboard() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const { t, language, setLanguage } = useLanguage();
+  const { isDark, toggleTheme } = useTheme();
 
   // Get user initials
   const getInitials = () => {
@@ -600,25 +602,51 @@ function CustomerDashboard() {
 
   // Menu items for the user avatar dropdown
   const menuItems = [
-    { label: 'Dashboard', icon: '🏠', path: '/dashboard', description: 'Overview & Balance' },
-    { label: 'Transfers', icon: '💸', path: '/transfers', description: 'Send money' },
-    { label: 'Cards', icon: '🎴', path: '/cards', description: 'Manage your cards' },
-    { label: 'Profile', icon: '👤', path: '/profile', description: 'Your settings' },
-    { label: 'Security', icon: '🔒', path: '/security', description: 'Password & 2FA' },
-    { label: 'Support', icon: '💬', path: '/support', description: 'Get help' },
+    { label: t('dashboard'), icon: '🏠', path: '/dashboard', description: t('overview') },
+    { label: t('transfers'), icon: '💸', path: '/transfers', description: t('sendMoney') },
+    { label: t('cards'), icon: '🎴', path: '/cards', description: t('manageCards') },
+    { label: t('profile'), icon: '👤', path: '/profile', description: t('yourSettings') },
+    { label: t('securitySettings'), icon: '🔒', path: '/security', description: t('passwordAnd2fa') },
+    { label: t('supportPage'), icon: '💬', path: '/support', description: t('getHelp') },
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className={`min-h-screen ${isDark ? 'bg-gray-900' : 'bg-white'}`}>
       {/* Simple Professional Header */}
-      <header className="bg-white border-b border-gray-200 h-16 px-4 sm:px-6 flex items-center justify-between">
-        <h1 className="header-logo">{APP_NAME}</h1>
+      <header className={`h-16 px-4 sm:px-6 flex items-center justify-between ${isDark ? 'bg-gray-900 border-b border-gray-800' : 'bg-white border-b border-gray-200'}`}>
+        <h1 className={`header-logo ${isDark ? 'text-white' : ''}`}>{APP_NAME}</h1>
         <div className="flex items-center space-x-2 sm:space-x-4">
+          {/* Language Toggle */}
+          <button
+            onClick={() => setLanguage(language === 'en' ? 'it' : 'en')}
+            className={`px-2 py-1 rounded font-bold text-xs sm:text-sm transition ${isDark ? 'bg-gray-800 hover:bg-gray-700 text-gray-300' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}
+            title={language === 'en' ? 'Switch to Italian' : 'Passa all\'Inglese'}
+          >
+            {language === 'en' ? '🇬🇧 EN' : '🇮🇹 IT'}
+          </button>
+          
+          {/* Theme Toggle */}
+          <button
+            onClick={toggleTheme}
+            className={`p-2 rounded-lg transition ${isDark ? 'hover:bg-gray-800 text-yellow-400' : 'hover:bg-gray-100 text-gray-600'}`}
+            title={isDark ? t('lightMode') : t('darkMode')}
+          >
+            {isDark ? (
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+            ) : (
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+              </svg>
+            )}
+          </button>
+          
           <NotificationBell />
           
           {/* Desktop: Show Logout button */}
-          <button onClick={logout} className="hidden sm:block text-sm text-gray-600 hover:text-gray-900" data-testid="logout-button">
-            Logout
+          <button onClick={logout} className={`hidden sm:block text-sm hover:text-gray-900 ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600'}`} data-testid="logout-button">
+            {t('logout')}
           </button>
           
           {/* Mobile: Show User Avatar */}
@@ -638,7 +666,7 @@ function CustomerDashboard() {
                   className="fixed inset-0 z-10"
                   onClick={() => setShowUserMenu(false)}
                 />
-                  <div className="fixed left-4 right-4 top-16 bg-white rounded-xl shadow-xl border border-gray-200 z-20 overflow-hidden">
+                  <div className={`fixed left-4 right-4 top-16 rounded-xl shadow-xl border z-20 overflow-hidden ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
                     {/* User Info Header */}
                     <div className="p-4 bg-gradient-to-r from-red-500 to-red-600 text-white">
                       <div className="flex items-center space-x-3">
@@ -661,14 +689,14 @@ function CustomerDashboard() {
                             setShowUserMenu(false);
                             navigate(item.path);
                           }}
-                          className="w-full px-4 py-3 flex items-center space-x-3 hover:bg-gray-50 transition-colors text-left"
+                          className={`w-full px-4 py-3 flex items-center space-x-3 transition-colors text-left ${isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}
                         >
                           <span className="text-xl w-8">{item.icon}</span>
                           <div className="flex-1">
-                            <p className="text-sm font-medium text-gray-900">{item.label}</p>
-                            <p className="text-xs text-gray-500">{item.description}</p>
+                            <p className={`text-sm font-medium ${isDark ? 'text-gray-200' : 'text-gray-900'}`}>{item.label}</p>
+                            <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>{item.description}</p>
                           </div>
-                          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className={`w-4 h-4 ${isDark ? 'text-gray-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                           </svg>
                         </button>
@@ -676,19 +704,19 @@ function CustomerDashboard() {
                     </div>
                     
                     {/* Logout Button */}
-                    <div className="border-t p-3">
+                    <div className={`border-t p-3 ${isDark ? 'border-gray-700' : ''}`}>
                       <button
                         onClick={() => {
                           setShowUserMenu(false);
                           logout();
                         }}
-                        className="w-full py-2.5 bg-gray-100 text-gray-700 rounded-lg font-medium text-sm hover:bg-gray-200 transition flex items-center justify-center space-x-2"
+                        className={`w-full py-2.5 rounded-lg font-medium text-sm transition flex items-center justify-center space-x-2 ${isDark ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
                         data-testid="mobile-logout-btn"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                         </svg>
-                        <span>Sign Out</span>
+                        <span>{t('signOut')}</span>
                       </button>
                     </div>
                   </div>
