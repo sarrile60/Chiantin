@@ -353,7 +353,7 @@ export function KYCApplication() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Postal Code</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('kycPostalCode')}</label>
               <input
                 type="text"
                 name="postal_code"
@@ -364,7 +364,7 @@ export function KYCApplication() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Tax Residency</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('kycTaxResidency')}</label>
               <input
                 type="text"
                 name="tax_residency"
@@ -376,7 +376,7 @@ export function KYCApplication() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Tax ID (Optional)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('kycTaxIdOptional')}</label>
               <input
                 type="text"
                 name="tax_id"
@@ -394,7 +394,7 @@ export function KYCApplication() {
               className="btn-primary btn-glow"
               data-testid="kyc-next-step1"
             >
-              Next: Upload Documents
+              {t('kycNextUploadDocuments')}
             </button>
           </div>
         </div>
@@ -403,7 +403,7 @@ export function KYCApplication() {
       {/* Step 2: Document Upload */}
       {step === 2 && (
         <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold mb-4">Upload Documents</h3>
+          <h3 className="text-lg font-semibold mb-4">{t('kycUploadDocuments')}</h3>
           <div className="space-y-4">
             {['PASSPORT', 'PROOF_OF_ADDRESS', 'SELFIE'].map((docType) => (
               <DocumentUpload
@@ -412,6 +412,7 @@ export function KYCApplication() {
                 uploaded={documents[docType] || (application?.documents?.find(d => d.document_type === docType)?.file_name)}
                 onUpload={(file) => handleFileUpload(docType, file)}
                 uploading={uploadingDoc === docType}
+                t={t}
               />
             ))}
           </div>
@@ -421,7 +422,7 @@ export function KYCApplication() {
               onClick={() => setStep(1)}
               className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
             >
-              Back
+              {t('back')}
             </button>
             <button
               type="button"
@@ -429,7 +430,7 @@ export function KYCApplication() {
               className="btn-primary btn-glow"
               data-testid="kyc-next-step2"
             >
-              Next: Review & Submit
+              {t('kycNextReviewSubmit')}
             </button>
           </div>
         </div>
@@ -438,16 +439,16 @@ export function KYCApplication() {
       {/* Step 3: Review & Submit */}
       {step === 3 && (
         <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold mb-4">Review & Submit</h3>
+          <h3 className="text-lg font-semibold mb-4">{t('kycReviewSubmit')}</h3>
           <div className="space-y-6">
             <div>
-              <h4 className="font-medium mb-2">Personal Information</h4>
+              <h4 className="font-medium mb-2">{t('kycPersonalInformation')}</h4>
               <dl className="grid grid-cols-2 gap-2 text-sm">
-                <dt className="text-gray-600">Name:</dt>
+                <dt className="text-gray-600">{t('name')}:</dt>
                 <dd>{formData.full_name}</dd>
-                <dt className="text-gray-600">Date of Birth:</dt>
+                <dt className="text-gray-600">{t('kycDateOfBirth')}:</dt>
                 <dd>{formData.date_of_birth}</dd>
-                <dt className="text-gray-600">Address:</dt>
+                <dt className="text-gray-600">{t('address')}:</dt>
                 <dd>{formData.street_address}, {formData.city}, {formData.postal_code}</dd>
               </dl>
             </div>
