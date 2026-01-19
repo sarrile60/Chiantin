@@ -242,8 +242,8 @@ export function CardsPage({ user, logout }) {
                         )}
 
                         {/* Click Hint */}
-                        <p className="text-center text-xs text-gray-400">
-                          {showCardDetails === card.id ? 'Click card to hide details' : 'Click card to reveal full details'}
+                        <p className={`text-center text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+                          {showCardDetails === card.id ? t('clickCardToHide') : t('clickCardToShow')}
                         </p>
                       </div>
                     ))}
