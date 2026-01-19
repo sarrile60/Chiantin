@@ -502,11 +502,11 @@ const translations = {
     paymentReviewNotice: 'Il tuo pagamento sarà esaminato ed elaborato entro 24-48 ore. Le restrizioni del conto saranno rimosse dopo la verifica.',
     
     // Dashboard Menu
-    overview: 'Panoramica e Saldo',
     manageCards: 'Gestisci le tue carte',
     yourSettings: 'Le tue impostazioni',
     passwordAnd2fa: 'Password e 2FA',
     getHelp: 'Ottieni aiuto',
+    paymentReviewNotice: 'Il tuo pagamento sarà esaminato ed elaborato entro 24-48 ore. Le restrizioni del conto saranno rimosse dopo la verifica.',
     
     // Cards Page
     managePhysicalVirtual: 'Gestisci le tue carte fisiche e virtuali',
