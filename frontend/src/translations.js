@@ -735,6 +735,29 @@ const translations = {
     ticketStatus: 'Ticket Status',
     updateStatus: 'Update Status',
     
+    // Forgot Password
+    forgotPassword: 'Forgot Password?',
+    forgotPasswordTitle: 'Reset Your Password',
+    forgotPasswordDesc: 'Enter your email address and we\'ll send you a link to reset your password.',
+    sendResetLink: 'Send Reset Link',
+    sendingResetLink: 'Sending...',
+    backToLogin: 'Back to Login',
+    resetLinkSent: 'Reset link sent! Check your email.',
+    resetLinkSentDesc: 'If an account exists with this email, you will receive a password reset link.',
+    
+    // Reset Password
+    resetPassword: 'Reset Password',
+    resetPasswordTitle: 'Create New Password',
+    resetPasswordDesc: 'Enter your new password below.',
+    newPassword: 'New Password',
+    confirmNewPassword: 'Confirm New Password',
+    resetPasswordBtn: 'Reset Password',
+    resettingPassword: 'Resetting...',
+    passwordResetSuccess: 'Password reset successful!',
+    passwordResetSuccessDesc: 'You can now login with your new password.',
+    goToLogin: 'Go to Login',
+    invalidResetToken: 'Invalid or expired reset link. Please request a new one.',
+    
     // Time formatting
     justNow: 'Just now',
     minutesAgo: 'm ago',
