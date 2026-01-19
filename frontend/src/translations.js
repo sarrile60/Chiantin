@@ -17,6 +17,9 @@ const translations = {
     success: 'Success',
     warning: 'Warning',
     
+    // PWA
+    installApp: 'Install App',
+    
     // Auth
     signIn: 'Sign In',
     signUp: 'Sign Up',
