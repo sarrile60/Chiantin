@@ -233,8 +233,15 @@ const translations = {
     clickToReveal: 'Click card to reveal full details',
     cardNumber: 'Card Number',
     cvv: 'CVV',
+    cvvCvc: 'CVV/CVC',
     expiryDate: 'Expiry Date',
     waitingForApproval: 'Waiting for approval',
+    cardDetails: 'Card Details',
+    cardType: 'Card Type',
+    cardId: 'Card ID',
+    virtualCardRequest: 'Virtual Card Request',
+    physicalCardRequest: 'Physical Card Request',
+    pending: 'Pending',
     
     // KYC
     identityVerification: 'Identity Verification (KYC)',
