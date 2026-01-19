@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
+import { useLanguage } from '../contexts/AppContext';
 
 export function NotificationBell() {
   const navigate = useNavigate();
@@ -9,6 +10,7 @@ export function NotificationBell() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [showDropdown, setShowDropdown] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { t } = useLanguage();
 
   useEffect(() => {
     fetchNotifications();
