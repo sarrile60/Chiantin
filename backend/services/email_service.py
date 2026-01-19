@@ -11,42 +11,40 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-# Load from .env file
-def get_resend_api_key():
+# Load from .env file - use absolute path
+def get_env_value(key, default=''):
     # First try environment
-    key = os.environ.get('RESEND_API_KEY', '')
-    if key:
-        return key
-    # Then try loading .env manually
-    env_path = Path(__file__).parent.parent / '.env'
-    if env_path.exists():
-        with open(env_path) as f:
-            for line in f:
-                if line.startswith('RESEND_API_KEY='):
-                    return line.strip().split('=', 1)[1]
-    return ''
-
-def get_sender_email():
-    email = os.environ.get('SENDER_EMAIL', '')
-    if email:
-        return email
-    env_path = Path(__file__).parent.parent / '.env'
-    if env_path.exists():
-        with open(env_path) as f:
-            for line in f:
-                if line.startswith('SENDER_EMAIL='):
-                    return line.strip().split('=', 1)[1]
-    return 'noreply@ecommbx.io'
+    value = os.environ.get(key, '')
+    if value:
+        return value
+    # Then try loading .env manually from multiple possible locations
+    possible_paths = [
+        Path(__file__).parent.parent / '.env',
+        Path('/app/backend/.env'),
+        Path('.env'),
+    ]
+    for env_path in possible_paths:
+        if env_path.exists():
+            with open(env_path) as f:
+                for line in f:
+                    line = line.strip()
+                    if line.startswith(f'{key}='):
+                        return line.split('=', 1)[1]
+    return default
 
 # Initialize
-RESEND_API_KEY = get_resend_api_key()
-SENDER_EMAIL = get_sender_email()
+RESEND_API_KEY = get_env_value('RESEND_API_KEY')
+SENDER_EMAIL = get_env_value('SENDER_EMAIL', 'noreply@ecommbx.io')
 resend.api_key = RESEND_API_KEY
 APP_NAME = "Project Atlas"
-FRONTEND_URL = os.environ.get('FRONTEND_URL', 'https://translatlas.preview.emergentagent.com')
+FRONTEND_URL = get_env_value('FRONTEND_URL', 'https://translatlas.preview.emergentagent.com')
 
-logger.info(f"Email service initialized with sender: {SENDER_EMAIL}")
-logger.info(f"Resend API key configured: {'Yes (' + RESEND_API_KEY[:10] + '...)' if RESEND_API_KEY else 'No'}")
+# Log initialization status
+if RESEND_API_KEY:
+    logger.info(f"Email service initialized with Resend API key: {RESEND_API_KEY[:10]}...")
+    logger.info(f"Sender email: {SENDER_EMAIL}")
+else:
+    logger.warning("Email service: No Resend API key found!")
 
 
 class EmailService:
