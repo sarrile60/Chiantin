@@ -1353,6 +1353,12 @@ const translations = {
     other: 'Altro',
     withdrawal: 'Prelievo',
     
+    // Tax Hold Reasons
+    outstandingTaxObligations: 'Obblighi fiscali in sospeso',
+    pendingTaxAuditReview: 'Revisione fiscale in corso',
+    taxEvasionInvestigation: 'Indagine per evasione fiscale',
+    unpaidVatObligations: 'Obblighi IVA non pagati',
+    
     // Time formatting
     justNow: 'Adesso',
     minutesAgo: 'm fa',
