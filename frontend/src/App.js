@@ -1967,8 +1967,8 @@ function ProfilePage() {
       <header className={`${isDark ? 'bg-gray-800' : 'header-gradient'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
-            <h1 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gradient-blue'}`} style={{ fontFamily: 'Space Grotesk' }}>
-              {APP_NAME}
+            <h1 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`} style={{ fontFamily: 'Space Grotesk' }}>
+              <StyledLogo isDark={isDark} />
             </h1>
             <div className="flex items-center space-x-4">
               <NotificationBell />
