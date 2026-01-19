@@ -951,7 +951,7 @@ function TransactionsPage() {
                 ← {t('back')}
               </button>
               <h1 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`} style={{ fontFamily: 'Space Grotesk' }}>
-                {APP_NAME}
+                <StyledLogo isDark={isDark} />
               </h1>
             </div>
             <div className="flex items-center space-x-4">
