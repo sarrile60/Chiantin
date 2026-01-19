@@ -91,7 +91,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="Project Atlas API",
+    title="ecommbx API",
     version="1.0.0",
     lifespan=lifespan
 )
