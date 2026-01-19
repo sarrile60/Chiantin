@@ -633,8 +633,15 @@ const translations = {
     clickToReveal: 'Clicca sulla carta per vedere i dettagli completi',
     cardNumber: 'Numero Carta',
     cvv: 'CVV',
+    cvvCvc: 'CVV/CVC',
     expiryDate: 'Data di Scadenza',
     waitingForApproval: 'In attesa di approvazione',
+    cardDetails: 'Dettagli Carta',
+    cardType: 'Tipo di Carta',
+    cardId: 'ID Carta',
+    virtualCardRequest: 'Richiesta Carta Virtuale',
+    physicalCardRequest: 'Richiesta Carta Fisica',
+    pending: 'In Attesa',
     
     // KYC
     identityVerification: 'Verifica Identità (KYC)',
