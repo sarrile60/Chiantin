@@ -384,22 +384,10 @@ function TransactionDetailsModal({ transaction, onClose }) {
                 <dt className={`${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{t('created')}</dt>
                 <dd className={`mt-1 ${isDark ? 'text-gray-200' : 'text-gray-900'}`}>{formatDate(transaction.created_at)}</dd>
               </div>
-              {transaction.external_id && (
-                <div className="col-span-2">
-                  <dt className={`${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{t('externalId')}</dt>
-                  <dd className={`font-mono text-xs mt-1 ${isDark ? 'text-gray-200' : 'text-gray-900'}`}>{transaction.external_id}</dd>
-                </div>
-              )}
               {transaction.reason && (
                 <div className="col-span-2">
                   <dt className={`${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{t('reason')}</dt>
                   <dd className={`mt-1 ${isDark ? 'text-gray-200' : 'text-gray-900'}`}>{transaction.reason}</dd>
-                </div>
-              )}
-              {transaction.performed_by && (
-                <div>
-                  <dt className={`${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{t('performedBy')}</dt>
-                  <dd className={`font-mono text-xs mt-1 ${isDark ? 'text-gray-200' : 'text-gray-900'}`}>{transaction.performed_by}</dd>
                 </div>
               )}
             </dl>
