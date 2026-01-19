@@ -2,9 +2,12 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api';
 import { useToast } from './Toast';
+import { useLanguage, useTheme } from '../contexts/AppContext';
 
 export function P2PTransferForm({ onSuccess }) {
   const toast = useToast();
+  const { t } = useLanguage();
+  const { isDark } = useTheme();
   const [beneficiaries, setBeneficiaries] = useState([]);
   const [accounts, setAccounts] = useState([]);
   const [formData, setFormData] = useState({
@@ -61,11 +64,11 @@ export function P2PTransferForm({ onSuccess }) {
         setRecipientValid(true);
       } else {
         setRecipientValid(false);
-        toast.error('Invalid IBAN format');
+        toast.error(t('invalidIbanFormat'));
       }
     } catch (err) {
       setRecipientValid(false);
-      toast.error('IBAN validation failed');
+      toast.error(t('invalidIbanFormat'));
     } finally {
       setValidating(false);
     }
@@ -86,7 +89,7 @@ export function P2PTransferForm({ onSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!hasEnoughBalance) {
-      toast.error('Insufficient balance');
+      toast.error(t('insufficientBalance'));
       return;
     }
     
@@ -105,7 +108,7 @@ export function P2PTransferForm({ onSuccess }) {
       });
       setTransactionResult({...result.data, amount: amountInCents});
       setShowConfirmation(true);
-      toast.success('Transfer successful!');
+      toast.success(t('transferSuccessful'));
       setTimeout(() => {
         setFormData({ to_iban: '', to_name: '', amount: '', reason: '', reference: '' });
         setShowConfirmation(false);
@@ -116,11 +119,11 @@ export function P2PTransferForm({ onSuccess }) {
       // Check for tax hold error
       const errorDetail = err.response?.data?.detail;
       if (errorDetail?.code === 'TAX_HOLD') {
-        toast.error('Account restricted due to tax obligations');
+        toast.error(t('accountRestrictedTax'));
         // Show detailed message in alert for better visibility
-        alert(errorDetail.formatted_message || 'Your account is restricted. Please contact support.');
+        alert(errorDetail.formatted_message || t('accountRestrictedTax'));
       } else {
-        toast.error(typeof errorDetail === 'string' ? errorDetail : 'Transfer failed');
+        toast.error(typeof errorDetail === 'string' ? errorDetail : t('transferFailed'));
       }
     } finally {
       setLoading(false);
@@ -146,28 +149,28 @@ export function P2PTransferForm({ onSuccess }) {
   if (showConfirmation && transactionResult) {
     return (
       <div className="max-w-lg mx-auto">
-        <div className="bg-white rounded-xl shadow-lg p-8 text-center">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg className="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className={`rounded-xl shadow-lg p-8 text-center ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
+          <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 ${isDark ? 'bg-green-900/30' : 'bg-green-100'}`}>
+            <svg className={`w-10 h-10 ${isDark ? 'text-green-400' : 'text-green-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h3 className="text-2xl font-semibold text-gray-900 mb-2">Payment Successful!</h3>
-          <p className="text-3xl font-bold text-gray-900 mb-2">€{(transactionResult.amount / 100).toFixed(2)}</p>
-          <p className="text-gray-600 mb-2">sent to {transactionResult.recipient}</p>
+          <h3 className={`text-2xl font-semibold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>{t('paymentSuccessful')}</h3>
+          <p className={`text-3xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>€{(transactionResult.amount / 100).toFixed(2)}</p>
+          <p className={`mb-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{t('sentTo')} {transactionResult.recipient}</p>
           {transactionResult.recipient_iban && (
-            <p className="text-sm text-gray-500 font-mono mb-6">{formatIBAN(transactionResult.recipient_iban)}</p>
+            <p className={`text-sm font-mono mb-6 ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>{formatIBAN(transactionResult.recipient_iban)}</p>
           )}
-          <div className="bg-gray-50 rounded-lg p-4 mb-6">
-            <p className="text-xs text-gray-500 mb-1">Transaction ID</p>
-            <p className="text-sm font-mono text-gray-700">{transactionResult.transaction_id}</p>
+          <div className={`rounded-lg p-4 mb-6 ${isDark ? 'bg-gray-700' : 'bg-gray-50'}`}>
+            <p className={`text-xs mb-1 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{t('transactionId')}</p>
+            <p className={`text-sm font-mono ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{transactionResult.transaction_id}</p>
           </div>
-          <div className="flex items-center justify-center text-green-600">
+          <div className={`flex items-center justify-center ${isDark ? 'text-green-400' : 'text-green-600'}`}>
             <svg className="animate-spin mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            Redirecting...
+            {t('redirecting')}
           </div>
         </div>
       </div>
@@ -176,7 +179,7 @@ export function P2PTransferForm({ onSuccess }) {
 
   return (
     <div className="max-w-lg mx-auto">
-      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+      <div className={`rounded-xl shadow-lg overflow-hidden ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
         {/* Header with Bank Icon */}
         <div className="bg-gradient-to-r from-red-600 to-red-700 px-6 py-8 text-center">
           <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -184,30 +187,30 @@ export function P2PTransferForm({ onSuccess }) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
             </svg>
           </div>
-          <h2 className="text-xl font-semibold text-white">Send Money</h2>
-          <p className="text-red-100 text-sm mt-1">Transfer funds securely via IBAN</p>
+          <h2 className="text-xl font-semibold text-white">{t('sendMoney')}</h2>
+          <p className="text-red-100 text-sm mt-1">{t('transferFundsSecurely')}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
           {/* Recipient Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Send money to
+            <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+              {t('sendMoneyTo')}
             </label>
             <input
               type="text"
               value={formData.to_name}
               onChange={(e) => setFormData({...formData, to_name: e.target.value})}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
-              placeholder="Recipient name"
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors ${isDark ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'border-gray-300 text-gray-900'}`}
+              placeholder={t('recipientName')}
               data-testid="transfer-name"
             />
           </div>
 
           {/* Recipient IBAN */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Recipient IBAN
+            <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+              {t('recipientIban')}
             </label>
             <div className="relative">
               <input
@@ -221,10 +224,10 @@ export function P2PTransferForm({ onSuccess }) {
                 onBlur={validateIBAN}
                 required
                 className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-red-500 transition-colors font-mono text-sm tracking-wider ${
-                  recipientValid === true ? 'border-green-500 bg-green-50' : 
-                  recipientValid === false ? 'border-red-500 bg-red-50' : 
-                  'border-gray-300'
-                }`}
+                  recipientValid === true ? 'border-green-500 bg-green-50 dark:bg-green-900/20' : 
+                  recipientValid === false ? 'border-red-500 bg-red-50 dark:bg-red-900/20' : 
+                  isDark ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'
+                } ${isDark && recipientValid === null ? 'text-white' : ''}`}
                 placeholder="DE89 3704 0044 0532 0130 00"
                 data-testid="transfer-iban"
               />
@@ -236,16 +239,16 @@ export function P2PTransferForm({ onSuccess }) {
                 </div>
               )}
             </div>
-            {validating && <p className="text-xs text-gray-500 mt-1">Validating IBAN...</p>}
-            {recipientValid === true && <p className="text-xs text-green-600 mt-1">✓ Valid IBAN format</p>}
-            {recipientValid === false && <p className="text-xs text-red-600 mt-1">✗ Invalid IBAN format</p>}
+            {validating && <p className={`text-xs mt-1 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{t('validatingIban')}</p>}
+            {recipientValid === true && <p className="text-xs text-green-600 mt-1">✓ {t('validIbanFormat')}</p>}
+            {recipientValid === false && <p className="text-xs text-red-600 mt-1">✗ {t('invalidIbanFormat')}</p>}
           </div>
 
           {/* Saved Recipients */}
           {beneficiaries.length > 0 && beneficiaries.some(b => b.recipient_iban) && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Or select from saved recipients
+              <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                {t('orSelectFromSaved')}
               </label>
               <div className="flex flex-wrap gap-2">
                 {beneficiaries.filter(b => b.recipient_iban).slice(0, 4).map(b => (
@@ -255,8 +258,8 @@ export function P2PTransferForm({ onSuccess }) {
                     onClick={() => selectBeneficiary(b)}
                     className={`px-3 py-2 text-sm rounded-full border transition-colors ${
                       formData.to_iban.replace(/\s/g, '') === (b.recipient_iban || '').replace(/\s/g, '')
-                        ? 'border-red-600 bg-red-50 text-red-700'
-                        : 'border-gray-300 hover:border-red-300 hover:bg-red-50'
+                        ? 'border-red-600 bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300'
+                        : isDark ? 'border-gray-600 text-gray-300 hover:border-red-500 hover:bg-red-900/20' : 'border-gray-300 hover:border-red-300 hover:bg-red-50'
                     }`}
                   >
                     {b.nickname || b.recipient_name}
@@ -268,34 +271,34 @@ export function P2PTransferForm({ onSuccess }) {
 
           {/* Pay From Account */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Pay from
+            <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+              {t('payFrom')}
             </label>
-            <div className="border border-gray-300 rounded-lg p-4 bg-gray-50">
+            <div className={`border rounded-lg p-4 ${isDark ? 'border-gray-600 bg-gray-700' : 'border-gray-300 bg-gray-50'}`}>
               {selectedAccount ? (
                 <div className="flex justify-between items-center">
                   <div>
-                    <p className="font-medium text-gray-900">Current Account</p>
-                    <p className="text-sm text-gray-500 font-mono">{formatIBAN(selectedAccount.iban)}</p>
+                    <p className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>{t('currentAccount')}</p>
+                    <p className={`text-sm font-mono ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{formatIBAN(selectedAccount.iban)}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm text-gray-500">Available</p>
-                    <p className="font-semibold text-gray-900">€{(availableBalance / 100).toFixed(2)}</p>
+                    <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{t('available')}</p>
+                    <p className={`font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>€{(availableBalance / 100).toFixed(2)}</p>
                   </div>
                 </div>
               ) : (
-                <p className="text-gray-500">No account available</p>
+                <p className={`${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{t('noAccountAvailable')}</p>
               )}
             </div>
           </div>
 
           {/* Amount */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Amount
+            <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+              {t('amount')}
             </label>
             <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-lg font-medium">€</span>
+              <span className={`absolute left-4 top-1/2 -translate-y-1/2 text-lg font-medium ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>€</span>
               <input
                 type="number"
                 step="0.01"
@@ -303,22 +306,22 @@ export function P2PTransferForm({ onSuccess }) {
                 value={formData.amount}
                 onChange={(e) => setFormData({...formData, amount: e.target.value})}
                 required
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors text-lg"
+                className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors text-lg ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'}`}
                 placeholder="0.00"
                 data-testid="transfer-amount"
               />
             </div>
             {formData.amount && (
               <div className="flex justify-between items-center mt-2">
-                <span className="text-xs text-gray-500">
+                <span className="text-xs">
                   {hasEnoughBalance ? (
-                    <span className="text-green-600">✓ Sufficient balance</span>
+                    <span className="text-green-600">✓ {t('sufficientBalance')}</span>
                   ) : (
-                    <span className="text-red-600">✗ Insufficient balance</span>
+                    <span className="text-red-600">✗ {t('insufficientBalance')}</span>
                   )}
                 </span>
-                <span className="text-xs text-gray-500">
-                  Remaining: €{((availableBalance - transferAmountCents) / 100).toFixed(2)}
+                <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                  {t('remaining')}: €{((availableBalance - transferAmountCents) / 100).toFixed(2)}
                 </span>
               </div>
             )}
@@ -333,8 +336,8 @@ export function P2PTransferForm({ onSuccess }) {
                 onClick={() => setFormData({...formData, amount: euro.toString()})}
                 className={`flex-1 py-2 text-sm rounded-lg border transition-colors ${
                   parseFloat(formData.amount) === euro
-                    ? 'border-red-600 bg-red-50 text-red-700 font-medium'
-                    : 'border-gray-300 hover:border-red-300 text-gray-700'
+                    ? 'border-red-600 bg-red-50 text-red-700 font-medium dark:bg-red-900/30 dark:text-red-300'
+                    : isDark ? 'border-gray-600 text-gray-300 hover:border-red-500' : 'border-gray-300 hover:border-red-300 text-gray-700'
                 }`}
               >
                 €{euro}
@@ -344,19 +347,19 @@ export function P2PTransferForm({ onSuccess }) {
 
           {/* Payment Details */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Details
+            <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+              {t('details')}
             </label>
             <textarea
               value={formData.reason}
               onChange={(e) => setFormData({...formData, reason: e.target.value})}
               rows={2}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors resize-none"
-              placeholder="What is this payment for? (optional)"
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors resize-none ${isDark ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'border-gray-300'}`}
+              placeholder={t('paymentPurpose')}
               data-testid="transfer-reason"
             />
-            <p className="text-xs text-gray-500 mt-1">
-              💡 These details will be visible to the recipient
+            <p className={`text-xs mt-1 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+              💡 {t('detailsVisibleToRecipient')}
             </p>
           </div>
 
@@ -369,8 +372,8 @@ export function P2PTransferForm({ onSuccess }) {
               onChange={(e) => setShowReference(e.target.checked)}
               className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
             />
-            <label htmlFor="showReference" className="ml-2 text-sm text-gray-700">
-              Add a reference number
+            <label htmlFor="showReference" className={`ml-2 text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+              {t('addReferenceNumber')}
             </label>
           </div>
 
@@ -380,8 +383,8 @@ export function P2PTransferForm({ onSuccess }) {
                 type="text"
                 value={formData.reference}
                 onChange={(e) => setFormData({...formData, reference: e.target.value})}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
-                placeholder="Reference number (e.g., INV-2024-001)"
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors ${isDark ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'border-gray-300'}`}
+                placeholder={t('referencePlaceholder')}
                 data-testid="transfer-reference"
               />
             </div>
@@ -400,14 +403,14 @@ export function P2PTransferForm({ onSuccess }) {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                Processing...
+                {t('processing')}
               </>
             ) : (
               <>
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                 </svg>
-                Make Payment
+                {t('makePayment')}
               </>
             )}
           </button>
@@ -415,9 +418,9 @@ export function P2PTransferForm({ onSuccess }) {
           {/* Save as Draft */}
           <button
             type="button"
-            className="w-full py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
+            className={`w-full py-3 border font-medium rounded-lg transition-colors ${isDark ? 'border-gray-600 text-gray-300 hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}
           >
-            Save as Draft
+            {t('saveAsDraft')}
           </button>
         </form>
       </div>
