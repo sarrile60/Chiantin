@@ -397,7 +397,7 @@ function TicketDetails({ ticket, onUpdate, isAdmin = false }) {
   );
 }
 
-function TicketStatusBadge({ status }) {
+function TicketStatusBadge({ status, t }) {
   const colors = {
     OPEN: 'bg-blue-100 text-blue-800 border-blue-300',
     IN_PROGRESS: 'bg-yellow-100 text-yellow-800 border-yellow-300',
@@ -406,9 +406,23 @@ function TicketStatusBadge({ status }) {
     CLOSED: 'bg-gray-100 text-gray-800 border-gray-300'
   };
 
+  // Translate status labels
+  const getStatusLabel = (status) => {
+    if (!t) return status.replace('_', ' ');
+    switch(status) {
+      case 'OPEN': return t('open');
+      case 'IN_PROGRESS': return t('inProgress');
+      case 'WAITING': return t('waiting');
+      case 'RESOLVED': return t('resolved');
+      case 'CLOSED': return t('closed');
+      default: return status.replace('_', ' ');
+    }
+  };
+
   return (
     <span className={`status-badge ${colors[status] || colors.OPEN}`}>
-      {status.replace('_', ' ')}
+      {getStatusLabel(status)}
+    </span>
     </span>
   );
 }
