@@ -118,12 +118,58 @@ export function NotificationBell() {
     const diffMs = now - date;
     const diffMins = Math.floor(diffMs / 60000);
     
-    if (diffMins < 1) return 'Just now';
-    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffMins < 1) return t('justNow');
+    if (diffMins < 60) return `${diffMins}${t('minutesAgo')}`;
     const diffHours = Math.floor(diffMins / 60);
-    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffHours < 24) return `${diffHours}${t('hoursAgo')}`;
     const diffDays = Math.floor(diffHours / 24);
-    return `${diffDays}d ago`;
+    return `${diffDays}${t('daysAgo')}`;
+  };
+
+  // Translate notification content based on known patterns
+  const translateNotificationTitle = (title) => {
+    if (!title) return '';
+    const titleLower = title.toLowerCase();
+    
+    if (titleLower.includes('card is ready') || titleLower.includes('card ready')) {
+      return t('notifCardReady');
+    }
+    if (titleLower.includes('kyc approved') || titleLower.includes('verification approved')) {
+      return t('notifKycApproved');
+    }
+    if (titleLower.includes('kyc submitted') || titleLower.includes('verification submitted')) {
+      return t('notifKycSubmitted');
+    }
+    if (titleLower.includes('transfer complete') || titleLower.includes('transfer successful')) {
+      return t('notifTransferComplete');
+    }
+    if (titleLower.includes('welcome')) {
+      return t('notifWelcome');
+    }
+    return title;
+  };
+
+  const translateNotificationMessage = (message, title) => {
+    if (!message) return '';
+    const messageLower = message.toLowerCase();
+    const titleLower = (title || '').toLowerCase();
+    
+    if (messageLower.includes('card has been issued') || messageLower.includes('ready to use')) {
+      return t('notifCardReadyMessage');
+    }
+    if (messageLower.includes('identity verification has been approved') || messageLower.includes('full access')) {
+      return t('notifKycApprovedMessage');
+    }
+    if (messageLower.includes('kyc application has been submitted') || messageLower.includes('under review')) {
+      return t('notifKycSubmittedMessage');
+    }
+    if (messageLower.includes('transfer has been processed')) {
+      return t('notifTransferCompleteMessage');
+    }
+    if (titleLower.includes('welcome') || messageLower.includes('thank you for joining')) {
+      return t('notifWelcomeMessage');
+    }
+    return message;
   };
 
   // Helper to determine if notification is clickable
