@@ -1,6 +1,7 @@
 // KYC Components
 import React, { useState, useEffect } from 'react';
 import api from '../api';
+import { useLanguage, useTheme } from '../contexts/AppContext';
 
 export function KYCApplication() {
   const [application, setApplication] = useState(null);
@@ -26,6 +27,8 @@ export function KYCApplication() {
   });
   const [uploadingDoc, setUploadingDoc] = useState(null);
   const [error, setError] = useState('');
+  const { t } = useLanguage();
+  const { isDark } = useTheme();
 
   useEffect(() => {
     fetchApplication();
