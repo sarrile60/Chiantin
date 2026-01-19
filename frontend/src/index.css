@@ -38,8 +38,35 @@
     --border-light: #F5F5F5;
   }
   
+  /* Dark Mode CSS Variables */
+  .dark {
+    --accent-red: #EF5350;
+    --accent-red-hover: #F44336;
+    --accent-red-light: #2D1F1F;
+    
+    --gray-50: #1A1A1A;
+    --gray-100: #212121;
+    --gray-200: #2D2D2D;
+    --gray-300: #3D3D3D;
+    --gray-400: #5C5C5C;
+    --gray-500: #7A7A7A;
+    --gray-600: #9E9E9E;
+    --gray-700: #BDBDBD;
+    --gray-800: #E0E0E0;
+    --gray-900: #F5F5F5;
+    
+    --background: #121212;
+    --foreground: #F5F5F5;
+    --border: #2D2D2D;
+    --border-light: #1F1F1F;
+  }
+  
   * {
     @apply border-gray-200;
+  }
+  
+  .dark * {
+    border-color: #2D2D2D;
   }
   
   body {
@@ -47,6 +74,11 @@
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     font-size: 14px;
     line-height: 1.5;
+  }
+  
+  .dark body {
+    background-color: #121212;
+    color: #F5F5F5;
   }
   
   h1, h2, h3, h4, h5, h6 {
