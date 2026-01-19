@@ -667,6 +667,18 @@ const translations = {
     kycSubmittedSuccess: 'Domanda KYC inviata con successo! Il nostro team la esaminerà a breve.',
     kycValidationError: 'Errore di validazione - controlla tutti i campi',
     kycSubmitFailed: 'Impossibile inviare la domanda KYC',
+    kycApplicationBeingReviewed: 'La tua domanda è in fase di revisione',
+    kycThankYouSubmitting: 'Grazie per aver inviato la verifica. Il nostro team sta esaminando la tua domanda. Di solito ci vogliono 1-2 giorni lavorativi.',
+    kycWhatHappensNext: 'Cosa succede dopo?',
+    kycReviewProcess: 'Processo di revisione',
+    kycReviewProcessDesc: 'Il nostro team verifica i tuoi documenti e le tue informazioni',
+    kycAccountActivation: 'Attivazione conto',
+    kycAccountActivationDesc: 'Una volta approvato, il tuo conto e IBAN saranno attivati',
+    kycFullBankingAccess: 'Accesso bancario completo',
+    kycFullBankingAccessDesc: 'Potrai inviare denaro, ordinare carte e utilizzare tutte le funzionalità',
+    kycCheckStatus: 'Verifica Stato',
+    kycStatus: 'Stato KYC',
+    kycCheckStatusFailed: 'Impossibile verificare lo stato',
     
     // Profile
     profile: 'Profilo',
