@@ -946,7 +946,35 @@ export function ProfessionalDashboard({ user, logout }) {
               {(() => {
                 const txn = selectedTransaction;
                 const metadata = txn.metadata || {};
-                const displayType = metadata.display_type || txn.transaction_type?.replace(/_/g, ' ') || 'Transaction';
+                const rawDisplayType = metadata.display_type || txn.transaction_type?.replace(/_/g, ' ') || 'Transaction';
+                
+                // Translate display type helper
+                const translateDisplayType = (type) => {
+                  if (!type) return t('transaction');
+                  const typeLower = type.toLowerCase();
+                  if (typeLower === 'sepa transfer') return t('sepaTransfer');
+                  if (typeLower === 'bank transfer') return t('bankTransfer');
+                  if (typeLower === 'wire transfer') return t('wireTransfer');
+                  if (typeLower === 'internal transfer') return t('internalTransfer');
+                  if (typeLower === 'card payment') return t('cardPayment');
+                  if (typeLower === 'atm withdrawal') return t('atmWithdrawal');
+                  if (typeLower === 'direct debit') return t('directDebit');
+                  if (typeLower === 'standing order') return t('standingOrder');
+                  if (typeLower === 'instant payment') return t('instantPayment');
+                  if (typeLower === 'top up' || typeLower === 'top_up') return t('topUpDisplay');
+                  if (typeLower === 'withdraw') return t('withdrawDisplay');
+                  if (typeLower === 'fee') return t('feeDisplay');
+                  if (typeLower === 'refund') return t('refund');
+                  if (typeLower === 'interest') return t('interest');
+                  if (typeLower === 'credit') return t('credit');
+                  if (typeLower === 'debit') return t('debit');
+                  if (typeLower === 'transfer') return t('transfer');
+                  if (typeLower === 'reversal') return t('reversal');
+                  if (typeLower === 'transaction') return t('transaction');
+                  return type;
+                };
+                
+                const displayType = translateDisplayType(rawDisplayType);
                 const isCredit = ['TOP_UP', 'CREDIT', 'REFUND', 'INTEREST'].includes(txn.transaction_type) || txn.direction === 'CREDIT';
                 const amount = txn.amount || 0;
 
@@ -965,7 +993,7 @@ export function ProfessionalDashboard({ user, logout }) {
                           </svg>
                         )}
                       </div>
-                      <p className="text-sm text-gray-600 mb-1">{displayType === 'SEPA Transfer' ? t('sepaTransfer') : displayType}</p>
+                      <p className="text-sm text-gray-600 mb-1">{displayType}</p>
                       <p className={`text-3xl font-bold ${isCredit ? 'text-green-600' : 'text-red-600'}`}>
                         {isCredit ? '+' : '-'}€{formatAmount(amount)}
                       </p>
@@ -989,7 +1017,7 @@ export function ProfessionalDashboard({ user, logout }) {
                       {/* Transaction Type */}
                       <div className="flex justify-between py-3 border-b">
                         <span className="text-sm text-gray-500">{t('type')}</span>
-                        <span className="text-sm font-medium text-gray-900">{txn.transaction_type?.replace(/_/g, ' ') || t('transaction')}</span>
+                        <span className="text-sm font-medium text-gray-900">{translateDisplayType(txn.transaction_type?.replace(/_/g, ' '))}</span>
                       </div>
 
                       {/* Sender/Recipient */}
