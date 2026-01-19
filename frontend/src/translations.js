@@ -1298,6 +1298,24 @@ const translations = {
     ref: 'Rif',
     sepaTransfer: 'Trasferimento SEPA',
     transaction: 'Transazione',
+    
+    // Time formatting
+    justNow: 'Adesso',
+    minutesAgo: 'm fa',
+    hoursAgo: 'h fa',
+    daysAgo: 'g fa',
+    
+    // Notification content translations
+    notifCardReady: 'La tua carta è pronta!',
+    notifCardReadyMessage: 'La tua carta è stata emessa ed è pronta per l\'uso.',
+    notifKycApproved: 'KYC Approvato',
+    notifKycApprovedMessage: 'La verifica della tua identità è stata approvata. Ora hai accesso completo a tutte le funzionalità.',
+    notifKycSubmitted: 'KYC Inviato',
+    notifKycSubmittedMessage: 'La tua domanda KYC è stata inviata ed è in revisione.',
+    notifTransferComplete: 'Trasferimento Completato',
+    notifTransferCompleteMessage: 'Il tuo trasferimento è stato elaborato con successo.',
+    notifWelcome: 'Benvenuto su Project Atlas',
+    notifWelcomeMessage: 'Grazie per esserti unito. Completa il KYC per sbloccare tutte le funzionalità.',
   }
 };
 
