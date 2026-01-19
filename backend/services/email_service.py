@@ -13,12 +13,76 @@ logger = logging.getLogger(__name__)
 
 # Constants
 APP_NAME = "ecommbx"
-FRONTEND_URL = "https://translatlas.preview.emergentagent.com"
+FRONTEND_URL = "https://fintech-rebrand.preview.emergentagent.com"
 
 # Hardcode the API key since environment loading is problematic
 # This should be moved to proper env vars in production
 _RESEND_API_KEY = "re_XAVmgwpr_73e1PpPi56DCGP5msWPupaLZ"
 _SENDER_EMAIL = "noreply@ecommbx.io"
+
+# Email translations for i18n support
+EMAIL_TRANSLATIONS = {
+    'en': {
+        # Password Reset Email
+        'password_reset_subject': f'Password Reset - {APP_NAME}',
+        'password_reset_title': 'Password Reset Request',
+        'password_reset_greeting': 'Hello,',
+        'password_reset_body': 'We received a request to reset your password. Click the button below to create a new password:',
+        'password_reset_button': 'Reset Password',
+        'password_reset_link_instruction': 'Or copy and paste this link into your browser:',
+        'password_reset_expiry': '⏰ This link expires in 1 hour.',
+        'password_reset_ignore': "If you didn't request this password reset, please ignore this email. Your password will remain unchanged.",
+        'password_reset_footer': f'© 2024 {APP_NAME}. All rights reserved.',
+        
+        # Admin Password Reset
+        'admin_reset_title': 'Password Reset',
+        'admin_reset_body': 'Your password has been reset by an administrator.',
+        'temp_password_label': 'Your temporary password:',
+        'admin_reset_warning': '⚠️ Please login and change your password immediately for security.',
+        
+        # OTP Email
+        'otp_subject': f'Your Login Code - {APP_NAME}',
+        'otp_title': 'Verification Code',
+        'otp_greeting': 'Hello,',
+        'otp_body': 'Your verification code is:',
+        'otp_expiry': '⏰ This code expires in 10 minutes.',
+        'otp_ignore': "If you didn't request this code, please ignore this email.",
+    },
+    'it': {
+        # Password Reset Email
+        'password_reset_subject': f'Reimpostazione Password - {APP_NAME}',
+        'password_reset_title': 'Richiesta Reimpostazione Password',
+        'password_reset_greeting': 'Ciao,',
+        'password_reset_body': 'Abbiamo ricevuto una richiesta per reimpostare la tua password. Clicca il pulsante qui sotto per creare una nuova password:',
+        'password_reset_button': 'Reimposta Password',
+        'password_reset_link_instruction': 'Oppure copia e incolla questo link nel tuo browser:',
+        'password_reset_expiry': '⏰ Questo link scade tra 1 ora.',
+        'password_reset_ignore': 'Se non hai richiesto la reimpostazione della password, ignora questa email. La tua password rimarrà invariata.',
+        'password_reset_footer': f'© 2024 {APP_NAME}. Tutti i diritti riservati.',
+        
+        # Admin Password Reset
+        'admin_reset_title': 'Reimpostazione Password',
+        'admin_reset_body': 'La tua password è stata reimpostata da un amministratore.',
+        'temp_password_label': 'La tua password temporanea:',
+        'admin_reset_warning': '⚠️ Accedi e cambia immediatamente la tua password per sicurezza.',
+        
+        # OTP Email
+        'otp_subject': f'Il Tuo Codice di Accesso - {APP_NAME}',
+        'otp_title': 'Codice di Verifica',
+        'otp_greeting': 'Ciao,',
+        'otp_body': 'Il tuo codice di verifica è:',
+        'otp_expiry': '⏰ Questo codice scade tra 10 minuti.',
+        'otp_ignore': 'Se non hai richiesto questo codice, ignora questa email.',
+    }
+}
+
+
+def get_translation(key: str, language: str = 'en') -> str:
+    """Get translation for a given key and language."""
+    lang = language.lower() if language else 'en'
+    if lang not in EMAIL_TRANSLATIONS:
+        lang = 'en'
+    return EMAIL_TRANSLATIONS[lang].get(key, EMAIL_TRANSLATIONS['en'].get(key, key))
 
 
 class EmailService:
@@ -29,15 +93,17 @@ class EmailService:
         # Set API key on initialization
         resend.api_key = _RESEND_API_KEY
     
-    def send_password_reset(self, to_email: str, reset_token: str, temp_password: Optional[str] = None):
-        """Send password reset email via Resend."""
+    def send_password_reset(self, to_email: str, reset_token: str, temp_password: Optional[str] = None, language: str = 'en'):
+        """Send password reset email via Resend with localization support."""
         # Ensure API key is set
         resend.api_key = _RESEND_API_KEY
         
-        subject = f"Password Reset - {APP_NAME}"
+        t = lambda key: get_translation(key, language)
+        subject = t('password_reset_subject')
         reset_link = f"{FRONTEND_URL}/reset-password?token={reset_token}"
         
         if temp_password:
+            # Admin-initiated password reset with temporary password
             html_body = f"""
             <!DOCTYPE html>
             <html>
@@ -46,6 +112,9 @@ class EmailService:
                 <style>
                     body {{ font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }}
                     .header {{ background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }}
+                    .header h1 {{ margin: 0; }}
+                    .header .brand {{ color: white; }}
+                    .header .brand-accent {{ color: #dc3545; }}
                     .content {{ background: #f8f9fa; padding: 30px; border-radius: 0 0 10px 10px; }}
                     .password-box {{ background: #fff3cd; border: 1px solid #ffc107; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: center; }}
                     .password {{ font-family: monospace; font-size: 24px; color: #856404; font-weight: bold; }}
@@ -55,25 +124,26 @@ class EmailService:
             </head>
             <body>
                 <div class="header">
-                    <h1>🔐 {APP_NAME}</h1>
-                    <p>Password Reset</p>
+                    <h1>🔐 <span class="brand">ecomm</span><span class="brand-accent">bx</span></h1>
+                    <p>{t('admin_reset_title')}</p>
                 </div>
                 <div class="content">
-                    <p>Hello,</p>
-                    <p>Your password has been reset by an administrator.</p>
+                    <p>{t('password_reset_greeting')}</p>
+                    <p>{t('admin_reset_body')}</p>
                     <div class="password-box">
-                        <p>Your temporary password:</p>
+                        <p>{t('temp_password_label')}</p>
                         <p class="password">{temp_password}</p>
                     </div>
-                    <p class="warning">⚠️ Please login and change your password immediately for security.</p>
+                    <p class="warning">{t('admin_reset_warning')}</p>
                 </div>
                 <div class="footer">
-                    <p>© 2024 {APP_NAME}. All rights reserved.</p>
+                    <p>{t('password_reset_footer')}</p>
                 </div>
             </body>
             </html>
             """
         else:
+            # User-initiated password reset with link
             html_body = f"""
             <!DOCTYPE html>
             <html>
@@ -82,24 +152,24 @@ class EmailService:
             </head>
             <body style="font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
                 <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-                    <h1 style="margin: 0;">🔐 {APP_NAME}</h1>
-                    <p style="margin: 10px 0 0 0;">Password Reset Request</p>
+                    <h1 style="margin: 0;">🔐 <span style="color: white;">ecomm</span><span style="color: #dc3545;">bx</span></h1>
+                    <p style="margin: 10px 0 0 0;">{t('password_reset_title')}</p>
                 </div>
                 <div style="background: #f8f9fa; padding: 30px; border-radius: 0 0 10px 10px;">
-                    <p>Hello,</p>
-                    <p>We received a request to reset your password. Click the button below to create a new password:</p>
+                    <p>{t('password_reset_greeting')}</p>
+                    <p>{t('password_reset_body')}</p>
                     <p style="text-align: center;">
-                        <a href="{reset_link}" style="display: inline-block; background: #dc3545; color: #ffffff; padding: 15px 40px; text-decoration: none; border-radius: 8px; font-weight: bold; margin: 20px 0;">Reset Password</a>
+                        <a href="{reset_link}" style="display: inline-block; background: #dc3545; color: #ffffff; padding: 15px 40px; text-decoration: none; border-radius: 8px; font-weight: bold; margin: 20px 0;">{t('password_reset_button')}</a>
                     </p>
-                    <p>Or copy and paste this link into your browser:</p>
+                    <p>{t('password_reset_link_instruction')}</p>
                     <div style="background: #e9ecef; padding: 15px; border-radius: 8px; margin: 20px 0; word-break: break-all; font-family: monospace; font-size: 12px;">
                         <a href="{reset_link}" style="color: #333;">{reset_link}</a>
                     </div>
-                    <p style="color: #666; font-size: 14px; margin-top: 20px;">⏰ This link expires in 1 hour.</p>
-                    <p style="color: #666; font-size: 14px;">If you didn't request this password reset, please ignore this email. Your password will remain unchanged.</p>
+                    <p style="color: #666; font-size: 14px; margin-top: 20px;">{t('password_reset_expiry')}</p>
+                    <p style="color: #666; font-size: 14px;">{t('password_reset_ignore')}</p>
                 </div>
                 <div style="text-align: center; margin-top: 20px; font-size: 12px; color: #666;">
-                    <p>© 2024 {APP_NAME}. All rights reserved.</p>
+                    <p>{t('password_reset_footer')}</p>
                 </div>
             </body>
             </html>
@@ -114,13 +184,14 @@ class EmailService:
             }
             
             response = resend.Emails.send(params)
-            logger.info(f"Password reset email sent to {to_email}, Resend ID: {response.get('id', 'unknown')}")
+            logger.info(f"Password reset email sent to {to_email} (lang={language}), Resend ID: {response.get('id', 'unknown')}")
             
             self.sent_emails.append({
                 'to': to_email,
                 'subject': subject,
                 'sent_at': datetime.utcnow(),
-                'resend_id': response.get('id')
+                'resend_id': response.get('id'),
+                'language': language
             })
             
             return True
@@ -129,12 +200,13 @@ class EmailService:
             print(f"[EMAIL ERROR] Failed to send to {to_email}: {str(e)}")
             return False
     
-    def send_otp(self, to_email: str, otp_code: str):
-        """Send OTP code via email using Resend."""
+    def send_otp(self, to_email: str, otp_code: str, language: str = 'en'):
+        """Send OTP code via email using Resend with localization support."""
         # Ensure API key is set
         resend.api_key = _RESEND_API_KEY
         
-        subject = f"Your Login Code - {APP_NAME}"
+        t = lambda key: get_translation(key, language)
+        subject = t('otp_subject')
         
         html_body = f"""
         <!DOCTYPE html>
@@ -144,6 +216,9 @@ class EmailService:
             <style>
                 body {{ font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }}
                 .header {{ background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }}
+                .header h1 {{ margin: 0; }}
+                .header .brand {{ color: white; }}
+                .header .brand-accent {{ color: #dc3545; }}
                 .content {{ background: #f8f9fa; padding: 30px; border-radius: 0 0 10px 10px; }}
                 .otp-box {{ background: #fff; border: 2px solid #dc3545; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center; }}
                 .otp {{ font-family: monospace; font-size: 36px; color: #dc3545; font-weight: bold; letter-spacing: 8px; }}
@@ -153,20 +228,20 @@ class EmailService:
         </head>
         <body>
             <div class="header">
-                <h1>🔒 {APP_NAME}</h1>
-                <p>Verification Code</p>
+                <h1>🔒 <span class="brand">ecomm</span><span class="brand-accent">bx</span></h1>
+                <p>{t('otp_title')}</p>
             </div>
             <div class="content">
-                <p>Hello,</p>
-                <p>Your verification code is:</p>
+                <p>{t('otp_greeting')}</p>
+                <p>{t('otp_body')}</p>
                 <div class="otp-box">
                     <p class="otp">{otp_code}</p>
                 </div>
-                <p class="warning">⏰ This code expires in 10 minutes.</p>
-                <p class="warning">If you didn't request this code, please ignore this email.</p>
+                <p class="warning">{t('otp_expiry')}</p>
+                <p class="warning">{t('otp_ignore')}</p>
             </div>
             <div class="footer">
-                <p>© 2024 {APP_NAME}. All rights reserved.</p>
+                <p>{t('password_reset_footer')}</p>
             </div>
         </body>
         </html>
@@ -181,13 +256,14 @@ class EmailService:
             }
             
             response = resend.Emails.send(params)
-            logger.info(f"OTP email sent to {to_email}, Resend ID: {response.get('id', 'unknown')}")
+            logger.info(f"OTP email sent to {to_email} (lang={language}), Resend ID: {response.get('id', 'unknown')}")
             
             self.sent_emails.append({
                 'to': to_email,
                 'subject': subject,
                 'sent_at': datetime.utcnow(),
-                'resend_id': response.get('id')
+                'resend_id': response.get('id'),
+                'language': language
             })
             
             return True
