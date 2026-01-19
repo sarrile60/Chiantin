@@ -124,6 +124,7 @@ const translations = {
     overview: 'Overview',
     availableBalance: 'Available balance',
     viewAccount: 'View Account',
+    verified: 'Verified',
     accounts: 'Accounts',
     cards: 'Cards',
     transfers: 'Transfers',
