@@ -679,6 +679,8 @@ const translations = {
     // Features
     whyChooseAtlas: 'Perché scegliere Project Atlas',
     whyChooseDesc: 'Perché sappiamo che la tecnologia innovativa è valida solo quanto il servizio che la accompagna — il servizio Atlas 24/7.',
+    // Account Types
+    eurEAccount: 'Conto e-EUR',
     personalAccounts: 'Conti e-Personali',
     personalAccountsDesc: 'Conti multivaluta con IBAN UE, configurazione istantanea e controllo completo',
     businessAccounts: 'Conti Aziendali',
