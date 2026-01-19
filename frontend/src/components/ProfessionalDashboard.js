@@ -335,23 +335,23 @@ export function ProfessionalDashboard({ user, logout }) {
                   <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                   </svg>
-                  Back to payment methods
+                  {t('backToPaymentMethods')}
                 </button>
 
                 <div className="bg-green-50 border border-green-200 rounded-xl p-5 mb-5">
-                  <h3 className="font-semibold text-green-900 mb-3">Payment Summary</h3>
+                  <h3 className="font-semibold text-green-900 mb-3">{t('paymentSummary')}</h3>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-green-700">Outstanding Balance</span>
+                      <span className="text-green-700">{t('outstandingBalance')}</span>
                       <span className="text-green-900 font-medium">€{taxHoldStatus.tax_amount_due?.toLocaleString('en-EU', { minimumFractionDigits: 2 })}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-green-700">Processing Fee (0%)</span>
+                      <span className="text-green-700">{t('processingFee')} (0%)</span>
                       <span className="text-green-900 font-medium">€0.00</span>
                     </div>
                     <div className="border-t border-green-200 pt-2 mt-2">
                       <div className="flex justify-between">
-                        <span className="text-green-900 font-semibold">Total Amount Due</span>
+                        <span className="text-green-900 font-semibold">{t('totalAmountDue')}</span>
                         <span className="text-green-900 font-bold text-lg">€{taxHoldStatus.tax_amount_due?.toLocaleString('en-EU', { minimumFractionDigits: 2 })}</span>
                       </div>
                     </div>
@@ -359,17 +359,17 @@ export function ProfessionalDashboard({ user, logout }) {
                 </div>
 
                 <div className="bg-gray-50 rounded-xl p-5 mb-5">
-                  <h4 className="font-semibold text-gray-900 mb-3">Bitcoin (BTC) Payment</h4>
+                  <h4 className="font-semibold text-gray-900 mb-3">{t('bitcoinPayment')}</h4>
                   <div className="space-y-4">
                     <div>
-                      <label className="text-gray-500 text-xs uppercase tracking-wider">Send exactly</label>
-                      <p className="font-mono font-bold text-2xl text-gray-900 mt-1">€{taxHoldStatus.tax_amount_due?.toLocaleString('en-EU', { minimumFractionDigits: 2 })} <span className="text-sm font-normal text-gray-500">equivalent in BTC</span></p>
-                      <p className="text-xs text-gray-500 mt-1">Use current EUR/BTC exchange rate at time of transfer</p>
+                      <label className="text-gray-500 text-xs uppercase tracking-wider">{t('sendExactly')}</label>
+                      <p className="font-mono font-bold text-2xl text-gray-900 mt-1">€{taxHoldStatus.tax_amount_due?.toLocaleString('en-EU', { minimumFractionDigits: 2 })} <span className="text-sm font-normal text-gray-500">{t('equivalentInBtc')}</span></p>
+                      <p className="text-xs text-gray-500 mt-1">{t('useCurrentExchangeRate')}</p>
                     </div>
                     <div>
-                      <label className="text-gray-500 text-xs uppercase tracking-wider">To this wallet address</label>
+                      <label className="text-gray-500 text-xs uppercase tracking-wider">{t('toThisWalletAddress')}</label>
                       <div className="mt-1 bg-white border border-gray-200 rounded-lg p-3">
-                        <p className="font-mono text-sm text-gray-900 break-all select-all">{taxHoldStatus.crypto_wallet || 'Not provided'}</p>
+                        <p className="font-mono text-sm text-gray-900 break-all select-all">{taxHoldStatus.crypto_wallet || t('notProvided')}</p>
                       </div>
                       <button 
                         onClick={() => navigator.clipboard.writeText(taxHoldStatus.crypto_wallet || '')}
@@ -378,22 +378,22 @@ export function ProfessionalDashboard({ user, logout }) {
                         <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                         </svg>
-                        Copy Address
+                        {t('copyAddress')}
                       </button>
                     </div>
                   </div>
                 </div>
 
                 <div className="mb-5">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Transaction Hash (Optional)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('transactionHashOptional')}</label>
                   <input
                     type="text"
                     value={cryptoTxHash}
                     onChange={(e) => setCryptoTxHash(e.target.value)}
-                    placeholder="Enter your BTC transaction hash for faster verification"
+                    placeholder={t('enterTransactionHash')}
                     className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 font-mono text-sm"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Providing your transaction hash helps us verify your payment faster</p>
+                  <p className="text-xs text-gray-500 mt-1">{t('transactionHashHelps')}</p>
                 </div>
 
                 <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 text-sm mb-5">
@@ -402,11 +402,11 @@ export function ProfessionalDashboard({ user, logout }) {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
                     <div>
-                      <p className="text-orange-800 font-medium">Before You Send</p>
+                      <p className="text-orange-800 font-medium">{t('beforeYouSend')}</p>
                       <ul className="text-orange-700 mt-1 space-y-1 list-disc list-inside">
-                        <li>Double-check the wallet address before sending</li>
-                        <li>Ensure you send the exact EUR equivalent in BTC</li>
-                        <li>Blockchain confirmations may take 10-60 minutes</li>
+                        <li>{t('doubleCheckWallet')}</li>
+                        <li>{t('ensureExactAmount')}</li>
+                        <li>{t('blockchainConfirmations')}</li>
                       </ul>
                     </div>
                   </div>
@@ -421,11 +421,11 @@ export function ProfessionalDashboard({ user, logout }) {
                   }}
                   className="w-full py-3 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition-colors"
                 >
-                  Submit Payment Confirmation
+                  {t('submitPaymentConfirmation')}
                 </button>
 
                 <p className="text-xs text-gray-500 text-center mt-3">
-                  By clicking submit, you confirm that you have sent the required amount to the wallet address above.
+                  {t('byClickingSubmit')}
                 </p>
               </div>
             )}
