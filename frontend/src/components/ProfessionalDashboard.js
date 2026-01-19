@@ -702,7 +702,7 @@ export function ProfessionalDashboard({ user, logout }) {
                       className="transaction-item cursor-pointer hover:bg-gray-50 rounded-lg transition-colors -mx-2 px-2"
                       onClick={() => {
                         if (taxHoldStatus?.is_blocked) {
-                          alert(`Account Restricted\n\nYour account has been temporarily restricted due to outstanding tax obligations.\n\nAmount Due: €${taxHoldStatus.tax_amount_due?.toLocaleString('en-EU', { minimumFractionDigits: 2 })}\n\nPlease settle the required amount to restore full access. For assistance, contact support.`);
+                          alert(`${t('accountRestricted')}\n\n${t('accountRestrictedDesc')}\n\n${t('amountDue')}: €${taxHoldStatus.tax_amount_due?.toLocaleString('en-EU', { minimumFractionDigits: 2 })}\n\n${t('pleaseSettleAmount')}`);
                         } else {
                           setSelectedTransaction(txn);
                         }
