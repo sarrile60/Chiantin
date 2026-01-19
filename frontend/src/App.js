@@ -596,11 +596,11 @@ function CustomerDashboard() {
   // Menu items for the user avatar dropdown
   const menuItems = [
     { label: 'Dashboard', icon: '🏠', path: '/dashboard', description: 'Overview & Balance' },
-    { label: 'Accounts', icon: '💳', path: '/dashboard', description: 'View your accounts' },
     { label: 'Transfers', icon: '💸', path: '/transfers', description: 'Send money' },
     { label: 'Cards', icon: '🎴', path: '/cards', description: 'Manage your cards' },
-    { label: 'Transactions', icon: '📊', path: '/dashboard', description: 'Activity history' },
     { label: 'Profile', icon: '👤', path: '/profile', description: 'Your settings' },
+    { label: 'Security', icon: '🔒', path: '/security', description: 'Password & 2FA' },
+    { label: 'Support', icon: '💬', path: '/support', description: 'Get help' },
   ];
 
   return (
