@@ -389,6 +389,16 @@ function LoginPage() {
                   className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-red-500 focus:border-red-500 transition ${isDark ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 text-gray-900'}`}
                   data-testid="password-input"
                 />
+                <div className="mt-2 text-right">
+                  <button
+                    type="button"
+                    onClick={() => navigate('/forgot-password')}
+                    className={`text-sm ${isDark ? 'text-red-400 hover:text-red-300' : 'text-red-500 hover:text-red-600'}`}
+                    data-testid="forgot-password-link"
+                  >
+                    {t('forgotPassword')}
+                  </button>
+                </div>
               </div>
 
               <button
