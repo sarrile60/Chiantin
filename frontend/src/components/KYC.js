@@ -454,7 +454,7 @@ export function KYCApplication() {
             </div>
             
             <div>
-              <h4 className="font-medium mb-2">Consents</h4>
+              <h4 className="font-medium mb-2">{t('kycConsents')}</h4>
               <div className="space-y-2">
                 <label className="flex items-start space-x-2">
                   <input
@@ -465,7 +465,7 @@ export function KYCApplication() {
                     className="mt-1"
                     data-testid="kyc-terms"
                   />
-                  <span className="text-sm">I accept the terms and conditions</span>
+                  <span className="text-sm">{t('kycAcceptTerms')}</span>
                 </label>
                 <label className="flex items-start space-x-2">
                   <input
@@ -476,7 +476,7 @@ export function KYCApplication() {
                     className="mt-1"
                     data-testid="kyc-privacy"
                   />
-                  <span className="text-sm">I accept the privacy policy</span>
+                  <span className="text-sm">{t('kycAcceptPrivacy')}</span>
                 </label>
               </div>
             </div>
@@ -487,7 +487,7 @@ export function KYCApplication() {
               onClick={() => setStep(2)}
               className="px-6 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
             >
-              Back
+              {t('back')}
             </button>
             <button
               onClick={handleSubmit}
@@ -495,7 +495,7 @@ export function KYCApplication() {
               className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
               data-testid="kyc-submit"
             >
-              {loading ? 'Submitting...' : 'Submit Application'}
+              {loading ? t('submitting') : t('kycSubmitApplication')}
             </button>
           </div>
         </div>
@@ -504,11 +504,11 @@ export function KYCApplication() {
   );
 }
 
-function DocumentUpload({ docType, uploaded, onUpload, uploading }) {
+function DocumentUpload({ docType, uploaded, onUpload, uploading, t }) {
   const labels = {
-    PASSPORT: 'Passport or ID Card',
-    PROOF_OF_ADDRESS: 'Proof of Address',
-    SELFIE: 'Selfie Photo'
+    PASSPORT: t ? t('kycPassportId') : 'Passport or ID Card',
+    PROOF_OF_ADDRESS: t ? t('kycProofOfAddress') : 'Proof of Address',
+    SELFIE: t ? t('kycSelfiePhoto') : 'Selfie Photo'
   };
 
   return (
@@ -521,7 +521,7 @@ function DocumentUpload({ docType, uploaded, onUpload, uploading }) {
           )}
         </div>
         <label className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 cursor-pointer">
-          {uploading ? 'Uploading...' : uploaded ? 'Replace' : 'Upload'}
+          {uploading ? (t ? t('uploading') : 'Uploading...') : uploaded ? (t ? t('replace') : 'Replace') : (t ? t('upload') : 'Upload')}
           <input
             type="file"
             onChange={(e) => onUpload(e.target.files[0])}
