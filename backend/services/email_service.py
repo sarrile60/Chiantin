@@ -135,6 +135,10 @@ class EmailService:
             """
         
         try:
+            # Ensure API key is set before sending
+            if not resend.api_key:
+                resend.api_key = RESEND_API_KEY
+            
             # Send via Resend
             params = {
                 "from": f"{APP_NAME} <{SENDER_EMAIL}>",
