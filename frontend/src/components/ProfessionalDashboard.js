@@ -705,7 +705,7 @@ export function ProfessionalDashboard({ user, logout }) {
                         </div>
                         {senderName && (
                           <p className="text-xs text-gray-600">{t('from')}: {senderName}</p>
-                        )}}
+                        )}
                         {description && (
                           <p className="text-xs text-gray-500 truncate">{description}</p>
                         )}
