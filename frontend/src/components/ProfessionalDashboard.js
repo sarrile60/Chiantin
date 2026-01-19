@@ -812,13 +812,13 @@ export function ProfessionalDashboard({ user, logout }) {
                       {/* Card Holder & Expiry */}
                       <div className="absolute bottom-4 left-6 right-6 flex justify-between items-end">
                         <div>
-                          <p className="text-white/50 text-[10px] uppercase tracking-wider mb-0.5">Card Holder</p>
+                          <p className="text-white/50 text-[10px] uppercase tracking-wider mb-0.5">{t('cardHolder')}</p>
                           <p className="text-white/90 text-sm font-medium uppercase tracking-wide">
                             {card.cardholder_name || `${user?.first_name} ${user?.last_name}`}
                           </p>
                         </div>
                         <div className="text-right">
-                          <p className="text-white/50 text-[10px] uppercase tracking-wider mb-0.5">Expires</p>
+                          <p className="text-white/50 text-[10px] uppercase tracking-wider mb-0.5">{t('expires')}</p>
                           <p className="text-white/90 text-sm font-mono">
                             {String(card.exp_month).padStart(2, '0')}/{String(card.exp_year).slice(-2)}
                           </p>
