@@ -1485,6 +1485,13 @@ const translations = {
     cancel: 'Annulla',
     creating: 'Creazione...',
     createTicket: 'Crea Ticket',
+    selectTicketToView: 'Seleziona un ticket per visualizzare i dettagli',
+    created: 'Creato',
+    typeYourMessage: 'Scrivi il tuo messaggio...',
+    sendMessage: 'Invia Messaggio',
+    sending: 'Invio...',
+    ticketStatus: 'Stato del Ticket',
+    updateStatus: 'Aggiorna Stato',
     
     // Time formatting
     justNow: 'Adesso',
