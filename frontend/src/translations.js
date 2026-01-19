@@ -90,8 +90,8 @@ const translations = {
     support: 'Support',
     
     // About Section
-    thisIsAtlas: 'This is Project Atlas',
-    aboutDesc1: 'Project Atlas represents the new age of fintech, revolutionizing the way businesses and individuals handle their global transactions.',
+    thisIsAtlas: 'This is ecommbx',
+    aboutDesc1: 'ecommbx represents the new age of fintech, revolutionizing the way businesses and individuals handle their global transactions.',
     aboutDesc2: 'We specialize in e-account management, cross-border payments, personal & business cards, and multi-currency conversions — all through a single, innovative and intuitive platform that gives you instant access to all of our services.',
     aboutDesc3: 'Our service model is based on four cornerstones: cutting-edge technology designed for the global banking industry; customized connections with banking partners around the world; stringent security; and maximum operational speed.',
     openYourAccount: 'Open Your Account',
