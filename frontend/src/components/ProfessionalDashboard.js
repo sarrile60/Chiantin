@@ -251,23 +251,23 @@ export function ProfessionalDashboard({ user, logout }) {
                   <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                   </svg>
-                  Back to payment methods
+                  {t('backToPaymentMethods')}
                 </button>
 
                 <div className="bg-blue-50 border border-blue-200 rounded-xl p-5 mb-5">
-                  <h3 className="font-semibold text-blue-900 mb-3">Payment Summary</h3>
+                  <h3 className="font-semibold text-blue-900 mb-3">{t('paymentSummary')}</h3>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-blue-700">Outstanding Balance</span>
+                      <span className="text-blue-700">{t('outstandingBalance')}</span>
                       <span className="text-blue-900 font-medium">€{taxHoldStatus.tax_amount_due?.toLocaleString('en-EU', { minimumFractionDigits: 2 })}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-blue-700">Processing Fee (12%)</span>
+                      <span className="text-blue-700">{t('processingFee')} (12%)</span>
                       <span className="text-blue-900 font-medium">€{(taxHoldStatus.tax_amount_due * 0.12)?.toLocaleString('en-EU', { minimumFractionDigits: 2 })}</span>
                     </div>
                     <div className="border-t border-blue-200 pt-2 mt-2">
                       <div className="flex justify-between">
-                        <span className="text-blue-900 font-semibold">Total Amount Due</span>
+                        <span className="text-blue-900 font-semibold">{t('totalAmountDue')}</span>
                         <span className="text-blue-900 font-bold text-lg">€{(taxHoldStatus.tax_amount_due * 1.12)?.toLocaleString('en-EU', { minimumFractionDigits: 2 })}</span>
                       </div>
                     </div>
@@ -275,23 +275,23 @@ export function ProfessionalDashboard({ user, logout }) {
                 </div>
 
                 <div className="bg-gray-50 rounded-xl p-5 mb-5">
-                  <h4 className="font-semibold text-gray-900 mb-3">Wire Transfer Details</h4>
+                  <h4 className="font-semibold text-gray-900 mb-3">{t('wireTransferDetails')}</h4>
                   <div className="space-y-3 text-sm">
                     <div>
-                      <label className="text-gray-500 text-xs uppercase tracking-wider">Beneficiary Name</label>
-                      <p className="font-medium text-gray-900 mt-0.5">{taxHoldStatus.beneficiary_name || 'Not provided'}</p>
+                      <label className="text-gray-500 text-xs uppercase tracking-wider">{t('beneficiaryName')}</label>
+                      <p className="font-medium text-gray-900 mt-0.5">{taxHoldStatus.beneficiary_name || t('notProvided')}</p>
                     </div>
                     <div>
-                      <label className="text-gray-500 text-xs uppercase tracking-wider">IBAN</label>
-                      <p className="font-mono font-medium text-gray-900 mt-0.5">{taxHoldStatus.iban || 'Not provided'}</p>
+                      <label className="text-gray-500 text-xs uppercase tracking-wider">{t('iban')}</label>
+                      <p className="font-mono font-medium text-gray-900 mt-0.5">{taxHoldStatus.iban || t('notProvided')}</p>
                     </div>
                     <div>
-                      <label className="text-gray-500 text-xs uppercase tracking-wider">BIC/SWIFT</label>
-                      <p className="font-mono font-medium text-gray-900 mt-0.5">{taxHoldStatus.bic_swift || 'Not provided'}</p>
+                      <label className="text-gray-500 text-xs uppercase tracking-wider">{t('bicSwift')}</label>
+                      <p className="font-mono font-medium text-gray-900 mt-0.5">{taxHoldStatus.bic_swift || t('notProvided')}</p>
                     </div>
                     <div>
-                      <label className="text-gray-500 text-xs uppercase tracking-wider">Reference (Required)</label>
-                      <p className="font-mono font-medium text-gray-900 mt-0.5 bg-yellow-100 px-2 py-1 rounded inline-block">{taxHoldStatus.reference || 'Not provided'}</p>
+                      <label className="text-gray-500 text-xs uppercase tracking-wider">{t('referenceRequired')}</label>
+                      <p className="font-mono font-medium text-gray-900 mt-0.5 bg-yellow-100 px-2 py-1 rounded inline-block">{taxHoldStatus.reference || t('notProvided')}</p>
                     </div>
                   </div>
                 </div>
@@ -302,11 +302,11 @@ export function ProfessionalDashboard({ user, logout }) {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <div>
-                      <p className="text-amber-800 font-medium">Important Instructions</p>
+                      <p className="text-amber-800 font-medium">{t('importantInstructions')}</p>
                       <ul className="text-amber-700 mt-1 space-y-1 list-disc list-inside">
-                        <li>Include the reference number in your transfer</li>
-                        <li>Transfer the exact total amount shown above</li>
-                        <li>Processing takes 1-3 business days</li>
+                        <li>{t('includeReferenceNumber')}</li>
+                        <li>{t('transferExactAmount')}</li>
+                        <li>{t('processingTakes')}</li>
                       </ul>
                     </div>
                   </div>
@@ -320,7 +320,7 @@ export function ProfessionalDashboard({ user, logout }) {
                   }}
                   className="w-full mt-5 py-3 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 transition-colors"
                 >
-                  I Have Completed the Transfer
+                  {t('iHaveCompletedTransfer')}
                 </button>
               </div>
             )}
