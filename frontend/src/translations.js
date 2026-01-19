@@ -1,4 +1,4 @@
-// Translations for Project Atlas - English and Italian
+// Translations for ecommbx - English and Italian
 const translations = {
   en: {
     // Common
