@@ -23,7 +23,7 @@ class TOTPHandler:
         self,
         secret: str,
         account_email: str,
-        issuer_name: str = "Project Atlas"
+        issuer_name: str = "ecommbx"
     ) -> str:
         """Get provisioning URI for QR code generation.
         
