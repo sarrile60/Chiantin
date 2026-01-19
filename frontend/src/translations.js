@@ -277,6 +277,10 @@ const translations = {
     back: 'Back',
     name: 'Name',
     address: 'Address',
+    draft: 'Draft',
+    loading: 'Loading...',
+    kycIdentityVerified: 'Your identity has been verified',
+    kycFullAccess: 'You now have full access to all banking features.',
     
     // Profile
     profile: 'Profile',
