@@ -134,3 +134,20 @@ class MFASetupResponse(BaseModel):
 
 class MFAVerifyRequest(BaseModel):
     token: str
+
+
+class ResendVerificationRequest(BaseModel):
+    email: str
+    language: Optional[str] = 'en'
+    
+    @field_validator('email')
+    @classmethod
+    def validate_email(cls, v):
+        email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$|^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.local$'
+        if not re.match(email_pattern, v):
+            raise ValueError('Invalid email address')
+        return v.lower()
+
+
+class VerifyEmailRequest(BaseModel):
+    token: str
