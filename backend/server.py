@@ -194,8 +194,10 @@ async def signup(
     db: AsyncIOMotorDatabase = Depends(get_database)
 ):
     """Register a new user and send verification email."""
+    logger.info(f"Signup attempt for email: {user_data.email}")
     try:
         auth_service = AuthService(db)
+        logger.info("AuthService created")
         
         # Create user data for auth service
         user_create = UserCreate(
@@ -205,12 +207,15 @@ async def signup(
             last_name=user_data.last_name,
             phone=user_data.phone
         )
+        logger.info("UserCreate object created")
         
         user = await auth_service.create_user(user_create)
+        logger.info(f"User created in database: {user.email}")
         
         # Generate verification token and store it
         email_service = EmailService()
         verification_token = email_service.generate_verification_token()
+        logger.info("Verification token generated")
         
         # Store verification token in database (expires in 24 hours)
         try:
