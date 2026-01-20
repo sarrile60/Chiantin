@@ -195,12 +195,13 @@ class SignupRequest(BaseModel):
 @app.get("/api/v1/debug/db-status")
 async def debug_db_status():
     """Debug endpoint to check database connection status - REMOVE IN PRODUCTION."""
-    import os
     from database import _database, _client
+    from config import settings
     
     result = {
-        "database_name_env": os.environ.get("DATABASE_NAME", "NOT SET"),
-        "mongo_url_prefix": os.environ.get("MONGO_URL", "NOT SET")[:50] + "..." if os.environ.get("MONGO_URL") else "NOT SET",
+        "settings_database_name": settings.DATABASE_NAME,
+        "settings_mongo_url_prefix": settings.MONGO_URL[:50] + "..." if len(settings.MONGO_URL) > 50 else settings.MONGO_URL,
+        "settings_frontend_url": settings.FRONTEND_URL,
         "connected_database": _database.name if _database is not None else "NOT CONNECTED",
         "client_status": "CONNECTED" if _client is not None else "NOT CONNECTED"
     }
