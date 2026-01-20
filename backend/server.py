@@ -82,6 +82,38 @@ async def create_audit_log(
 # ============== END AUDIT LOGGING HELPER ==============
 
 
+async def auto_seed_if_empty():
+    """Auto-seed database with admin user if empty."""
+    try:
+        db = get_database()
+        user_count = await db.users.count_documents({})
+        
+        if user_count == 0:
+            logger.info("Database is empty - auto-seeding admin user...")
+            from core.auth import hash_password
+            
+            # Create Super Admin
+            admin = {
+                "_id": "admin_super_001",
+                "email": settings.SEED_SUPERADMIN_EMAIL,
+                "password_hash": hash_password(settings.SEED_SUPERADMIN_PASSWORD),
+                "first_name": "Super",
+                "last_name": "Admin",
+                "role": "SUPER_ADMIN",
+                "status": "ACTIVE",
+                "email_verified": True,
+                "mfa_enabled": False,
+                "created_at": datetime.now(timezone.utc),
+                "updated_at": datetime.now(timezone.utc)
+            }
+            await db.users.insert_one(admin)
+            logger.info(f"✓ Auto-seeded admin user: {settings.SEED_SUPERADMIN_EMAIL}")
+        else:
+            logger.info(f"Database has {user_count} users - skipping auto-seed")
+    except Exception as e:
+        logger.warning(f"Auto-seed check failed (non-fatal): {e}")
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Startup and shutdown events with error handling for production resilience."""
@@ -92,6 +124,10 @@ async def lifespan(app: FastAPI):
         logger.info(f"FRONTEND_URL: {settings.FRONTEND_URL}")
         logger.info(f"RESEND_API_KEY configured: {'Yes' if settings.RESEND_API_KEY else 'No'}")
         await connect_db()
+        
+        # Auto-seed if database is empty
+        await auto_seed_if_empty()
+        
         logger.info("Application startup complete")
     except Exception as e:
         # Log the error but don't crash - let health checks fail gracefully
