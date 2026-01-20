@@ -222,16 +222,18 @@ async def signup(
         "used": False
     })
     
-    # Send verification email
+    # Send verification email (don't fail registration if email fails)
     language = user_data.language or 'en'
-    email_service.send_verification_email(
-        to_email=user.email,
-        verification_token=verification_token,
-        first_name=user.first_name,
-        language=language
-    )
-    
-    logger.info(f"User registered: {user.email}, verification email sent (lang={language})")
+    try:
+        email_service.send_verification_email(
+            to_email=user.email,
+            verification_token=verification_token,
+            first_name=user.first_name,
+            language=language
+        )
+        logger.info(f"User registered: {user.email}, verification email sent (lang={language})")
+    except Exception as e:
+        logger.error(f"User registered but verification email failed: {user.email}, error: {str(e)}")
     
     return UserResponse(
         id=user.id,
