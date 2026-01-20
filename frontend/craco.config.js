@@ -42,27 +42,17 @@ const webpackConfig = {
       },
     },
   },
-  // Babel configuration for WebView compatibility
+  // Remove custom babel presets to avoid "loose" option conflicts
+  // The browserslist in package.json handles target compatibility
   babel: {
-    presets: [
-      [
-        '@babel/preset-env',
-        {
-          targets: {
-            // Target older browsers for WebView compatibility
-            chrome: '60',
-            firefox: '60',
-            safari: '11',
-            edge: '79',
-            ios: '11',
-            android: '5',
-          },
-          useBuiltIns: 'entry',
-          corejs: 3,
-        },
-      ],
-    ],
     plugins: [],
+    loaderOptions: {
+      // Ensure consistent "loose" mode across all class-related plugins
+      assumptions: {
+        setPublicClassFields: true,
+        privateFieldsAsProperties: true,
+      },
+    },
   },
   webpack: {
     alias: {
