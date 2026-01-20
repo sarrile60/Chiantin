@@ -290,6 +290,24 @@ async def login(
         )
         raise HTTPException(status_code=403, detail="Account is disabled. Please contact support.")
     
+    # Check if email is verified
+    if not user.email_verified:
+        # Audit: Unverified email login attempt
+        await create_audit_log(
+            db=db,
+            action="LOGIN_BLOCKED",
+            entity_type="auth",
+            entity_id=user.id,
+            description=f"Login blocked for unverified email: {user.email}",
+            performed_by=user.id,
+            performed_by_email=user.email,
+            metadata={"ip_address": client_ip, "reason": "email_not_verified"}
+        )
+        raise HTTPException(
+            status_code=403, 
+            detail="EMAIL_NOT_VERIFIED"
+        )
+    
     # Check MFA
     if user.mfa_enabled:
         if not credentials.totp_token:
