@@ -836,6 +836,117 @@ function ResetPasswordPage() {
   );
 }
 
+// Email Verification Page
+function VerifyEmailPage() {
+  const [verifying, setVerifying] = useState(true);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { t, language, setLanguage } = useLanguage();
+  const { isDark, toggleTheme } = useTheme();
+
+  useEffect(() => {
+    const verifyEmail = async () => {
+      const params = new URLSearchParams(location.search);
+      const token = params.get('token');
+
+      if (!token) {
+        setError(t('emailVerificationFailedDesc') || 'No verification token provided.');
+        setVerifying(false);
+        return;
+      }
+
+      try {
+        await api.post('/auth/verify-email', { token });
+        setSuccess(true);
+      } catch (err) {
+        setError(err.response?.data?.detail || t('emailVerificationFailedDesc'));
+      } finally {
+        setVerifying(false);
+      }
+    };
+
+    verifyEmail();
+  }, [location.search]);
+
+  return (
+    <div className={`min-h-screen flex flex-col ${isDark ? 'bg-gray-900' : 'bg-white'}`}>
+      {/* Header with Language/Theme toggles */}
+      <div className={`flex justify-end items-center p-4 space-x-2`}>
+        <button
+          onClick={() => setLanguage(language === 'en' ? 'it' : 'en')}
+          className={`px-3 py-1.5 rounded-lg font-bold text-sm transition ${isDark ? 'bg-gray-800 hover:bg-gray-700 text-gray-300' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}
+        >
+          {language === 'en' ? '🇬🇧 EN' : '🇮🇹 IT'}
+        </button>
+        <button
+          onClick={toggleTheme}
+          className={`p-2 rounded-lg transition ${isDark ? 'hover:bg-gray-800 text-yellow-400' : 'hover:bg-gray-100 text-gray-600'}`}
+        >
+          {isDark ? <Sun size={20} /> : <Moon size={20} />}
+        </button>
+      </div>
+
+      <div className="flex-1 flex items-center justify-center p-4">
+        <div className={`w-full max-w-md rounded-xl shadow-xl p-8 text-center ${isDark ? 'bg-gray-800 border border-gray-700' : 'bg-white'}`}>
+          {verifying ? (
+            <>
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+              </div>
+              <h2 className={`text-2xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                {t('verifyingEmail')}
+              </h2>
+            </>
+          ) : success ? (
+            <>
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <CheckCircle className="w-8 h-8 text-green-600" />
+              </div>
+              <h2 className={`text-2xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                {t('emailVerifiedSuccess')}
+              </h2>
+              <p className={`mb-6 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                {t('emailVerifiedSuccessDesc')}
+              </p>
+              <button
+                onClick={() => navigate('/login')}
+                className="w-full bg-[#dc3545] hover:bg-[#c82333] text-white py-3 rounded-lg font-semibold transition"
+              >
+                {t('goToLogin')}
+              </button>
+            </>
+          ) : (
+            <>
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <XCircle className="w-8 h-8 text-red-600" />
+              </div>
+              <h2 className={`text-2xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                {t('emailVerificationFailed')}
+              </h2>
+              <p className={`mb-6 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                {error}
+              </p>
+              <div className="space-y-3">
+                <button
+                  onClick={() => navigate('/login')}
+                  className="w-full bg-[#dc3545] hover:bg-[#c82333] text-white py-3 rounded-lg font-semibold transition"
+                >
+                  {t('goToLogin')}
+                </button>
+                <p className={`text-sm ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
+                  {t('dontSeeEmail')}
+                </p>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // Accounts Page (for mobile navigation)
 function AccountsPage() {
   const { user } = useAuth();
