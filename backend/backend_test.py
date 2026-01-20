@@ -599,6 +599,233 @@ class AtlasBankingAPITester:
             return True
         return False
 
+    # ==================== EMAIL VERIFICATION TESTS ====================
+    
+    def test_signup_creates_unverified_user(self):
+        """Test that signup creates user with email_verified=false"""
+        import random
+        import string
+        unique_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+        test_email = f"test_user_{unique_suffix}@test.com"
+        
+        success, response = self.run_test(
+            "Signup - Create Unverified User",
+            "POST",
+            "/api/v1/auth/signup",
+            201,
+            data={
+                "email": test_email,
+                "password": "TestPass123!",
+                "first_name": "Test",
+                "last_name": "User",
+                "language": "en"
+            },
+            description="Create new user - should have email_verified=false"
+        )
+        if success:
+            if response.get('email_verified') == False:
+                print(f"   ✓ User created with email_verified=false")
+                print(f"   ✓ User ID: {response.get('id')}")
+                print(f"   ✓ Email: {response.get('email')}")
+                return True, test_email, response.get('id')
+            else:
+                print(f"   ❌ User created but email_verified={response.get('email_verified')} (expected False)")
+                return False, test_email, response.get('id')
+        return False, None, None
+    
+    def test_unverified_user_login_blocked(self, email, password):
+        """Test that unverified user cannot login"""
+        success, response = self.run_test(
+            "Login - Unverified User (Should Fail)",
+            "POST",
+            "/api/v1/auth/login",
+            403,
+            data={"email": email, "password": password},
+            description="Attempt to login with unverified email - should return 403"
+        )
+        if success:
+            # Check the error message
+            if response.get('detail') == "EMAIL_NOT_VERIFIED":
+                print(f"   ✓ Correct error message: '{response.get('detail')}'")
+                return True
+            else:
+                print(f"   ⚠️  Wrong error message: '{response.get('detail')}'")
+                print(f"   Expected: 'EMAIL_NOT_VERIFIED'")
+                return False
+        return False
+    
+    def test_verify_email_with_invalid_token(self):
+        """Test verify email with invalid token"""
+        success, response = self.run_test(
+            "Verify Email - Invalid Token",
+            "POST",
+            "/api/v1/auth/verify-email",
+            400,
+            data={"token": "invalid_token_12345"},
+            description="Verify email with invalid token - should return 400"
+        )
+        if success:
+            print(f"   ✓ Invalid token correctly rejected")
+            return True
+        return False
+    
+    def test_resend_verification_for_unverified_user(self, email):
+        """Test resending verification email for unverified user"""
+        success, response = self.run_test(
+            "Resend Verification - Unverified User",
+            "POST",
+            "/api/v1/auth/resend-verification",
+            200,
+            data={"email": email, "language": "en"},
+            description="Resend verification email to unverified user"
+        )
+        if success:
+            if response.get('success') == True:
+                print(f"   ✓ Verification email resent successfully")
+                print(f"   ✓ Message: {response.get('message', 'N/A')}")
+                return True
+            else:
+                print(f"   ❌ Response success={response.get('success')} (expected True)")
+                return False
+        return False
+    
+    def test_resend_verification_for_verified_user(self, email):
+        """Test that resend verification blocks already verified users"""
+        success, response = self.run_test(
+            "Resend Verification - Already Verified (Should Fail)",
+            "POST",
+            "/api/v1/auth/resend-verification",
+            400,
+            data={"email": email, "language": "en"},
+            description="Resend verification to verified user - should return 400"
+        )
+        if success:
+            if "already verified" in response.get('detail', '').lower():
+                print(f"   ✓ Correctly blocked: '{response.get('detail')}'")
+                return True
+            else:
+                print(f"   ⚠️  Wrong error message: '{response.get('detail')}'")
+                return False
+        return False
+    
+    def test_demo_user_can_login(self):
+        """Test that existing demo users can still login (email_verified=true)"""
+        success, response = self.run_test(
+            "Demo User Login - customer@demo.com",
+            "POST",
+            "/api/v1/auth/login",
+            200,
+            data={"email": "customer@demo.com", "password": "Demo@123456"},
+            description="Verify demo user can login (should have email_verified=true)"
+        )
+        if success and 'access_token' in response:
+            user = response.get('user', {})
+            if user.get('email_verified') == True:
+                print(f"   ✓ Demo user logged in successfully")
+                print(f"   ✓ Email verified: {user.get('email_verified')}")
+                return True
+            else:
+                print(f"   ⚠️  Demo user email_verified={user.get('email_verified')} (expected True)")
+                return False
+        return False
+    
+    def test_verify_email_with_valid_token_from_db(self, user_email):
+        """Test verify email by getting token from database"""
+        # This test requires direct database access to get the verification token
+        # We'll check if we can get the token from MongoDB
+        try:
+            import pymongo
+            from datetime import datetime
+            
+            # Connect to MongoDB
+            client = pymongo.MongoClient("mongodb://localhost:27017")
+            db = client["atlas_banking"]
+            
+            # Find the verification token for this user
+            verification = db.email_verifications.find_one({
+                "email": user_email,
+                "used": False
+            }, sort=[("created_at", -1)])
+            
+            if not verification:
+                print(f"   ⚠️  No verification token found in database for {user_email}")
+                return False
+            
+            token = verification.get('token')
+            print(f"   ✓ Found verification token in database")
+            
+            # Now test the verify endpoint with the real token
+            success, response = self.run_test(
+                "Verify Email - Valid Token",
+                "POST",
+                "/api/v1/auth/verify-email",
+                200,
+                data={"token": token},
+                description="Verify email with valid token from database"
+            )
+            
+            if success:
+                if response.get('success') == True:
+                    print(f"   ✓ Email verified successfully")
+                    print(f"   ✓ Message: {response.get('message', 'N/A')}")
+                    return True
+                else:
+                    print(f"   ❌ Response success={response.get('success')} (expected True)")
+                    return False
+            return False
+            
+        except Exception as e:
+            print(f"   ❌ Error accessing database: {str(e)}")
+            return False
+    
+    def test_verified_user_can_login(self, email, password):
+        """Test that verified user can now login"""
+        success, response = self.run_test(
+            "Login - Verified User (Should Succeed)",
+            "POST",
+            "/api/v1/auth/login",
+            200,
+            data={"email": email, "password": password},
+            description="Login with verified email - should succeed"
+        )
+        if success and 'access_token' in response:
+            user = response.get('user', {})
+            if user.get('email_verified') == True:
+                print(f"   ✓ Verified user logged in successfully")
+                print(f"   ✓ Email verified: {user.get('email_verified')}")
+                return True
+            else:
+                print(f"   ⚠️  User email_verified={user.get('email_verified')} (expected True)")
+                return False
+        return False
+    
+    def test_italian_language_support(self):
+        """Test email verification with Italian language"""
+        import random
+        import string
+        unique_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+        test_email = f"test_italian_{unique_suffix}@test.com"
+        
+        success, response = self.run_test(
+            "Signup - Italian Language",
+            "POST",
+            "/api/v1/auth/signup",
+            201,
+            data={
+                "email": test_email,
+                "password": "TestPass123!",
+                "first_name": "Test",
+                "last_name": "Italiano",
+                "language": "it"
+            },
+            description="Create user with Italian language preference"
+        )
+        if success:
+            print(f"   ✓ User created with Italian language")
+            print(f"   ✓ Email: {response.get('email')}")
+            return True
+        return False
+
 
 def main():
     print("=" * 70)
