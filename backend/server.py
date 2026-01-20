@@ -192,14 +192,56 @@ class SignupRequest(BaseModel):
     language: Optional[str] = 'en'
 
 
+@app.get("/api/v1/debug/db-status")
+async def debug_db_status():
+    """Debug endpoint to check database connection status - REMOVE IN PRODUCTION."""
+    import os
+    from database import _database, _client
+    
+    result = {
+        "database_name_env": os.environ.get("DATABASE_NAME", "NOT SET"),
+        "mongo_url_prefix": os.environ.get("MONGO_URL", "NOT SET")[:50] + "..." if os.environ.get("MONGO_URL") else "NOT SET",
+        "connected_database": _database.name if _database else "NOT CONNECTED",
+        "client_status": "CONNECTED" if _client else "NOT CONNECTED"
+    }
+    
+    # Try to actually query the database
+    if _database:
+        try:
+            # Try to list collections
+            collections = await _database.list_collection_names()
+            result["collections_count"] = len(collections)
+            result["has_users_collection"] = "users" in collections
+            
+            # Try to count users
+            user_count = await _database.users.count_documents({})
+            result["user_count"] = user_count
+            result["db_query_status"] = "SUCCESS"
+        except Exception as e:
+            result["db_query_status"] = f"ERROR: {str(e)}"
+    
+    return result
+
+
 @app.post("/api/v1/auth/signup", response_model=UserResponse, status_code=201)
 async def signup(
     user_data: SignupRequest,
     db: AsyncIOMotorDatabase = Depends(get_database)
 ):
     """Register a new user and send verification email."""
+    import os
     logger.info(f"Signup attempt for email: {user_data.email}")
+    logger.info(f"Using database: {db.name}, DATABASE_NAME env: {os.environ.get('DATABASE_NAME', 'NOT SET')}")
+    
     try:
+        # First verify we can actually write to the database
+        try:
+            test_result = await db.command("ping")
+            logger.info(f"Database ping successful: {test_result}")
+        except Exception as ping_err:
+            logger.error(f"Database ping failed: {str(ping_err)}")
+            raise HTTPException(status_code=500, detail=f"Database connection error: {str(ping_err)}")
+        
         auth_service = AuthService(db)
         logger.info("AuthService created")
         
@@ -263,8 +305,11 @@ async def signup(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Signup error: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Registration failed: {str(e)}")
+        import traceback
+        error_details = traceback.format_exc()
+        logger.error(f"Signup error: {str(e)}\n{error_details}")
+        # Return more detailed error to help debug production issues
+        raise HTTPException(status_code=500, detail=f"Registration failed: {str(e)} | DB: {db.name if db else 'None'}")
 
 
 @app.post("/api/v1/auth/login", response_model=TokenResponse)
