@@ -29,6 +29,7 @@ import { AdminTransfersQueue } from './components/AdminTransfersQueue';
 import { AdminAccountsControl } from './components/AdminAccountsControl';
 import { LandingPage } from './components/LandingPage';
 import { useLanguage, useTheme } from './contexts/AppContext';
+import { Sun, Moon, Mail, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 
 // Styled Logo Component - displays "ecomm" with "bx" in red
 const StyledLogo = ({ className = '', isDark = false }) => (
