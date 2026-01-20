@@ -374,6 +374,118 @@ async def login(
     )
 
 
+@app.post("/api/v1/auth/verify-email")
+async def verify_email(
+    request_data: VerifyEmailRequest,
+    db: AsyncIOMotorDatabase = Depends(get_database)
+):
+    """Verify email address using token from email."""
+    # Find the verification record
+    verification = await db.email_verifications.find_one({
+        "token": request_data.token,
+        "used": False
+    })
+    
+    if not verification:
+        raise HTTPException(
+            status_code=400, 
+            detail="Invalid or expired verification link. Please request a new one."
+        )
+    
+    # Check if token is expired
+    if verification["expires_at"] < datetime.utcnow():
+        raise HTTPException(
+            status_code=400, 
+            detail="Verification link has expired. Please request a new one."
+        )
+    
+    # Mark email as verified
+    await db.users.update_one(
+        {"_id": verification["user_id"]},
+        {"$set": {"email_verified": True, "updated_at": datetime.utcnow()}}
+    )
+    
+    # Mark verification token as used
+    await db.email_verifications.update_one(
+        {"_id": verification["_id"]},
+        {"$set": {"used": True, "verified_at": datetime.utcnow()}}
+    )
+    
+    # Get user for audit log
+    user = await db.users.find_one({"_id": verification["user_id"]})
+    
+    # Audit log
+    await create_audit_log(
+        db=db,
+        action="EMAIL_VERIFIED",
+        entity_type="auth",
+        entity_id=verification["user_id"],
+        description=f"Email verified for {verification['email']}",
+        performed_by=verification["user_id"],
+        performed_by_email=verification["email"],
+        metadata={"email": verification["email"]}
+    )
+    
+    logger.info(f"Email verified successfully for: {verification['email']}")
+    
+    return {"message": "Email verified successfully. You can now log in.", "success": True}
+
+
+@app.post("/api/v1/auth/resend-verification")
+async def resend_verification_email(
+    request_data: ResendVerificationRequest,
+    db: AsyncIOMotorDatabase = Depends(get_database)
+):
+    """Resend email verification email."""
+    # Find the user
+    user = await db.users.find_one({"email": request_data.email.lower()})
+    
+    if not user:
+        # Don't reveal if email exists - return success anyway for security
+        return {"message": "If an account exists with this email, a verification link will be sent.", "success": True}
+    
+    # Check if already verified
+    if user.get("email_verified", False):
+        raise HTTPException(
+            status_code=400, 
+            detail="Email is already verified. You can proceed to login."
+        )
+    
+    # Invalidate any existing verification tokens for this user
+    await db.email_verifications.update_many(
+        {"user_id": str(user["_id"]), "used": False},
+        {"$set": {"used": True, "invalidated_at": datetime.utcnow()}}
+    )
+    
+    # Generate new verification token
+    email_service = EmailService()
+    verification_token = email_service.generate_verification_token()
+    
+    # Store new verification token
+    await db.email_verifications.insert_one({
+        "_id": str(uuid.uuid4()),
+        "user_id": str(user["_id"]),
+        "email": user["email"],
+        "token": verification_token,
+        "created_at": datetime.utcnow(),
+        "expires_at": datetime.utcnow() + timedelta(hours=24),
+        "used": False
+    })
+    
+    # Send verification email
+    language = request_data.language or 'en'
+    email_service.send_verification_email(
+        to_email=user["email"],
+        verification_token=verification_token,
+        first_name=user.get("first_name", ""),
+        language=language
+    )
+    
+    logger.info(f"Verification email resent to: {user['email']} (lang={language})")
+    
+    return {"message": "Verification email sent. Please check your inbox.", "success": True}
+
+
 @app.get("/api/v1/auth/me", response_model=UserResponse)
 async def get_me(
     current_user: dict = Depends(get_current_user),
