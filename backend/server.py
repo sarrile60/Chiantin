@@ -195,31 +195,35 @@ class SignupRequest(BaseModel):
 @app.get("/api/v1/debug/db-status")
 async def debug_db_status():
     """Debug endpoint to check database connection status - REMOVE IN PRODUCTION."""
-    from database import _database, _client
+    from database import get_database
     from config import settings
     
     result = {
         "settings_database_name": settings.DATABASE_NAME,
         "settings_mongo_url_prefix": settings.MONGO_URL[:50] + "..." if len(settings.MONGO_URL) > 50 else settings.MONGO_URL,
         "settings_frontend_url": settings.FRONTEND_URL,
-        "connected_database": _database.name if _database is not None else "NOT CONNECTED",
-        "client_status": "CONNECTED" if _client is not None else "NOT CONNECTED"
     }
     
-    # Try to actually query the database
-    if _database is not None:
+    # Get database using the same method as API endpoints
+    try:
+        db = get_database()
+        result["connected_database"] = db.name
+        result["database_match"] = db.name == settings.DATABASE_NAME
+        
+        # Try to actually query the database
         try:
-            # Try to list collections
-            collections = await _database.list_collection_names()
+            collections = await db.list_collection_names()
             result["collections_count"] = len(collections)
             result["has_users_collection"] = "users" in collections
             
-            # Try to count users
-            user_count = await _database.users.count_documents({})
+            user_count = await db.users.count_documents({})
             result["user_count"] = user_count
             result["db_query_status"] = "SUCCESS"
         except Exception as e:
             result["db_query_status"] = f"ERROR: {str(e)}"
+    except Exception as e:
+        result["connected_database"] = "CONNECTION_FAILED"
+        result["db_query_status"] = f"CONNECTION_ERROR: {str(e)}"
     
     return result
 
