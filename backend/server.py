@@ -2127,6 +2127,13 @@ async def admin_withdraw_account(
     return {"ok": True, "message": "Debit successful", "new_balance": new_balance}
 
 
+# Health check endpoint at root path for deployment health checks
+@app.get("/health")
+async def root_health_check():
+    """Root health check endpoint for Kubernetes/deployment."""
+    return {"status": "healthy", "app": settings.APP_NAME}
+
+
 @app.get("/api/health")
 async def health_check():
     """Health check endpoint."""
