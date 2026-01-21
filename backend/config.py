@@ -38,7 +38,7 @@ class Settings(BaseSettings):
     S3_REGION: str = "us-east-1"
     S3_BUCKET: str = "atlas-banking"
     S3_USE_SSL: bool = False
-    STORAGE_BASE_PATH: str = "/tmp/atlas_storage"
+    STORAGE_BASE_PATH: str = "/app/storage"
     
     # Seeding
     SEED_SUPERADMIN_EMAIL: str = "admin@atlas.local"
