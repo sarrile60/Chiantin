@@ -1,11 +1,12 @@
 // Customer Dashboard - Professional (No Fake Cards!)
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../api';
 import { useLanguage, useTheme } from '../contexts/AppContext';
 
 export function ProfessionalDashboard({ user, logout }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const [accounts, setAccounts] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [kycStatus, setKycStatus] = useState(null);
