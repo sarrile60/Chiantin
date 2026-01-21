@@ -97,9 +97,12 @@ export function ProfessionalDashboard({ user, logout }) {
 
   const formatDate = (dateStr) => {
     if (!dateStr) return '';
-    // Parse as UTC and display in local timezone (Europe/Rome for Italy)
-    const date = new Date(dateStr);
-    // Add timezone offset for proper local time display
+    // Ensure UTC parsing by appending 'Z' if not present
+    let normalizedStr = dateStr;
+    if (!dateStr.endsWith('Z') && !dateStr.includes('+') && !dateStr.includes('-', 10)) {
+      normalizedStr = dateStr + 'Z';
+    }
+    const date = new Date(normalizedStr);
     return date.toLocaleDateString('en-GB', { 
       day: '2-digit', 
       month: 'short', 
@@ -110,7 +113,12 @@ export function ProfessionalDashboard({ user, logout }) {
 
   const formatDateTime = (dateStr) => {
     if (!dateStr) return '';
-    const date = new Date(dateStr);
+    // Ensure UTC parsing by appending 'Z' if not present
+    let normalizedStr = dateStr;
+    if (!dateStr.endsWith('Z') && !dateStr.includes('+') && !dateStr.includes('-', 10)) {
+      normalizedStr = dateStr + 'Z';
+    }
+    const date = new Date(normalizedStr);
     return date.toLocaleString('en-GB', { 
       day: '2-digit', 
       month: 'short', 
