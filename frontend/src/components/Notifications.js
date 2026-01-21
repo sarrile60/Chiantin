@@ -67,9 +67,24 @@ export function NotificationBell() {
       return;
     }
     
+    // Transfer-related notifications - pass entity_id to show the specific transfer
+    if (entityType === 'transfer' || title.includes('transfer')) {
+      // Navigate to dashboard with the transfer ID to auto-open details
+      if (notif.entity_id) {
+        navigate('/dashboard', { state: { showTransferId: notif.entity_id } });
+      } else {
+        navigate('/dashboard');
+      }
+      return;
+    }
+    
     // Transaction-related notifications
-    if (entityType === 'transaction' || entityType === 'transfer' || notifType === 'transaction') {
-      navigate('/dashboard');
+    if (entityType === 'transaction' || notifType === 'transaction') {
+      if (notif.entity_id) {
+        navigate('/dashboard', { state: { showTransactionId: notif.entity_id } });
+      } else {
+        navigate('/dashboard');
+      }
       return;
     }
     
