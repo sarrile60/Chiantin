@@ -384,7 +384,7 @@ export function AdminKYCReview() {
               {viewingDocument.content_type?.startsWith('image/') ? (
                 <div className="text-center">
                   <img 
-                    src={`${process.env.REACT_APP_BACKEND_URL}/api/v1/kyc/documents/${viewingDocument.file_key}`}
+                    src={`${process.env.REACT_APP_BACKEND_URL}/api/v1/kyc/documents/${encodeURIComponent(viewingDocument.file_key)}`}
                     alt={viewingDocument.document_type}
                     className="max-w-full h-auto rounded-lg shadow-lg mx-auto"
                     style={{ maxHeight: '70vh' }}
