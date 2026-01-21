@@ -86,10 +86,18 @@ async def auto_seed_if_empty():
     """Auto-seed database with admin user if empty."""
     try:
         db = get_database()
+        
+        # CLEAR LOG: Show which database we're checking
+        logger.info("=" * 60)
+        logger.info(f"SEED CHECK: Connected to database '{db.name}'")
+        
         user_count = await db.users.count_documents({})
+        logger.info(f"SEED CHECK: Users count = {user_count}")
         
         if user_count == 0:
-            logger.info("Database is empty - auto-seeding admin user...")
+            logger.info("=" * 60)
+            logger.info("SEED: Database is EMPTY - Creating admin user...")
+            logger.info("=" * 60)
             from core.auth import hash_password
             
             # Create Super Admin
@@ -107,11 +115,15 @@ async def auto_seed_if_empty():
                 "updated_at": datetime.now(timezone.utc)
             }
             await db.users.insert_one(admin)
-            logger.info(f"✓ Auto-seeded admin user: {settings.SEED_SUPERADMIN_EMAIL}")
+            logger.info(f"SEED: ✅ Admin user CREATED: {settings.SEED_SUPERADMIN_EMAIL}")
+            logger.info(f"SEED: ✅ Password: {settings.SEED_SUPERADMIN_PASSWORD}")
+            logger.info("=" * 60)
         else:
-            logger.info(f"Database has {user_count} users - skipping auto-seed")
+            logger.info(f"SEED: Database has {user_count} users - skipping seed")
+            logger.info("=" * 60)
     except Exception as e:
-        logger.warning(f"Auto-seed check failed (non-fatal): {e}")
+        logger.error(f"SEED ERROR: Failed to seed database: {e}")
+        logger.error("=" * 60)
 
 
 @asynccontextmanager
