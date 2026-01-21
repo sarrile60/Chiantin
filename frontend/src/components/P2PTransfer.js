@@ -104,7 +104,8 @@ export function P2PTransferForm({ onSuccess }) {
       const result = await api.post('/transfers/p2p', {
         to_iban: cleanIban,
         amount: amountInCents,
-        reason: formData.reason || 'P2P Transfer'
+        reason: formData.reason || 'P2P Transfer',
+        recipient_name: formData.to_name || null
       });
       setTransactionResult({...result.data, amount: amountInCents});
       setShowConfirmation(true);
