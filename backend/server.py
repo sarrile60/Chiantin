@@ -2573,3 +2573,60 @@ async def try_multiple_databases():
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("server:app", host="0.0.0.0", port=8001, reload=True)
+
+
+@app.get("/api/debug/test-transfer/{user_email}")
+async def debug_test_transfer(
+    user_email: str,
+    to_iban: str = "DE89370400440532013000",
+    amount: int = 100,
+    db: AsyncIOMotorDatabase = Depends(get_database)
+):
+    """Debug endpoint to test transfer logic."""
+    from bson import ObjectId
+    
+    result = {"steps": []}
+    
+    # Step 1: Find user
+    user = await db.users.find_one({"email": user_email})
+    if not user:
+        return {"error": "User not found", "steps": result["steps"]}
+    result["steps"].append(f"1. User found: {user['_id']} (type: {type(user['_id']).__name__})")
+    
+    user_id = user["_id"]
+    
+    # Step 2: Find bank account
+    acc = await db.bank_accounts.find_one({"user_id": user_id})
+    if not acc:
+        # Try as string
+        acc = await db.bank_accounts.find_one({"user_id": str(user_id)})
+    if not acc:
+        return {"error": "Bank account not found", "steps": result["steps"]}
+    result["steps"].append(f"2. Bank account found: {acc['iban']}, ledger: {acc['ledger_account_id']}")
+    
+    # Step 3: Check balance
+    ledger_id = acc["ledger_account_id"]
+    entries = await db.ledger_entries.find({"account_id": ledger_id}).to_list(1000)
+    total_credit = sum(e["amount"] for e in entries if e.get("direction") == "CREDIT")
+    total_debit = sum(e["amount"] for e in entries if e.get("direction") == "DEBIT")
+    balance = total_credit - total_debit
+    result["steps"].append(f"3. Balance: {balance} cents (€{balance/100:.2f})")
+    
+    if balance < amount:
+        return {"error": f"Insufficient funds: {balance} < {amount}", "steps": result["steps"]}
+    result["steps"].append(f"4. Balance sufficient for {amount} cents")
+    
+    # Step 4: Check recipient IBAN
+    normalized_iban = to_iban.replace(" ", "").upper()
+    to_acc = await db.bank_accounts.find_one({"iban": normalized_iban})
+    if to_acc:
+        result["steps"].append(f"5. Recipient IBAN found - INTERNAL transfer")
+    else:
+        result["steps"].append(f"5. Recipient IBAN not found - EXTERNAL transfer")
+    
+    result["ready"] = True
+    result["transfer_type"] = "INTERNAL" if to_acc else "EXTERNAL"
+    result["balance"] = balance
+    result["amount"] = amount
+    
+    return result
