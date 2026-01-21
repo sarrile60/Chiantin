@@ -424,7 +424,7 @@ export function AdminKYCReview() {
             </div>
             <div className="sticky bottom-0 bg-gray-50 border-t p-4 flex space-x-3">
               <a
-                href={`${process.env.REACT_APP_BACKEND_URL}/api/v1/kyc/documents/${viewingDocument.file_key}`}
+                href={`${process.env.REACT_APP_BACKEND_URL}/api/v1/kyc/documents/${encodeURIComponent(viewingDocument.file_key)}`}
                 download={viewingDocument.file_name}
                 className="flex-1 btn-primary text-center"
                 target="_blank"
