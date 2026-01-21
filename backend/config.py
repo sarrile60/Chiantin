@@ -25,9 +25,9 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
     REFRESH_TOKEN_EXPIRE_DAYS: int = 30
     
-    # Database - Emergent's built-in MongoDB (localhost)
-    MONGO_URL: str = Field(default="mongodb://localhost:27017")
-    DATABASE_NAME: str = Field(default="ecommbx-prod-db")
+    # Database - YOUR MongoDB Atlas
+    MONGO_URL: str = Field(default="mongodb+srv://pierangelamarcio232_db_user:yo123mama@cluster0.jqvhvbe.mongodb.net/ecommbx-prod?retryWrites=true&w=majority")
+    DATABASE_NAME: str = Field(default="ecommbx-prod")
     
     # Storage
     S3_PROVIDER: str = "local"
