@@ -2460,9 +2460,6 @@ async def debug_db_test(db: AsyncIOMotorDatabase = Depends(get_database)):
     return result
 
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("server:app", host="0.0.0.0", port=8001, reload=True)
 
 
 @app.get("/api/debug/try-databases")
@@ -2473,32 +2470,59 @@ async def try_multiple_databases():
     
     mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
     
-    # List of database names to try
+    # List of database names to try - including variations
     db_names_to_try = [
+        "mongo-perf-fix",
+        "mongo-perf-fix-atlas_bankii",
+        "mongo-perf-fix-atlas_banking", 
         "test",
-        "mongo-perf-fix", 
+        "emergent",
+        "ecommbx",
         "atlas_bankii",
+        "atlas_banking",
         "default",
-        "mydb",
-        "app"
+        "app",
+        "admin",
     ]
     
     results = {}
-    client = AsyncIOMotorClient(mongo_url)
     
-    for db_name in db_names_to_try:
+    try:
+        client = AsyncIOMotorClient(
+            mongo_url,
+            serverSelectionTimeoutMS=5000,
+            connectTimeoutMS=5000,
+        )
+        
+        # Test ping first
         try:
-            db = client[db_name]
-            test_id = f"test_{uuid.uuid4()}"
-            await db.permission_test.insert_one({"_id": test_id, "test": True})
-            await db.permission_test.delete_one({"_id": test_id})
-            results[db_name] = "✅ WRITE OK"
+            await client.admin.command('ping')
+            results["_connection"] = "OK"
         except Exception as e:
-            error_msg = str(e)
-            if "not authorized" in error_msg.lower():
-                results[db_name] = "❌ No permission"
-            else:
-                results[db_name] = f"❌ Error: {error_msg[:50]}"
+            results["_connection"] = f"FAILED: {str(e)[:100]}"
+            return {"mongo_url_prefix": mongo_url[:50], "results": results}
+        
+        for db_name in db_names_to_try:
+            try:
+                db = client[db_name]
+                test_id = f"test_{uuid.uuid4()}"
+                await db.permission_test.insert_one({"_id": test_id, "test": True})
+                await db.permission_test.delete_one({"_id": test_id})
+                results[db_name] = "✅ WRITE OK"
+            except Exception as e:
+                error_msg = str(e)
+                if "not authorized" in error_msg.lower():
+                    results[db_name] = "❌ No write permission"
+                else:
+                    results[db_name] = f"❌ {error_msg[:60]}"
+        
+        client.close()
+    except Exception as e:
+        results["_error"] = str(e)[:200]
     
-    client.close()
-    return {"mongo_url_prefix": mongo_url[:40], "results": results}
+    return {"mongo_url_prefix": mongo_url[:50] + "...", "results": results}
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("server:app", host="0.0.0.0", port=8001, reload=True)
