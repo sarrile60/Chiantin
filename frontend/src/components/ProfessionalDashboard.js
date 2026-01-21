@@ -70,18 +70,28 @@ export function ProfessionalDashboard({ user, logout }) {
   };
 
   const formatDate = (dateStr) => {
+    if (!dateStr) return '';
+    // Parse as UTC and display in local timezone (Europe/Rome for Italy)
     const date = new Date(dateStr);
-    return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-  };
-
-  const formatDateTime = (dateStr) => {
-    const date = new Date(dateStr);
+    // Add timezone offset for proper local time display
     return date.toLocaleDateString('en-GB', { 
       day: '2-digit', 
       month: 'short', 
       year: 'numeric',
+      timeZone: 'Europe/Rome'
+    });
+  };
+
+  const formatDateTime = (dateStr) => {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    return date.toLocaleString('en-GB', { 
+      day: '2-digit', 
+      month: 'short', 
+      year: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
+      timeZone: 'Europe/Rome'
     });
   };
 
