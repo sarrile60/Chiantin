@@ -1113,6 +1113,18 @@ export function ProfessionalDashboard({ user, logout }) {
                 const displayType = translateDisplayType(rawDisplayType);
                 const isCredit = ['TOP_UP', 'CREDIT', 'REFUND', 'INTEREST'].includes(txn.transaction_type) || txn.direction === 'CREDIT';
                 const amount = txn.amount || 0;
+                
+                // Translate description helper
+                const translateDescription = (desc) => {
+                  if (!desc) return desc;
+                  // Check if it's a refund description
+                  if (desc.toLowerCase().includes('refund for rejected transfer to')) {
+                    const recipientMatch = desc.match(/to\s+(.+)$/i);
+                    const recipient = recipientMatch ? recipientMatch[1] : '';
+                    return t('refundForRejectedTransferTo').replace('{recipient}', recipient);
+                  }
+                  return desc;
+                };
 
                 return (
                   <>
