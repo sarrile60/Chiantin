@@ -225,6 +225,7 @@ class AdvancedBankingService:
         first_of_month = datetime(now.year, now.month, 1)
         
         # Query all DEBIT entries for current month
+        # Exclude TRANSFER_REFUND since refunds should not count as spending
         pipeline = [
             {
                 "$match": {
@@ -243,6 +244,12 @@ class AdvancedBankingService:
             },
             {
                 "$unwind": "$transaction"
+            },
+            {
+                # Exclude refund transactions from spending
+                "$match": {
+                    "transaction.transaction_type": {"$nin": ["TRANSFER_REFUND", "REFUND"]}
+                }
             },
             {
                 "$group": {
