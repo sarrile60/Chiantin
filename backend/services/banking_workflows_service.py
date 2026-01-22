@@ -390,6 +390,19 @@ class BankingWorkflowsService:
             }}
         )
         
+        # Update the original transaction to show REJECTED status and rejection reason
+        transaction_id = trans_doc.get("transaction_id")
+        if transaction_id:
+            await self.db.transactions.update_one(
+                {"_id": transaction_id},
+                {"$set": {
+                    "status": "REJECTED",
+                    "rejection_reason": reason,
+                    "admin_notes": reason,
+                    "updated_at": now
+                }}
+            )
+        
         # Create notification for user
         # Use the transaction_id from the transfer record so clicking the notification opens the correct transaction
         transaction_id = trans_doc.get("transaction_id", transfer_id)
