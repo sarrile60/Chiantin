@@ -334,7 +334,9 @@ function TransactionDetailsModal({ transaction, onClose }) {
     const labels = {
       POSTED: t('posted'),
       REVERSED: t('reversed'),
-      PENDING: t('pending')
+      PENDING: t('pending'),
+      REJECTED: t('rejected'),
+      SUBMITTED: t('submitted')
     };
     return labels[status] || status;
   };
