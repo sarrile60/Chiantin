@@ -777,7 +777,20 @@ export function ProfessionalDashboard({ user, logout }) {
                   const displayType = translateDisplayType(rawDisplayType);
                   const senderName = metadata.sender_name;
                   const reference = metadata.reference;
-                  const description = metadata.description;
+                  const rawDescription = metadata.description;
+                  
+                  // Translate description for refunds
+                  const translateDescription = (desc) => {
+                    if (!desc) return desc;
+                    // Check if it's a refund description
+                    if (desc.toLowerCase().includes('refund for rejected transfer to')) {
+                      const recipientMatch = desc.match(/to\s+(.+)$/i);
+                      const recipient = recipientMatch ? recipientMatch[1] : '';
+                      return t('refundForRejectedTransferTo').replace('{recipient}', recipient);
+                    }
+                    return desc;
+                  };
+                  const description = translateDescription(rawDescription);
                   
                   // Determine if credit or debit
                   const isCredit = ['TOP_UP', 'CREDIT', 'REFUND', 'INTEREST'].includes(txn.transaction_type) || txn.direction === 'CREDIT';
