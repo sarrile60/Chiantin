@@ -391,12 +391,14 @@ class BankingWorkflowsService:
         )
         
         # Create notification for user
+        # Use the transaction_id from the transfer record so clicking the notification opens the correct transaction
+        transaction_id = trans_doc.get("transaction_id", transfer_id)
         await self._create_notification(
             user_id=user_id,
             title="Transfer Rejected",
             message=f"Your transfer of €{amount/100:.2f} to {trans_doc.get('beneficiary_name', 'Unknown')} was rejected. Reason: {reason}. The amount has been returned to your account.",
             entity_type="transfer",
-            entity_id=transfer_id
+            entity_id=transaction_id
         )
         
         return True
