@@ -155,10 +155,10 @@ export function NotificationBell() {
     if (titleLower.includes('kyc submitted') || titleLower.includes('verification submitted')) {
       return t('notifKycSubmitted');
     }
-    if (titleLower.includes('transfer rejected') || titleLower === 'transfer rejected') {
+    if (titleLower.includes('transfer rejected') || titleLower === 'transfer rejected' || titleLower.includes('transfer failed')) {
       return t('notifTransferRejected');
     }
-    if (titleLower.includes('transfer complete') || titleLower.includes('transfer successful')) {
+    if (titleLower.includes('transfer complete') || titleLower.includes('transfer successful') || titleLower.includes('transfer completed')) {
       return t('notifTransferComplete');
     }
     if (titleLower.includes('welcome')) {
