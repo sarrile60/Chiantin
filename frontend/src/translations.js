@@ -1475,6 +1475,7 @@ const translations = {
     transferRejected: 'Trasferimento Rifiutato',
     transferRejectedMessage: 'Il tuo trasferimento è stato rifiutato',
     refundForRejectedTransfer: 'Rimborso per trasferimento rifiutato',
+    refundForRejectedTransferTo: 'Rimborso per trasferimento rifiutato a {recipient}',
     topUpDisplay: 'Ricarica',
     withdrawDisplay: 'Prelievo',
     feeDisplay: 'Commissione',
