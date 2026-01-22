@@ -155,6 +155,9 @@ export function NotificationBell() {
     if (titleLower.includes('kyc submitted') || titleLower.includes('verification submitted')) {
       return t('notifKycSubmitted');
     }
+    if (titleLower.includes('transfer rejected') || titleLower === 'transfer rejected') {
+      return t('notifTransferRejected');
+    }
     if (titleLower.includes('transfer complete') || titleLower.includes('transfer successful')) {
       return t('notifTransferComplete');
     }
@@ -183,6 +186,23 @@ export function NotificationBell() {
     }
     if (messageLower.includes('transfer has been processed')) {
       return t('notifTransferCompleteMessage');
+    }
+    // Transfer rejected messages
+    if (titleLower.includes('transfer rejected') || messageLower.includes('was rejected')) {
+      // Extract amount and reason from message
+      const amountMatch = message.match(/€[\d,]+\.?\d*/);
+      const amount = amountMatch ? amountMatch[0] : '';
+      // Extract recipient name (after "to " and before " was rejected")
+      const recipientMatch = message.match(/to\s+([^.]+?)\s+was rejected/i);
+      const recipient = recipientMatch ? recipientMatch[1] : '';
+      // Extract reason (after "Reason: ")
+      const reasonMatch = message.match(/Reason:\s*(.+?)\.?\s*(The amount|$)/i);
+      const reason = reasonMatch ? reasonMatch[1] : '';
+      
+      return t('notifTransferRejectedMessage')
+        .replace('{amount}', amount)
+        .replace('{recipient}', recipient)
+        .replace('{reason}', reason);
     }
     if (titleLower.includes('welcome') || messageLower.includes('thank you for joining')) {
       return t('notifWelcomeMessage');
