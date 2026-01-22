@@ -189,6 +189,8 @@ export function TransactionsList({ accountId, isAdmin = false }) {
               <option value="POSTED">{t('posted')}</option>
               <option value="REVERSED">{t('reversed')}</option>
               <option value="PENDING">{t('pending')}</option>
+              <option value="REJECTED">{t('rejected')}</option>
+              <option value="SUBMITTED">{t('submitted')}</option>
             </select>
           </div>
           <div>
