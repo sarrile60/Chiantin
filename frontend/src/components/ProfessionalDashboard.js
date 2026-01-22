@@ -1048,6 +1048,7 @@ export function ProfessionalDashboard({ user, logout }) {
                   if (typeLower === 'top up' || typeLower === 'top_up') return t('topUpDisplay');
                   if (typeLower === 'withdraw' || typeLower === 'withdrawal') return t('withdrawDisplay');
                   if (typeLower === 'fee') return t('feeDisplay');
+                  if (typeLower === 'transfer refund' || typeLower === 'transfer_refund') return t('transferRefund');
                   if (typeLower === 'refund') return t('refund');
                   if (typeLower === 'interest') return t('interest');
                   if (typeLower === 'credit') return t('credit');
