@@ -457,11 +457,6 @@ function TicketDetails({ ticket, onUpdate, isAdmin = false }) {
                     Support
                   </span>
                 )}
-                {msg.edited_at && (
-                  <span className={`ml-2 text-xs italic ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
-                    (edited)
-                  </span>
-                )}
               </span>
               <div className="flex items-center gap-2">
                 <span className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
