@@ -1994,10 +1994,10 @@ function AdminDashboard() {
                             <p className="font-mono text-sm">{acc.iban || 'Not set'}</p>
                             {acc.bic && <p className="font-mono text-xs text-gray-500">BIC: {acc.bic}</p>}
                           </div>
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-4">
                             <button
                               onClick={() => handleOpenEditIban(acc)}
-                              className="text-xs text-blue-600 hover:text-blue-800 font-medium transition"
+                              className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium transition"
                               data-testid={`edit-iban-btn-${acc.id}`}
                             >
                               Edit IBAN
