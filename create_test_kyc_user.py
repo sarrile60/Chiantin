@@ -4,6 +4,7 @@ Create a test user with verified email and submit KYC for frontend testing
 import requests
 import time
 from pymongo import MongoClient
+from bson import ObjectId
 from datetime import datetime, timedelta
 
 BASE_URL = "https://money-flow-136.preview.emergentagent.com/api/v1"
@@ -39,15 +40,32 @@ print(f"✅ User registered: {user_id}")
 client = MongoClient(MONGO_URL)
 db = client["ecommbx-prod"]
 
+# Try both string and ObjectId
 result = db.users.update_one(
     {"_id": user_id},
     {"$set": {"email_verified": True}}
 )
 
+if result.modified_count == 0:
+    # Try with ObjectId
+    try:
+        result = db.users.update_one(
+            {"_id": ObjectId(user_id)},
+            {"$set": {"email_verified": True}}
+        )
+    except:
+        pass
+
 if result.modified_count > 0:
     print(f"✅ Email verified in database")
 else:
-    print(f"⚠️  Could not verify email (user may already be verified)")
+    print(f"⚠️  Could not verify email")
+    # Check if user exists
+    user = db.users.find_one({"_id": user_id})
+    if not user:
+        user = db.users.find_one({"_id": ObjectId(user_id)})
+    if user:
+        print(f"   User found: {user.get('email')}, email_verified: {user.get('email_verified')}")
 
 # 3. Login as user
 response = requests.post(
