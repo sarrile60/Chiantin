@@ -2049,7 +2049,7 @@ function AdminDashboard() {
         <div className="header-bar border-b border-gray-200">
           <div className="px-8 h-full flex justify-between items-center">
             <h2 className="text-lg font-semibold">{activeSection.charAt(0).toUpperCase() + activeSection.slice(1)}</h2>
-            <span className="badge badge-info">{user?.role}</span>
+            <span className="badge badge-info ml-3">ECOMMBX</span>
           </div>
         </div>
         <div className="p-8">
