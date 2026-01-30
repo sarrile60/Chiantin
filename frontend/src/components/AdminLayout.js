@@ -85,7 +85,7 @@ export function AdminLayout({ user, logout, children }) {
             <h2 className="text-lg font-semibold text-gray-900">Admin Dashboard</h2>
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-600">{user?.first_name} {user?.last_name}</span>
-              <span className="badge badge-info">{user?.role}</span>
+              <span className="badge badge-info ml-2">ECOMMBX</span>
             </div>
           </div>
         </div>
