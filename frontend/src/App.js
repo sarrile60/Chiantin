@@ -1801,6 +1801,40 @@ function AdminDashboard() {
     }
   }, [selectedUser]);
 
+  // Edit IBAN Functions
+  const handleOpenEditIban = (account) => {
+    setEditIbanAccount(account);
+    setEditIbanValue(account.iban || '');
+    setEditBicValue(account.bic || '');
+    setShowEditIbanModal(true);
+  };
+
+  const handleUpdateIban = async () => {
+    if (!editIbanValue || !editBicValue) {
+      toast.error('IBAN and BIC are required');
+      return;
+    }
+
+    setEditIbanLoading(true);
+    try {
+      await api.patch(`/admin/users/${selectedUser.user.id}/account-iban`, {
+        iban: editIbanValue.toUpperCase(),
+        bic: editBicValue.toUpperCase()
+      });
+      toast.success('IBAN and BIC updated successfully!');
+      setShowEditIbanModal(false);
+      setEditIbanAccount(null);
+      setEditIbanValue('');
+      setEditBicValue('');
+      // Refresh user details to show updated IBAN
+      viewUserDetails(selectedUser.user.id);
+    } catch (err) {
+      toast.error('Failed to update IBAN: ' + (err.response?.data?.detail || err.message));
+    } finally {
+      setEditIbanLoading(false);
+    }
+  };
+
   const renderContent = () => {
     switch(activeSection) {
       case 'overview':
