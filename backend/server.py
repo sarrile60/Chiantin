@@ -2398,6 +2398,57 @@ async def admin_reject_transfer(
     return {"ok": True, "message": "Transfer rejected"}
 
 
+@app.get("/api/v1/admin/accounts-with-users")
+async def get_all_accounts_with_users(
+    current_user: dict = Depends(require_admin),
+    db: AsyncIOMotorDatabase = Depends(get_database)
+):
+    """Get all bank accounts with their user information (efficient single query)."""
+    from bson import ObjectId
+    
+    # Get all bank accounts
+    accounts_cursor = db.bank_accounts.find({})
+    accounts = []
+    user_ids = set()
+    
+    async for acc in accounts_cursor:
+        user_id = acc.get("user_id")
+        if user_id:
+            user_ids.add(user_id if isinstance(user_id, ObjectId) else ObjectId(user_id) if ObjectId.is_valid(str(user_id)) else None)
+        accounts.append(acc)
+    
+    # Remove None values
+    user_ids = {uid for uid in user_ids if uid is not None}
+    
+    # Fetch all users in one query
+    users_map = {}
+    if user_ids:
+        users_cursor = db.users.find({"_id": {"$in": list(user_ids)}})
+        async for user in users_cursor:
+            users_map[str(user["_id"])] = user
+    
+    # Combine accounts with user info
+    result = []
+    for acc in accounts:
+        user_id = acc.get("user_id")
+        user_id_str = str(user_id) if user_id else None
+        user = users_map.get(user_id_str, {})
+        
+        result.append({
+            "id": str(acc["_id"]),
+            "account_number": acc.get("account_number", ""),
+            "iban": acc.get("iban"),
+            "bic": acc.get("bic"),
+            "balance": acc.get("balance_in_cents", 0),
+            "currency": acc.get("currency", "EUR"),
+            "userId": user_id_str,
+            "userName": f"{user.get('first_name', '')} {user.get('last_name', '')}".strip() or "Unknown",
+            "userEmail": user.get("email", "Unknown")
+        })
+    
+    return result
+
+
 @app.post("/api/v1/admin/accounts/{account_id}/topup")
 async def admin_topup_account(
     account_id: str,
