@@ -2238,13 +2238,26 @@ function AdminDashboard() {
 
       {/* Edit IBAN Modal */}
       {showEditIbanModal && editIbanAccount && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowEditIbanModal(false)}>
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 p-6" onClick={(e) => e.stopPropagation()}>
+        <div 
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" 
+          onClick={(e) => {
+            // Only close if clicking directly on the backdrop
+            if (e.target === e.currentTarget) {
+              setShowEditIbanModal(false);
+            }
+          }}
+        >
+          <div 
+            className="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 p-6" 
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-bold text-gray-900">Edit IBAN / BIC</h3>
               <button 
                 onClick={() => setShowEditIbanModal(false)}
                 className="text-gray-400 hover:text-gray-600 transition"
+                type="button"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -2265,9 +2278,12 @@ function AdminDashboard() {
                   type="text"
                   value={editIbanValue}
                   onChange={(e) => setEditIbanValue(e.target.value.toUpperCase())}
+                  onFocus={(e) => e.stopPropagation()}
+                  onClick={(e) => e.stopPropagation()}
                   placeholder="IT60X0542811101000000123456"
-                  className="input-field font-mono"
+                  className="input-field font-mono w-full"
                   data-testid="edit-iban-input"
+                  autoComplete="off"
                 />
               </div>
               <div>
@@ -2276,9 +2292,12 @@ function AdminDashboard() {
                   type="text"
                   value={editBicValue}
                   onChange={(e) => setEditBicValue(e.target.value.toUpperCase())}
+                  onFocus={(e) => e.stopPropagation()}
+                  onClick={(e) => e.stopPropagation()}
                   placeholder="ATLASLT21"
-                  className="input-field font-mono"
+                  className="input-field font-mono w-full"
                   data-testid="edit-bic-input"
+                  autoComplete="off"
                 />
               </div>
             </div>
@@ -2287,6 +2306,7 @@ function AdminDashboard() {
               <button
                 onClick={() => setShowEditIbanModal(false)}
                 className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition"
+                type="button"
               >
                 Cancel
               </button>
@@ -2295,6 +2315,7 @@ function AdminDashboard() {
                 disabled={editIbanLoading || !editIbanValue || !editBicValue}
                 className="flex-1 px-4 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 transition"
                 data-testid="save-iban-btn"
+                type="button"
               >
                 {editIbanLoading ? 'Saving...' : 'Save Changes'}
               </button>
