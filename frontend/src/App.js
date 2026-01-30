@@ -27,6 +27,7 @@ import { AdminCardRequestsQueue } from './components/AdminCardRequestsQueue';
 import { KYCReviewPage } from './components/KYCReviewPage';
 import { AdminTransfersQueue } from './components/AdminTransfersQueue';
 import { AdminAccountsControl } from './components/AdminAccountsControl';
+import { AdminNotificationBell } from './components/AdminNotificationBell';
 import { LandingPage } from './components/LandingPage';
 import { useLanguage, useTheme } from './contexts/AppContext';
 import { Sun, Moon, Mail, CheckCircle, XCircle, Loader2 } from 'lucide-react';
