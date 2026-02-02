@@ -639,6 +639,51 @@ function TicketDetails({ ticket, onUpdate, onDelete, isAdmin = false }) {
           </div>
         </div>
       )}
+
+      {/* Delete Message Confirmation Modal */}
+      {confirmDeleteMessage && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" data-testid="delete-message-modal">
+          <div className={`p-6 rounded-xl shadow-xl max-w-md w-full mx-4 ${isDark ? 'bg-gray-800 border border-gray-700' : 'bg-white'}`}>
+            <h3 className={`text-lg font-semibold mb-3 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+              Delete Message
+            </h3>
+            <p className={`mb-4 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+              Are you sure you want to delete this message? This action cannot be undone.
+            </p>
+            {deletingMessageIndex !== null && ticket.messages && ticket.messages[deletingMessageIndex] && (
+              <div className={`p-3 rounded-lg mb-4 ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                <p className={`text-xs mb-1 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                  <strong>From:</strong> {ticket.messages[deletingMessageIndex].is_staff ? 'ECOMMBX Support' : ticket.messages[deletingMessageIndex].sender_name}
+                </p>
+                <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                  {ticket.messages[deletingMessageIndex].content.length > 100 
+                    ? ticket.messages[deletingMessageIndex].content.substring(0, 100) + '...' 
+                    : ticket.messages[deletingMessageIndex].content}
+                </p>
+              </div>
+            )}
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => {
+                  setConfirmDeleteMessage(false);
+                  setDeletingMessageIndex(null);
+                }}
+                className={`px-4 py-2 rounded-lg border transition ${isDark ? 'border-gray-600 text-gray-300 hover:bg-gray-700' : 'border-gray-300 hover:bg-gray-50'}`}
+                data-testid="cancel-delete-message"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteMessage}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+                data-testid="confirm-delete-message"
+              >
+                Delete Message
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
