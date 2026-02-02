@@ -368,7 +368,7 @@ class APITester:
                 timeout=10
             )
             
-            if response.status_code != 200:
+            if response.status_code not in [200, 201]:
                 self.log_test("User Registration with Plain Password", False, 
                             f"Registration failed: Status {response.status_code}")
                 return False
