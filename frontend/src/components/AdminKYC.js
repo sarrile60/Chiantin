@@ -43,8 +43,8 @@ export function AdminKYCReview() {
     
     setDownloadingDocument(true);
     try {
-      // Use the dedicated download endpoint
-      const downloadUrl = `${process.env.REACT_APP_BACKEND_URL}/api/v1/kyc/documents/${doc.file_key}/download`;
+      // Use the document endpoint with download=true query parameter
+      const downloadUrl = `${process.env.REACT_APP_BACKEND_URL}/api/v1/kyc/documents/${encodeURIComponent(doc.file_key)}?download=true`;
       
       // Fetch the document with auth header
       const response = await fetch(downloadUrl, {
