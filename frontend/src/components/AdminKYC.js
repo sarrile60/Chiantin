@@ -43,17 +43,19 @@ export function AdminKYCReview() {
     
     setDownloadingDocument(true);
     try {
-      const documentUrl = `${process.env.REACT_APP_BACKEND_URL}/api/v1/kyc/documents/${doc.file_key}`;
+      // Use the dedicated download endpoint
+      const downloadUrl = `${process.env.REACT_APP_BACKEND_URL}/api/v1/kyc/documents/${doc.file_key}/download`;
       
-      // Fetch the document
-      const response = await fetch(documentUrl, {
+      // Fetch the document with auth header
+      const response = await fetch(downloadUrl, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`
         }
       });
       
       if (!response.ok) {
-        throw new Error('Failed to fetch document');
+        const errorText = await response.text();
+        throw new Error(errorText || 'Failed to download document');
       }
       
       // Get the blob
