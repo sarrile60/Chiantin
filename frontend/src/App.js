@@ -1744,6 +1744,36 @@ function AdminDashboard() {
 
   const formatAmount = (cents) => `€${(cents / 100).toFixed(2)}`;
 
+  // Delete User Function (Hard Delete)
+  const handleDeleteUser = async () => {
+    if (!selectedUser) return;
+    
+    const userEmail = selectedUser.user.email;
+    const confirmMessage = `⚠️ PERMANENT DELETE ⚠️\n\nYou are about to PERMANENTLY DELETE this user:\n\n• Email: ${userEmail}\n• Name: ${selectedUser.user.first_name} ${selectedUser.user.last_name}\n\nThis action will:\n- Delete the user account\n- Delete all bank accounts\n- Delete all transactions\n- Delete KYC data\n- Delete support tickets\n\nThis action CANNOT be undone!\n\nType the user's email to confirm:`;
+    
+    const confirmInput = prompt(confirmMessage);
+    
+    if (confirmInput !== userEmail) {
+      if (confirmInput !== null) {
+        toast.error('Email does not match. Deletion cancelled.');
+      }
+      return;
+    }
+    
+    setDeleteUserLoading(true);
+    try {
+      await api.delete(`/admin/users/${selectedUser.user.id}/permanent`);
+      toast.success(`User ${userEmail} has been permanently deleted`);
+      setSelectedUser(null);
+      fetchUsers(); // Refresh user list
+    } catch (err) {
+      console.error('Failed to delete user:', err);
+      toast.error('Failed to delete user: ' + (err.response?.data?.detail || err.message));
+    } finally {
+      setDeleteUserLoading(false);
+    }
+  };
+
   // Tax Hold Functions
   const fetchUserTaxHold = async (userId) => {
     try {
