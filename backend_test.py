@@ -396,11 +396,19 @@ def main():
         tester.test_admin_accounts_list()
         print()
 
+        print("📊 Testing Analytics Endpoint...")
+        tester.test_admin_analytics_overview()
+        print()
+
         print("🔔 Testing Notification Bell Endpoints...")
         tester.test_admin_kyc_pending()
         tester.test_admin_card_requests()
         tester.test_admin_transfers_queue()
         tester.test_admin_support_tickets()
+        print()
+
+        print("💸 Testing Transfers Endpoints...")
+        tester.test_admin_rejected_transfers()
         print()
     else:
         print("⚠️  Skipping admin tests due to login failure")
