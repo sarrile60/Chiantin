@@ -351,13 +351,13 @@ function SignupPage() {
               className="w-full py-3 px-4 bg-gradient-to-r from-red-500 to-red-600 text-white font-semibold rounded-lg hover:shadow-lg hover:shadow-red-500/30 transition-all duration-300 disabled:opacity-50"
               data-testid="signup-button"
             >
-              {loading ? (t('creatingAccount') || 'Creating Account...') : t('createAccount')}
+              {loading ? (t('creatingAccount') || 'Creating Account...') : (t('createAccount') || 'Create Account')}
             </button>
           </form>
 
           <div className={`mt-6 pt-6 border-t text-center ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
             <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-              {t('alreadyHaveAccount')}{' '}
+              {t('alreadyHaveAccount') || 'Already have an account?'}{' '}
               <button
                 type="button"
                 onClick={() => navigate('/login')}
