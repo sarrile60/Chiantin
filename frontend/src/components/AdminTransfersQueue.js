@@ -117,6 +117,7 @@ export function AdminTransfersQueue() {
                 <th>Beneficiary</th>
                 <th>Amount</th>
                 <th>Status</th>
+                {activeTab === 'REJECTED' && <th>Reason</th>}
                 <th>Action</th>
               </tr>
             </thead>
@@ -126,7 +127,14 @@ export function AdminTransfersQueue() {
                   <td className="text-xs">{new Date(t.created_at).toLocaleDateString()}</td>
                   <td>{t.beneficiary_name}</td>
                   <td className="font-semibold">€{(t.amount/100).toFixed(2)}</td>
-                  <td><span className="badge badge-info">{t.status}</span></td>
+                  <td><span className={`badge ${t.status === 'REJECTED' ? 'badge-error' : t.status === 'COMPLETED' ? 'badge-success' : 'badge-warning'}`}>{t.status}</span></td>
+                  {activeTab === 'REJECTED' && (
+                    <td className="max-w-xs">
+                      <span className="text-xs text-red-600 truncate block" title={t.reject_reason}>
+                        {t.reject_reason ? (t.reject_reason.length > 50 ? t.reject_reason.substring(0, 50) + '...' : t.reject_reason) : 'N/A'}
+                      </span>
+                    </td>
+                  )}
                   <td><button className="btn-text text-xs">Open</button></td>
                 </tr>
               ))}
