@@ -818,7 +818,7 @@ async def reset_password(
 async def get_kyc_application(
     current_user: dict = Depends(get_current_user),
     db: AsyncIOMotorDatabase = Depends(get_database),
-    storage: LocalS3Storage = Depends(get_storage)
+    storage: CloudinaryStorage = Depends(get_storage)
 ):
     """Get current user's KYC application."""
     kyc_service = KYCService(db, storage)
@@ -832,7 +832,7 @@ async def upload_kyc_document(
     file: UploadFile = File(...),
     current_user: dict = Depends(get_current_user),
     db: AsyncIOMotorDatabase = Depends(get_database),
-    storage: LocalS3Storage = Depends(get_storage)
+    storage: CloudinaryStorage = Depends(get_storage)
 ):
     """Upload KYC document."""
     kyc_service = KYCService(db, storage)
@@ -843,7 +843,7 @@ async def upload_kyc_document(
 @app.get("/api/v1/kyc/documents/{document_key:path}")
 async def view_kyc_document(
     document_key: str,
-    storage: LocalS3Storage = Depends(get_storage)
+    storage: CloudinaryStorage = Depends(get_storage)
 ):
     """View uploaded KYC document - public for now (TODO: add admin auth)."""
     try:
@@ -914,7 +914,7 @@ async def submit_kyc(
     data: KYCSubmitRequest,
     current_user: dict = Depends(get_current_user),
     db: AsyncIOMotorDatabase = Depends(get_database),
-    storage: LocalS3Storage = Depends(get_storage)
+    storage: CloudinaryStorage = Depends(get_storage)
 ):
     """Submit KYC application for review."""
     kyc_service = KYCService(db, storage)
@@ -926,7 +926,7 @@ async def submit_kyc(
 async def get_pending_kyc(
     current_user: dict = Depends(require_admin),
     db: AsyncIOMotorDatabase = Depends(get_database),
-    storage: LocalS3Storage = Depends(get_storage)
+    storage: CloudinaryStorage = Depends(get_storage)
 ):
     """Get all pending KYC applications (admin)."""
     kyc_service = KYCService(db, storage)
@@ -940,7 +940,7 @@ async def review_kyc(
     review: KYCReviewRequest,
     current_user: dict = Depends(require_admin),
     db: AsyncIOMotorDatabase = Depends(get_database),
-    storage: LocalS3Storage = Depends(get_storage)
+    storage: CloudinaryStorage = Depends(get_storage)
 ):
     """Review KYC application (admin)."""
     kyc_service = KYCService(db, storage)
