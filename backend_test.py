@@ -834,6 +834,10 @@ def main():
         tester.test_admin_user_notes_update()
         tester.test_admin_tax_hold_management()
         print()
+
+        print("📄 Testing KYC Document Placeholder Fix...")
+        tester.test_kyc_document_placeholder()
+        print()
     else:
         print("⚠️  Skipping admin tests due to login failure")
         print()
