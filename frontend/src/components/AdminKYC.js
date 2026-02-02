@@ -99,9 +99,16 @@ export function AdminKYCReview() {
 
   const formatDate = (dateStr) => {
     if (!dateStr) return 'N/A';
-    // Ensure UTC timezone is applied for proper local conversion
-    const utcDate = dateStr.endsWith('Z') ? dateStr : dateStr + 'Z';
-    return new Date(utcDate).toLocaleString();
+    try {
+      const date = new Date(dateStr);
+      // Check if date is valid
+      if (isNaN(date.getTime())) {
+        return 'N/A';
+      }
+      return date.toLocaleString();
+    } catch (err) {
+      return 'N/A';
+    }
   };
 
   if (loading) {
