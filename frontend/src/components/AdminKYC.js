@@ -391,7 +391,7 @@ export function AdminKYCReview() {
               {viewingDocument.content_type?.startsWith('image/') ? (
                 <div className="text-center">
                   <img 
-                    src={`${process.env.REACT_APP_BACKEND_URL}/api/v1/kyc/documents/${encodeURIComponent(viewingDocument.file_key)}`}
+                    src={`${process.env.REACT_APP_BACKEND_URL}/api/v1/kyc/documents/${viewingDocument.file_key}`}
                     alt={viewingDocument.document_type}
                     className="max-w-full h-auto rounded-lg shadow-lg mx-auto"
                     style={{ maxHeight: '70vh' }}
@@ -412,7 +412,7 @@ export function AdminKYCReview() {
                   <div className="mt-4 text-sm text-gray-600">
                     <p className="font-medium">{viewingDocument.file_name}</p>
                     <p>Size: {(viewingDocument.file_size / 1024).toFixed(2)} KB</p>
-                    <p className="text-xs mt-2">Uploaded: {new Date(viewingDocument.uploaded_at + (viewingDocument.uploaded_at?.endsWith('Z') ? '' : 'Z')).toLocaleString()}</p>
+                    <p className="text-xs mt-2">Uploaded: {formatDate(viewingDocument.uploaded_at)}</p>
                   </div>
                 </div>
               ) : (
@@ -423,7 +423,7 @@ export function AdminKYCReview() {
                     </svg>
                     <p className="font-medium mb-2">{viewingDocument.file_name}</p>
                     <p className="text-sm text-gray-600">Size: {(viewingDocument.file_size / 1024).toFixed(2)} KB</p>
-                    <p className="text-sm text-gray-600">Uploaded: {new Date(viewingDocument.uploaded_at + (viewingDocument.uploaded_at?.endsWith('Z') ? '' : 'Z')).toLocaleString()}</p>
+                    <p className="text-sm text-gray-600">Uploaded: {formatDate(viewingDocument.uploaded_at)}</p>
                     <p className="text-xs text-gray-500 mt-4">Document preview not available for this file type</p>
                   </div>
                 </div>
