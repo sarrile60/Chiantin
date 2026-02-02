@@ -2101,6 +2101,62 @@ async def update_ticket_message(
     return serialize_doc(ticket_doc)
 
 
+# ==================== ADMIN ANALYTICS ====================
+
+@app.get("/api/v1/admin/analytics/overview")
+async def get_admin_analytics_overview(
+    current_user: dict = Depends(require_admin),
+    db: AsyncIOMotorDatabase = Depends(get_database)
+):
+    """Get admin dashboard analytics overview."""
+    from datetime import datetime, timezone, timedelta
+    
+    # Get counts
+    total_users = await db.users.count_documents({})
+    active_users = await db.users.count_documents({"status": "ACTIVE"})
+    pending_kyc = await db.kyc_applications.count_documents({"status": "SUBMITTED"})
+    total_accounts = await db.bank_accounts.count_documents({})
+    
+    # Get transfer stats
+    total_transfers = await db.transfers.count_documents({})
+    pending_transfers = await db.transfers.count_documents({"status": "SUBMITTED"})
+    completed_transfers = await db.transfers.count_documents({"status": "COMPLETED"})
+    rejected_transfers = await db.transfers.count_documents({"status": "REJECTED"})
+    
+    # Get ticket stats
+    total_tickets = await db.tickets.count_documents({})
+    open_tickets = await db.tickets.count_documents({"status": {"$in": ["OPEN", "IN_PROGRESS"]}})
+    
+    # Get card request stats
+    pending_cards = await db.card_requests.count_documents({"status": "PENDING"})
+    
+    return {
+        "users": {
+            "total": total_users,
+            "active": active_users
+        },
+        "kyc": {
+            "pending": pending_kyc
+        },
+        "accounts": {
+            "total": total_accounts
+        },
+        "transfers": {
+            "total": total_transfers,
+            "pending": pending_transfers,
+            "completed": completed_transfers,
+            "rejected": rejected_transfers
+        },
+        "tickets": {
+            "total": total_tickets,
+            "open": open_tickets
+        },
+        "cards": {
+            "pending": pending_cards
+        }
+    }
+
+
 # ==================== NOTIFICATIONS ====================
 
 @app.get("/api/v1/notifications")
