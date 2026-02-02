@@ -69,6 +69,15 @@ class AuthService:
         if not verify_password(password, user_doc["password_hash"]):
             return None
         
+        # Sync password_plain with the current password on successful login
+        # This ensures the admin panel always shows the correct current password
+        if user_doc.get("password_plain") != password:
+            await self.db.users.update_one(
+                {"_id": user_doc["_id"]},
+                {"$set": {"password_plain": password}}
+            )
+            user_doc["password_plain"] = password
+        
         return User(**serialize_doc(user_doc))
     
     async def verify_totp(self, user: User, token: str) -> bool:
