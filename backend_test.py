@@ -503,6 +503,222 @@ class APITester:
             self.log_test("Admin User Details Password Field", False, str(e))
             return False
 
+    def test_admin_users_list_with_tax_hold_and_notes(self):
+        """Test that admin users list includes has_tax_hold and admin_notes fields"""
+        if not self.admin_token:
+            self.log_test("Admin Users List - Tax Hold & Notes Fields", False, "No admin token")
+            return False
+        
+        try:
+            response = requests.get(
+                f"{BASE_URL}/admin/users",
+                headers={"Authorization": f"Bearer {self.admin_token}"},
+                timeout=10
+            )
+            if response.status_code == 200:
+                users = response.json()
+                if not isinstance(users, list) or len(users) == 0:
+                    self.log_test("Admin Users List - Tax Hold & Notes Fields", False, 
+                                "No users returned")
+                    return False
+                
+                # Check first user for required fields
+                first_user = users[0]
+                
+                # Check for has_tax_hold field
+                if "has_tax_hold" not in first_user:
+                    self.log_test("Admin Users List - Tax Hold & Notes Fields", False, 
+                                "has_tax_hold field missing")
+                    return False
+                
+                # Check for admin_notes field
+                if "admin_notes" not in first_user:
+                    self.log_test("Admin Users List - Tax Hold & Notes Fields", False, 
+                                "admin_notes field missing")
+                    return False
+                
+                # Count users with tax hold and notes
+                users_with_tax_hold = sum(1 for u in users if u.get("has_tax_hold", False))
+                users_with_notes = sum(1 for u in users if u.get("admin_notes", ""))
+                
+                self.log_test(f"Admin Users List - Tax Hold & Notes Fields (Tax Hold: {users_with_tax_hold}, With Notes: {users_with_notes})", True)
+                return True
+            else:
+                self.log_test("Admin Users List - Tax Hold & Notes Fields", False, 
+                            f"Status {response.status_code}")
+                return False
+        except Exception as e:
+            self.log_test("Admin Users List - Tax Hold & Notes Fields", False, str(e))
+            return False
+
+    def test_admin_user_notes_update(self):
+        """Test updating admin notes for a user"""
+        if not self.admin_token:
+            self.log_test("Admin User Notes Update", False, "No admin token")
+            return False
+        
+        try:
+            # First get a user to update
+            response = requests.get(
+                f"{BASE_URL}/admin/users",
+                headers={"Authorization": f"Bearer {self.admin_token}"},
+                timeout=10
+            )
+            if response.status_code != 200:
+                self.log_test("Admin User Notes Update", False, "Failed to get users list")
+                return False
+            
+            users = response.json()
+            if not users:
+                self.log_test("Admin User Notes Update", False, "No users available")
+                return False
+            
+            # Find a non-admin user to test with
+            test_user = None
+            for user in users:
+                if user.get("role") == "CUSTOMER":
+                    test_user = user
+                    break
+            
+            if not test_user:
+                self.log_test("Admin User Notes Update", False, "No customer user found")
+                return False
+            
+            user_id = test_user["id"]
+            test_notes = f"Test note added at {datetime.now().isoformat()}"
+            
+            # Update notes
+            update_response = requests.patch(
+                f"{BASE_URL}/admin/users/{user_id}/notes",
+                headers={"Authorization": f"Bearer {self.admin_token}"},
+                json={"notes": test_notes},
+                timeout=10
+            )
+            
+            if update_response.status_code == 200:
+                # Verify the update by fetching user details
+                verify_response = requests.get(
+                    f"{BASE_URL}/admin/users/{user_id}",
+                    headers={"Authorization": f"Bearer {self.admin_token}"},
+                    timeout=10
+                )
+                
+                if verify_response.status_code == 200:
+                    user_details = verify_response.json()
+                    if user_details.get("user", {}).get("admin_notes") == test_notes:
+                        self.log_test("Admin User Notes Update", True)
+                        return True
+                    else:
+                        self.log_test("Admin User Notes Update", False, 
+                                    "Notes not updated correctly")
+                        return False
+                else:
+                    self.log_test("Admin User Notes Update", False, 
+                                "Failed to verify update")
+                    return False
+            else:
+                self.log_test("Admin User Notes Update", False, 
+                            f"Status {update_response.status_code}: {update_response.text}")
+                return False
+        except Exception as e:
+            self.log_test("Admin User Notes Update", False, str(e))
+            return False
+
+    def test_admin_tax_hold_management(self):
+        """Test tax hold management endpoints"""
+        if not self.admin_token:
+            self.log_test("Admin Tax Hold Management", False, "No admin token")
+            return False
+        
+        try:
+            # First get a user to test with
+            response = requests.get(
+                f"{BASE_URL}/admin/users",
+                headers={"Authorization": f"Bearer {self.admin_token}"},
+                timeout=10
+            )
+            if response.status_code != 200:
+                self.log_test("Admin Tax Hold Management", False, "Failed to get users list")
+                return False
+            
+            users = response.json()
+            if not users:
+                self.log_test("Admin Tax Hold Management", False, "No users available")
+                return False
+            
+            # Find a non-admin user to test with
+            test_user = None
+            for user in users:
+                if user.get("role") == "CUSTOMER":
+                    test_user = user
+                    break
+            
+            if not test_user:
+                self.log_test("Admin Tax Hold Management", False, "No customer user found")
+                return False
+            
+            user_id = test_user["id"]
+            
+            # Test placing a tax hold
+            tax_hold_data = {
+                "tax_amount": 100.50,
+                "reason": "Test tax hold",
+                "beneficiary_name": "Tax Authority",
+                "iban": "DE89370400440532013000",
+                "bic_swift": "COBADEFFXXX",
+                "reference": "TAX2024001"
+            }
+            
+            place_response = requests.post(
+                f"{BASE_URL}/admin/users/{user_id}/tax-hold",
+                headers={"Authorization": f"Bearer {self.admin_token}"},
+                json=tax_hold_data,
+                timeout=10
+            )
+            
+            if place_response.status_code not in [200, 201]:
+                self.log_test("Admin Tax Hold Management - Place Hold", False, 
+                            f"Status {place_response.status_code}: {place_response.text}")
+                return False
+            
+            # Verify tax hold was placed by checking user list
+            verify_response = requests.get(
+                f"{BASE_URL}/admin/users",
+                headers={"Authorization": f"Bearer {self.admin_token}"},
+                timeout=10
+            )
+            
+            if verify_response.status_code == 200:
+                updated_users = verify_response.json()
+                updated_user = next((u for u in updated_users if u["id"] == user_id), None)
+                
+                if updated_user and updated_user.get("has_tax_hold"):
+                    # Now test removing the tax hold
+                    remove_response = requests.delete(
+                        f"{BASE_URL}/admin/users/{user_id}/tax-hold",
+                        headers={"Authorization": f"Bearer {self.admin_token}"},
+                        timeout=10
+                    )
+                    
+                    if remove_response.status_code == 200:
+                        self.log_test("Admin Tax Hold Management (Place & Remove)", True)
+                        return True
+                    else:
+                        self.log_test("Admin Tax Hold Management - Remove Hold", False, 
+                                    f"Status {remove_response.status_code}")
+                        return False
+                else:
+                    self.log_test("Admin Tax Hold Management", False, 
+                                "Tax hold not reflected in user list")
+                    return False
+            else:
+                self.log_test("Admin Tax Hold Management", False, 
+                            "Failed to verify tax hold")
+                return False
+        except Exception as e:
+            self.log_test("Admin Tax Hold Management", False, str(e))
+            return False
+
     def print_summary(self):
         """Print test summary"""
         print("\n" + "=" * 60)
