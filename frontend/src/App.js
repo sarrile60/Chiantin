@@ -1713,6 +1713,7 @@ function AdminDashboard() {
 
   const viewUserDetails = async (userId) => {
     console.log('Fetching user details for:', userId);
+    setShowPassword(false); // Reset password visibility when viewing a new user
     try {
       const response = await api.get(`/admin/users/${userId}`);
       console.log('User details response:', response.data);
