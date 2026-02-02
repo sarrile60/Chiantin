@@ -450,6 +450,14 @@ function TicketDetails({ ticket, onUpdate, onDelete, isAdmin = false }) {
                 >
                   Close Ticket
                 </button>
+                <div className={`border-t my-2 ${isDark ? 'border-gray-600' : 'border-gray-200'}`}></div>
+                <button
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="text-xs text-red-600 hover:text-red-700 font-medium"
+                  data-testid="delete-ticket-btn"
+                >
+                  Delete Ticket
+                </button>
               </div>
             )}
           </div>
