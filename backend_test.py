@@ -976,6 +976,8 @@ def main():
 
         print("💸 Testing Transfers Endpoints...")
         tester.test_admin_rejected_transfers()
+        tester.test_admin_update_reject_reason()
+        tester.test_admin_delete_transfer()
         print()
 
         print("🔐 Testing New Features - Plain Text Password Storage...")
