@@ -379,6 +379,95 @@ class EcommbxAPITester:
             print(f"   ✓ {len(open_tickets)} open/in-progress tickets")
         return success
 
+    def test_kyc_dates_format(self):
+        """Test KYC applications have proper date formats (not 'Invalid Date')"""
+        if not self.admin_token:
+            print("⚠️  Skipping - No admin token")
+            return False
+        
+        success, response = self.run_test(
+            "KYC Applications - Date Format Check",
+            "GET",
+            "/api/v1/admin/kyc/pending",
+            200,
+            headers={'Authorization': f'Bearer {self.admin_token}'},
+            description="Check KYC applications have valid date formats"
+        )
+        if success:
+            kyc_count = len(response) if isinstance(response, list) else 0
+            print(f"   ✓ Retrieved {kyc_count} KYC applications")
+            
+            # Check date fields
+            if kyc_count > 0:
+                for kyc in response[:3]:  # Check first 3
+                    submitted_at = kyc.get('submitted_at')
+                    if submitted_at:
+                        print(f"   ✓ KYC {kyc.get('id', 'unknown')}: submitted_at = {submitted_at}")
+                    
+                    # Check documents dates
+                    if 'documents' in kyc and len(kyc['documents']) > 0:
+                        for doc in kyc['documents'][:2]:  # Check first 2 docs
+                            uploaded_at = doc.get('uploaded_at')
+                            if uploaded_at:
+                                print(f"   ✓ Document uploaded_at = {uploaded_at}")
+        return success
+
+    def test_transfers_queue_rejection_reason(self):
+        """Test transfers queue shows rejection reason"""
+        if not self.admin_token:
+            print("⚠️  Skipping - No admin token")
+            return False
+        
+        success, response = self.run_test(
+            "Transfers Queue - Rejection Reason Check",
+            "GET",
+            "/api/v1/admin/transfers",
+            200,
+            headers={'Authorization': f'Bearer {self.admin_token}'},
+            description="Check transfers have rejection_reason field"
+        )
+        if success:
+            transfers_data = response.get('data', []) if isinstance(response, dict) else []
+            print(f"   ✓ Retrieved {len(transfers_data)} transfers")
+            
+            # Check for rejected transfers with rejection_reason
+            rejected_transfers = [t for t in transfers_data if t.get('status') == 'REJECTED']
+            if rejected_transfers:
+                print(f"   ✓ Found {len(rejected_transfers)} rejected transfers")
+                for transfer in rejected_transfers[:2]:  # Check first 2
+                    rejection_reason = transfer.get('rejection_reason')
+                    if rejection_reason:
+                        print(f"   ✓ Transfer {transfer.get('id', 'unknown')}: rejection_reason = '{rejection_reason}'")
+                    else:
+                        print(f"   ⚠️  Transfer {transfer.get('id', 'unknown')}: No rejection_reason field")
+            else:
+                print(f"   ℹ️  No rejected transfers found to check rejection_reason")
+        return success
+
+    def test_admin_overview_tab(self):
+        """Test admin overview/analytics endpoint"""
+        if not self.admin_token:
+            print("⚠️  Skipping - No admin token")
+            return False
+        
+        success, response = self.run_test(
+            "Admin Overview Tab - Analytics",
+            "GET",
+            "/api/v1/admin/analytics/overview",
+            200,
+            headers={'Authorization': f'Bearer {self.admin_token}'},
+            description="Fetch overview analytics data"
+        )
+        if success:
+            print(f"   ✓ Overview data retrieved")
+            # Check for key metrics
+            if isinstance(response, dict):
+                metrics = ['total_users', 'total_accounts', 'total_balance', 'pending_kyc']
+                for metric in metrics:
+                    if metric in response:
+                        print(f"   ✓ {metric}: {response[metric]}")
+        return success
+
     def print_summary(self):
         """Print test summary"""
         print("\n" + "="*80)
