@@ -43,19 +43,19 @@ class KYCService:
         file: UploadFile,
         document_type: DocumentType
     ) -> KYCDocument:
-        """Upload a KYC document."""
+        """Upload a KYC document to Cloudinary."""
         # Generate unique key
         file_id = str(uuid.uuid4())
         key = f"kyc/{user_id}/{document_type.value}_{file_id}_{file.filename}"
         
-        # Upload to storage
+        # Upload to Cloudinary storage
         metadata = self.storage.upload_fileobj(
             file.file,
             key,
             content_type=file.content_type
         )
         
-        # Create document record
+        # Create document record with Cloudinary URL
         doc = KYCDocument(
             document_type=document_type,
             file_key=key,
@@ -64,10 +64,14 @@ class KYCService:
             content_type=file.content_type or "application/octet-stream"
         )
         
+        # Add Cloudinary URL to the document data
+        doc_data = doc.model_dump()
+        doc_data["cloudinary_url"] = metadata.url  # Store the Cloudinary URL
+        
         # Add to application
         await self.db.kyc_applications.update_one(
             {"user_id": user_id},
-            {"$push": {"documents": doc.model_dump()}}
+            {"$push": {"documents": doc_data}}
         )
         
         return doc
