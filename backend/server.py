@@ -2783,6 +2783,118 @@ async def admin_reject_transfer(
     return {"ok": True, "message": "Transfer rejected"}
 
 
+class UpdateRejectReasonRequest(BaseModel):
+    reason: str = Field(..., min_length=1, description="New rejection reason")
+
+
+@app.patch("/api/v1/admin/transfers/{transfer_id}/reject-reason")
+async def admin_update_reject_reason(
+    transfer_id: str,
+    data: UpdateRejectReasonRequest,
+    current_user: dict = Depends(require_admin),
+    db: AsyncIOMotorDatabase = Depends(get_database)
+):
+    """Admin updates the rejection reason for a rejected transfer."""
+    from bson import ObjectId
+    from bson.errors import InvalidId
+    
+    # Find transfer
+    transfer = await db.transfers.find_one({"_id": transfer_id})
+    if not transfer:
+        try:
+            transfer = await db.transfers.find_one({"_id": ObjectId(transfer_id)})
+        except InvalidId:
+            pass
+    
+    if not transfer:
+        raise HTTPException(status_code=404, detail="Transfer not found")
+    
+    if transfer.get("status") != "REJECTED":
+        raise HTTPException(status_code=400, detail="Can only update rejection reason for rejected transfers")
+    
+    # Update the rejection reason
+    await db.transfers.update_one(
+        {"_id": transfer["_id"]},
+        {"$set": {
+            "reject_reason": data.reason,
+            "reject_reason_updated_at": datetime.now(timezone.utc),
+            "reject_reason_updated_by": current_user["id"]
+        }}
+    )
+    
+    # Audit log
+    await create_audit_log(
+        db=db,
+        action="TRANSFER_REJECT_REASON_UPDATED",
+        entity_type="transfer",
+        entity_id=str(transfer["_id"]),
+        description=f"Rejection reason updated for transfer {transfer_id}",
+        performed_by=current_user["id"],
+        performed_by_role=current_user["role"],
+        performed_by_email=current_user["email"],
+        metadata={"new_reason": data.reason}
+    )
+    
+    return {"ok": True, "message": "Rejection reason updated"}
+
+
+@app.delete("/api/v1/admin/transfers/{transfer_id}")
+async def admin_delete_transfer(
+    transfer_id: str,
+    current_user: dict = Depends(require_admin),
+    db: AsyncIOMotorDatabase = Depends(get_database)
+):
+    """Admin permanently deletes a transfer (any status)."""
+    from bson import ObjectId
+    from bson.errors import InvalidId
+    
+    # Only SUPER_ADMIN can delete transfers
+    if current_user["role"] != "SUPER_ADMIN":
+        raise HTTPException(status_code=403, detail="Only Super Admin can delete transfers")
+    
+    # Find transfer
+    transfer = await db.transfers.find_one({"_id": transfer_id})
+    if not transfer:
+        try:
+            transfer = await db.transfers.find_one({"_id": ObjectId(transfer_id)})
+        except InvalidId:
+            pass
+    
+    if not transfer:
+        raise HTTPException(status_code=404, detail="Transfer not found")
+    
+    transfer_status = transfer.get("status", "UNKNOWN")
+    transfer_amount = transfer.get("amount", 0)
+    beneficiary = transfer.get("beneficiary_name", "Unknown")
+    
+    # Delete the transfer
+    result = await db.transfers.delete_one({"_id": transfer["_id"]})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=500, detail="Failed to delete transfer")
+    
+    # Audit log
+    await create_audit_log(
+        db=db,
+        action="TRANSFER_PERMANENTLY_DELETED",
+        entity_type="transfer",
+        entity_id=str(transfer["_id"]),
+        description=f"Transfer to {beneficiary} (€{transfer_amount/100:.2f}) permanently deleted",
+        performed_by=current_user["id"],
+        performed_by_role=current_user["role"],
+        performed_by_email=current_user["email"],
+        metadata={
+            "status": transfer_status,
+            "amount": transfer_amount,
+            "beneficiary": beneficiary
+        }
+    )
+    
+    logger.info(f"Transfer {transfer_id} permanently deleted by admin {current_user['email']}")
+    
+    return {"ok": True, "message": "Transfer permanently deleted"}
+
+
 @app.get("/api/v1/admin/accounts-with-users")
 async def get_all_accounts_with_users(
     current_user: dict = Depends(require_admin),
