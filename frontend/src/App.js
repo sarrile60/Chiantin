@@ -1650,6 +1650,12 @@ function AdminDashboard() {
   const [editIbanValue, setEditIbanValue] = useState('');
   const [editBicValue, setEditBicValue] = useState('');
   const [editIbanLoading, setEditIbanLoading] = useState(false);
+  
+  // Password visibility state
+  const [showPassword, setShowPassword] = useState(false);
+  
+  // Delete user state
+  const [deleteUserLoading, setDeleteUserLoading] = useState(false);
 
   useEffect(() => {
     fetchUsers();
