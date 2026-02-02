@@ -558,14 +558,14 @@ function LoginPage() {
 
           <div className={`mt-6 pt-6 border-t text-center ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
             <p className={`text-sm mb-4 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-              {t('dontHaveAccount')}{' '}
+              {t('dontHaveAccount') || "Don't have an account?"}{' '}
               <button
                 type="button"
                 onClick={() => navigate('/signup')}
                 className="font-medium text-red-500 hover:text-red-600"
                 data-testid="goto-signup"
               >
-                {t('createAccount')}
+                {t('createAccount') || 'Create Account'}
               </button>
             </p>
           </div>
