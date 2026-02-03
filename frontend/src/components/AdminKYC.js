@@ -20,6 +20,12 @@ export function AdminKYCReview() {
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  
+  // Manual queue state
+  const [showQueueModal, setShowQueueModal] = useState(false);
+  const [queueEmail, setQueueEmail] = useState('');
+  const [queueReason, setQueueReason] = useState('');
+  const [queueLoading, setQueueLoading] = useState(false);
 
   useEffect(() => {
     fetchApplications();
