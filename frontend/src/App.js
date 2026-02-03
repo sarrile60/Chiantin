@@ -2722,8 +2722,7 @@ function SupportPage() {
             title={language === 'en' ? 'Switch to Italian' : 'Passa a Inglese'}
             data-testid="support-language-toggle"
           >
-            <span className="text-base">{language === 'en' ? '🇬🇧' : '🇮🇹'}</span>
-            <span className="hidden sm:inline">{language === 'en' ? 'EN' : 'IT'}</span>
+            <span className="font-bold">{language === 'en' ? 'EN' : 'IT'}</span>
           </button>
           {/* Theme Toggle */}
           <button
