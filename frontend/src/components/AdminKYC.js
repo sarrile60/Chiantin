@@ -199,8 +199,20 @@ export function AdminKYCReview() {
       <div className="lg:col-span-1">
         <div className="bg-white rounded-lg shadow">
           <div className="p-4 border-b">
-            <h3 className="text-lg font-semibold">Pending KYC Applications</h3>
-            <p className="text-sm text-gray-600 mt-1">{applications.length} application(s)</p>
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="text-lg font-semibold">Pending KYC Applications</h3>
+                <p className="text-sm text-gray-600 mt-1">{applications.length} application(s)</p>
+              </div>
+              <button
+                onClick={() => setShowQueueModal(true)}
+                className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                data-testid="manual-queue-btn"
+                title="Manually add a user to the KYC queue"
+              >
+                + Queue User
+              </button>
+            </div>
           </div>
           <div className="divide-y max-h-[600px] overflow-y-auto">
             {applications.length === 0 ? (
