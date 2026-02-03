@@ -45,6 +45,9 @@ class TicketService:
     
     async def get_all_tickets(self, status_filter: Optional[str] = None) -> List[dict]:
         """Get all tickets (admin) with user information."""
+        from bson import ObjectId
+        from bson.errors import InvalidId
+        
         query = {}
         if status_filter and status_filter != 'all':
             query["status"] = status_filter
@@ -57,13 +60,25 @@ class TicketService:
         async for doc in cursor:
             ticket_docs.append(doc)
         
-        # Fetch all users in one batch query for efficiency
-        user_ids = list(set(doc.get("user_id") for doc in ticket_docs if doc.get("user_id")))
+        # Fetch all users - handle both ObjectId and string IDs
+        user_ids_str = list(set(doc.get("user_id") for doc in ticket_docs if doc.get("user_id")))
+        
+        # Convert string IDs to ObjectId for query (MongoDB stores _id as ObjectId)
+        user_ids_query = []
+        for uid in user_ids_str:
+            user_ids_query.append(uid)  # Keep string version
+            try:
+                user_ids_query.append(ObjectId(uid))  # Also try ObjectId version
+            except (InvalidId, TypeError):
+                pass
+        
         users_map = {}
         
-        if user_ids:
-            users_cursor = self.db.users.find({"_id": {"$in": user_ids}})
+        if user_ids_query:
+            # Query with both string and ObjectId versions
+            users_cursor = self.db.users.find({"_id": {"$in": user_ids_query}})
             async for user_doc in users_cursor:
+                # Map by string version of ID
                 user_id = str(user_doc["_id"])
                 users_map[user_id] = {
                     "email": user_doc.get("email", ""),
