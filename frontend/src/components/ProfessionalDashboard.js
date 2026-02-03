@@ -1077,7 +1077,7 @@ export function ProfessionalDashboard({ user, logout }) {
           </div>
           <button
             onClick={() => navigate('/support')}
-            className="btn-primary w-full sm:w-auto text-sm px-4 py-2 whitespace-nowrap"
+            className="btn-primary w-full sm:w-auto text-sm px-4 py-3 min-h-[44px] whitespace-nowrap"
             data-testid="contact-support-btn"
           >
             <span className="flex items-center justify-center gap-2">
