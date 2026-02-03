@@ -468,6 +468,91 @@ class EcommbxAPITester:
                         print(f"   ✓ {metric}: {response[metric]}")
         return success
 
+    def test_admin_manual_kyc_queue(self):
+        """Test admin can manually queue a user for KYC review"""
+        if not self.admin_token:
+            print("⚠️  Skipping - No admin token")
+            return False
+        
+        # Test with Michele Marcheggiani (the user mentioned in the bug report)
+        success, response = self.run_test(
+            "Admin Manual KYC Queue - Michele Marcheggiani",
+            "POST",
+            "/api/v1/admin/kyc/queue-user",
+            200,
+            data={
+                "user_email": "michele.marcheggiani@gmail.com",
+                "reason": "Testing manual queue functionality"
+            },
+            headers={'Authorization': f'Bearer {self.admin_token}'},
+            description="Manually queue Michele Marcheggiani for KYC review"
+        )
+        if success:
+            print(f"   ✓ User queued successfully")
+            if isinstance(response, dict):
+                print(f"   ✓ Response: {response.get('message', 'No message')}")
+                print(f"   ✓ KYC Status: {response.get('kyc_status', 'Unknown')}")
+        return success
+
+    def test_admin_manual_kyc_queue_nonexistent(self):
+        """Test admin manual queue with non-existent user (should fail)"""
+        if not self.admin_token:
+            print("⚠️  Skipping - No admin token")
+            return False
+        
+        success, response = self.run_test(
+            "Admin Manual KYC Queue - Non-existent User",
+            "POST",
+            "/api/v1/admin/kyc/queue-user",
+            404,
+            data={
+                "user_email": "nonexistent@example.com",
+                "reason": "Testing error handling"
+            },
+            headers={'Authorization': f'Bearer {self.admin_token}'},
+            description="Try to queue non-existent user (should return 404)"
+        )
+        return success
+
+    def test_kyc_queue_contains_michele(self):
+        """Test that Michele Marcheggiani appears in the KYC queue"""
+        if not self.admin_token:
+            print("⚠️  Skipping - No admin token")
+            return False
+        
+        success, response = self.run_test(
+            "KYC Queue - Check Michele Marcheggiani",
+            "GET",
+            "/api/v1/admin/kyc/pending",
+            200,
+            headers={'Authorization': f'Bearer {self.admin_token}'},
+            description="Verify Michele Marcheggiani is in the KYC queue"
+        )
+        if success:
+            kyc_apps = response if isinstance(response, list) else []
+            print(f"   ✓ Retrieved {len(kyc_apps)} KYC applications")
+            
+            # Look for Michele Marcheggiani
+            michele_found = False
+            for app in kyc_apps:
+                full_name = app.get('full_name', '').lower()
+                if 'michele' in full_name and 'marcheggiani' in full_name:
+                    michele_found = True
+                    print(f"   ✅ Michele Marcheggiani FOUND in queue!")
+                    print(f"      - Status: {app.get('status', 'Unknown')}")
+                    print(f"      - Full Name: {app.get('full_name', 'N/A')}")
+                    print(f"      - Documents: {len(app.get('documents', []))} uploaded")
+                    print(f"      - Submitted At: {app.get('submitted_at', 'N/A')}")
+                    break
+            
+            if not michele_found:
+                print(f"   ⚠️  Michele Marcheggiani NOT found in queue")
+                print(f"   ℹ️  Available applications:")
+                for app in kyc_apps[:5]:  # Show first 5
+                    print(f"      - {app.get('full_name', 'Unknown')} ({app.get('status', 'Unknown')})")
+        
+        return success
+
     def print_summary(self):
         """Print test summary"""
         print("\n" + "="*80)
