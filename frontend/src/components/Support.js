@@ -130,6 +130,15 @@ export function SupportTickets({ isAdmin = false }) {
                     data-testid={`ticket-${ticket.id}`}
                   >
                     <p className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>{ticket.subject}</p>
+                    {/* Show client name for admin view */}
+                    {isAdmin && ticket.user_name && (
+                      <p className={`text-xs mt-1 ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>
+                        <span className="font-medium">{ticket.user_name}</span>
+                        {ticket.user_email && ticket.user_name !== ticket.user_email && (
+                          <span className={isDark ? 'text-gray-500' : 'text-gray-500'}> • {ticket.user_email}</span>
+                        )}
+                      </p>
+                    )}
                     <div className="flex items-center justify-between mt-2">
                       <TicketStatusBadge status={ticket.status} t={t} />
                       <span className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
