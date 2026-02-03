@@ -81,8 +81,8 @@ export function LandingPage() {
 
   return (
     <div className={`min-h-screen ${isDark ? 'bg-gray-900' : 'bg-white'}`}>
-      {/* Navigation */}
-      <nav className={`fixed top-0 left-0 right-0 backdrop-blur-sm border-b z-50 ${isDark ? 'bg-gray-900/95 border-gray-800' : 'bg-white/95 border-gray-100'}`}>
+      {/* Navigation - with safe area inset for PWA mode on iOS */}
+      <nav className={`fixed top-0 left-0 right-0 backdrop-blur-sm border-b z-50 ${isDark ? 'bg-gray-900/95 border-gray-800' : 'bg-white/95 border-gray-100'}`} style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16 sm:h-20">
             {/* Logo */}
