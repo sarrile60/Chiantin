@@ -535,6 +535,77 @@ export function AdminKYCReview() {
           </div>
         </div>
       )}
+      
+      {/* Manual Queue Modal */}
+      {showQueueModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-md w-full p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">Manually Queue User for KYC Review</h3>
+              <button 
+                onClick={() => setShowQueueModal(false)} 
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <p className="text-sm text-gray-600 mb-4">
+              Use this feature when a user's KYC submission failed or their application needs to be re-queued for review.
+            </p>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  User Email *
+                </label>
+                <input
+                  type="email"
+                  value={queueEmail}
+                  onChange={(e) => setQueueEmail(e.target.value)}
+                  placeholder="user@example.com"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  data-testid="queue-email-input"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Reason (Optional)
+                </label>
+                <textarea
+                  value={queueReason}
+                  onChange={(e) => setQueueReason(e.target.value)}
+                  placeholder="Why is this user being manually queued?"
+                  rows={2}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  data-testid="queue-reason-input"
+                />
+              </div>
+            </div>
+            
+            <div className="flex justify-end space-x-3 mt-6">
+              <button
+                onClick={() => setShowQueueModal(false)}
+                className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+                disabled={queueLoading}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleManualQueue}
+                disabled={queueLoading || !queueEmail.trim()}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                data-testid="queue-submit-btn"
+              >
+                {queueLoading ? 'Queueing...' : 'Queue for Review'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
