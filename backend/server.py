@@ -2326,10 +2326,11 @@ async def get_all_tickets(
     current_user: dict = Depends(require_admin),
     db: AsyncIOMotorDatabase = Depends(get_database)
 ):
-    """Get all tickets (admin)."""
+    """Get all tickets (admin) with user information."""
     ticket_service = TicketService(db)
     tickets = await ticket_service.get_all_tickets(status_filter=status)
-    return [t.model_dump() for t in tickets]
+    # tickets is already a list of dicts with user info included
+    return tickets
 
 
 class UpdateTicketStatus(BaseModel):
