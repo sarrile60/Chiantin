@@ -128,7 +128,7 @@ class SupportTicketsAPITester:
         
         try:
             response = requests.post(
-                f"{self.base_url}/api/v1/tickets",
+                f"{self.base_url}/api/v1/tickets/create",
                 headers={"Authorization": f"Bearer {self.user_token}"},
                 json={
                     "subject": f"Test Ticket - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
