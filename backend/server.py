@@ -693,6 +693,37 @@ async def change_password(
     return {"success": True, "message": "Password changed successfully. Please login again."}
 
 
+# Transfer Authorization - Verify Password Schema
+class VerifyPasswordRequest(BaseModel):
+    password: str
+
+
+@app.post("/api/v1/auth/verify-password")
+async def verify_user_password(
+    data: VerifyPasswordRequest,
+    current_user: dict = Depends(get_current_user),
+    db: AsyncIOMotorDatabase = Depends(get_database)
+):
+    """
+    Verify user's password for transfer authorization.
+    Used to confirm identity before processing sensitive transactions.
+    """
+    from bson import ObjectId
+    
+    # Get user from database
+    user_doc = await db.users.find_one({"_id": ObjectId(current_user["id"])})
+    if not user_doc:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Verify password
+    if not verify_password(data.password, user_doc["password_hash"]):
+        logger.warning(f"Transfer authorization failed - incorrect password for user {current_user['email']}")
+        raise HTTPException(status_code=401, detail="Incorrect password")
+    
+    logger.info(f"Transfer authorization successful for user {current_user['email']}")
+    return {"success": True, "message": "Password verified successfully"}
+
+
 # Password Reset Request Schema
 class ForgotPasswordRequest(BaseModel):
     email: str
