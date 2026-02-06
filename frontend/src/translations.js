@@ -1186,6 +1186,17 @@ const translations = {
     pleaseEnterSixDigit: 'Inserisci un codice a 6 cifre',
     invalidCodeTryAgain: 'Codice non valido. Riprova.',
     loadingQrCode: 'Caricamento codice QR...',
+    
+    // Transfer Authorization
+    authorizeTransfer: 'Autorizza Trasferimento',
+    securityVerification: 'Verifica di Sicurezza Richiesta',
+    enterPasswordToAuthorize: 'Per la tua sicurezza, inserisci la password del tuo account per autorizzare questo trasferimento.',
+    pleaseEnterPassword: 'Inserisci la tua password',
+    incorrectPassword: 'Password errata. Riprova.',
+    verificationFailed: 'Verifica fallita. Riprova.',
+    confirmAndSend: 'Conferma e Invia',
+    enterYourPassword: 'Inserisci la tua password',
+    
     devicesAndSessions: 'Dispositivi e Sessioni',
     manageDevicesAccess: 'Gestisci i dispositivi che hanno accesso al tuo account',
     showDevices: 'Mostra Dispositivi',
