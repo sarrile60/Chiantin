@@ -29,15 +29,21 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     // Only redirect to login on 401 if NOT already on a public auth page
-    // This prevents the login form from refreshing when credentials are wrong
+    // AND if NOT a password verification request (transfer authorization)
     if (error.response?.status === 401) {
       const currentPath = window.location.pathname;
       const publicAuthPaths = ['/login', '/signup', '/forgot-password', '/reset-password', '/verify-email'];
       const isPublicAuthPage = publicAuthPaths.some(path => currentPath.startsWith(path));
       
-      // Only clear tokens and redirect if we're NOT on a public auth page
-      // (i.e., the user was logged in and their session expired)
-      if (!isPublicAuthPage) {
+      // Check if this is a password verification request (transfer authorization)
+      // These should return 401 for wrong password but NOT logout the user
+      const requestUrl = error.config?.url || '';
+      const isPasswordVerification = requestUrl.includes('/auth/verify-password');
+      
+      // Only clear tokens and redirect if:
+      // 1. We're NOT on a public auth page
+      // 2. This is NOT a password verification request
+      if (!isPublicAuthPage && !isPasswordVerification) {
         localStorage.removeItem('access_token');
         localStorage.removeItem('user');
         window.location.href = '/login';
