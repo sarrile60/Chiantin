@@ -13,10 +13,10 @@
   },
   {
     "content": "Call testing agent with NEW test users only (never real clients)",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Review test report and fix any critical issues",
-    "status": "pending"
+    "status": "completed"
   }
 ]
