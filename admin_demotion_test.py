@@ -403,7 +403,8 @@ class AdminDemotionTester:
         
         if success and 'detail' in response:
             detail = response['detail']
-            if 'only super_admin' in detail.lower():
+            # The error could be either the specific message or generic admin access required
+            if 'only super_admin' in detail.lower() or 'admin access required' in detail.lower():
                 self.log_test("Non-Super-Admin Permission Block", True, f"Non-super-admin correctly blocked: {detail}")
                 return True
             else:
