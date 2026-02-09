@@ -2065,6 +2065,45 @@ function AdminDashboard() {
                           data-testid="enable-user-btn"
                         >Enable</button>
                       )}
+                      
+                      {/* Demote Admin Button - Only show for admin/super_admin users */}
+                      {(selectedUser.user.role === 'ADMIN' || selectedUser.user.role === 'SUPER_ADMIN') && (
+                        <button
+                          onClick={() => {
+                            if (window.confirm(
+                              `⚠️ DEMOTE ADMIN USER\n\n` +
+                              `User: ${selectedUser.user.first_name} ${selectedUser.user.last_name}\n` +
+                              `Email: ${selectedUser.user.email}\n` +
+                              `Current Role: ${selectedUser.user.role}\n\n` +
+                              `This will change their role from ${selectedUser.user.role} to USER.\n` +
+                              `They will lose all admin privileges immediately.\n\n` +
+                              `Are you sure you want to proceed?`
+                            )) {
+                              api.post(`/admin/users/${selectedUser.user.id}/demote`)
+                                .then(response => {
+                                  toast.success(response.data.message || 'User demoted successfully');
+                                  fetchUsers(); // Refresh the user list
+                                  setSelectedUser(null); // Close the details panel
+                                })
+                                .catch(err => {
+                                  console.error('Demote error:', err);
+                                  toast.error(err.response?.data?.detail || 'Failed to demote user');
+                                });
+                            }
+                          }}
+                          className="px-3 py-1 text-sm border border-orange-600 text-orange-600 rounded hover:bg-orange-50"
+                          data-testid="demote-user-btn"
+                          title="Demote this admin user to regular user"
+                        >
+                          <span className="flex items-center space-x-1">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
+                            </svg>
+                            <span>Demote to User</span>
+                          </span>
+                        </button>
+                      )}
+                      
                       {/* Delete User Button */}
                       <button
                         onClick={handleDeleteUser}
