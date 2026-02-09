@@ -30,6 +30,8 @@ import { AdminAccountsControl } from './components/AdminAccountsControl';
 import { AdminNotificationBell } from './components/AdminNotificationBell';
 import { LandingPage } from './components/LandingPage';
 import { useLanguage, useTheme } from './contexts/AppContext';
+import { useBalanceVisibility, formatBalance } from './hooks/useBalanceVisibility';
+import BalanceToggle from './components/BalanceToggle';
 import { Sun, Moon, Mail, CheckCircle, XCircle, Loader2, Eye, EyeOff } from 'lucide-react';
 
 // Styled Logo Component - displays "ecomm" with "bx" in red
