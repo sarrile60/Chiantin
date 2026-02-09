@@ -445,7 +445,7 @@ def main():
     else:
         print("❌ Failed to get Italian user notifications after removal")
 
-    # Step 6: Test English user for comparison
+    # Step 7: Test English user for comparison
     print("\n🇺🇸 TESTING ENGLISH USER TAX HOLD FLOW (Comparison)")
     print("-" * 50)
     
