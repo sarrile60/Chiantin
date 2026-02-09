@@ -1,11 +1,11 @@
 [
   {
     "content": "Check database schemas for creation timestamp fields (KYC, transfers, tickets, cards)",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Create new backend API endpoint to get counts of items created AFTER cleared_at timestamp",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Update AdminNotificationBell.js to use new smart counting endpoint",
