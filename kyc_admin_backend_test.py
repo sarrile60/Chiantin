@@ -471,7 +471,7 @@ class KYCAdminTester:
             "date_of_birth": "1990-01-01",
             "nationality": "Estonian",
             "country": "Estonia", 
-            "address": "New Street 456",
+            "street_address": "New Street 456",
             "city": "Tallinn",
             "postal_code": "54321",
             "tax_residency": "Estonia",
