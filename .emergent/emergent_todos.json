@@ -1,11 +1,11 @@
 [
   {
     "content": "Find the backend endpoint that creates tax hold removal notification",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Check translations.js for missing Italian translation keys",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Update backend to send notification in user's preferred language",
