@@ -5,10 +5,10 @@
   },
   {
     "content": "Fix visual bug: Grey text with poor contrast in admin panel and forms",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Test fixes with NEW test user (never real clients)",
-    "status": "pending"
+    "status": "in_progress"
   }
 ]
