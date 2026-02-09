@@ -1980,12 +1980,21 @@ async def set_tax_hold(
         await db.tax_holds.insert_one(hold_doc)
         message = "Tax hold placed successfully"
     
-    # Create notification for user
+    # Create notification for user in their preferred language
+    user_language = user_doc.get('language', 'en')
     notification_service = NotificationService(db)
+    
+    if user_language == 'it':
+        title = "Avviso di Restrizione Account"
+        message = f"Il tuo account è stato limitato a causa di obblighi fiscali in sospeso. Importo dovuto: €{data.tax_amount:.2f}. Contatta il supporto per assistenza."
+    else:  # Default to English
+        title = "Account Restriction Notice"
+        message = f"Your account has been restricted due to outstanding tax obligations. Amount due: €{data.tax_amount:.2f}. Please contact support for assistance."
+    
     await notification_service.create_notification(
         user_id=actual_user_id,
-        title="Account Restriction Notice",
-        message=f"Your account has been restricted due to outstanding tax obligations. Amount due: €{data.tax_amount:.2f}. Please contact support for assistance.",
+        title=title,
+        message=message,
         notification_type="SECURITY"
     )
     
