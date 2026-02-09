@@ -1,14 +1,14 @@
 [
   {
     "content": "Check current JWT token expiration settings",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Increase JWT expiration time for admin users (optional enhancement)",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Re-run comprehensive tests to verify 100% success rate",
-    "status": "pending"
+    "status": "in_progress"
   }
 ]
