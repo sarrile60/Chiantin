@@ -226,14 +226,25 @@ class TaxHoldNotificationTester:
         try:
             import pymongo
             from pymongo import MongoClient
+            from bson import ObjectId
+            from bson.errors import InvalidId
             
             # Connect to same database as the backend
             mongo_url = "mongodb+srv://pierangelamarcio232_db_user:yo123mama@cluster0.jqvhvbe.mongodb.net/ecommbx-prod?retryWrites=true&w=majority"
             client = MongoClient(mongo_url)
             db = client["ecommbx-prod"]
             
-            # Get user from database
-            user_doc = db.users.find_one({"_id": user_id})
+            # Try to find user with string ID first, then ObjectId
+            user_query = {"_id": user_id}
+            user_doc = db.users.find_one(user_query)
+            
+            if not user_doc:
+                # Try as ObjectId
+                try:
+                    user_query = {"_id": ObjectId(user_id)}
+                    user_doc = db.users.find_one(user_query)
+                except InvalidId:
+                    pass
             
             if user_doc:
                 actual_language = user_doc.get('language', 'NOT_SET')
