@@ -278,7 +278,8 @@ async def signup(
             password=user_data.password,
             first_name=user_data.first_name,
             last_name=user_data.last_name,
-            phone=user_data.phone
+            phone=user_data.phone,
+            language=user_data.language
         )
         logger.info("UserCreate object created")
         
