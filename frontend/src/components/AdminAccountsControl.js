@@ -1,7 +1,9 @@
 // Admin Accounts Control - Top-Up/Withdraw
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import api from '../api';
 import { useToast } from './Toast';
+import { useBalanceVisibility, formatBalance } from '../hooks/useBalanceVisibility';
+import BalanceToggle from './BalanceToggle';
 
 export function AdminAccountsControl() {
   const toast = useToast();
