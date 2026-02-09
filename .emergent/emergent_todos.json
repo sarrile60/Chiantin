@@ -5,11 +5,11 @@
   },
   {
     "content": "Check translations.js for missing Italian translation keys",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Update backend to send notification in user's preferred language",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Test with NEW test user only (create Italian-speaking test user)",
