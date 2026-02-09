@@ -91,7 +91,16 @@ export function AdminAccountsControl() {
               <tr>
                 <th>User</th>
                 <th>Account</th>
-                <th>Balance</th>
+                <th>
+                  <div className="flex items-center gap-2">
+                    Balance
+                    <BalanceToggle 
+                      isVisible={isBalanceVisible} 
+                      onToggle={toggleBalanceVisibility} 
+                      size="small"
+                    />
+                  </div>
+                </th>
                 <th>IBAN / BIC</th>
                 <th>Actions</th>
               </tr>
@@ -104,7 +113,7 @@ export function AdminAccountsControl() {
                     <div className="text-xs text-gray-600">{acc.userEmail}</div>
                   </td>
                   <td>{acc.account_number}</td>
-                  <td className="font-semibold">€{(acc.balance / 100).toFixed(2)}</td>
+                  <td className="font-semibold">{formatBalance(acc.balance, isBalanceVisible)}</td>
                   <td>
                     <div className="font-mono text-xs">{acc.iban || 'Not set'}</div>
                     <div className="font-mono text-xs text-gray-500">{acc.bic || ''}</div>
