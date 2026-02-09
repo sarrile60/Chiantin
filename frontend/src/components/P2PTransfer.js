@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import api from '../api';
 import { useToast } from './Toast';
 import { useLanguage, useTheme } from '../contexts/AppContext';
+import { useBalanceVisibility, formatBalance } from '../hooks/useBalanceVisibility';
+import BalanceToggle from './BalanceToggle';
 
 export function P2PTransferForm({ onSuccess }) {
   const toast = useToast();
