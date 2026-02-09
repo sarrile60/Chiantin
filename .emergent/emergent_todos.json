@@ -1,7 +1,7 @@
 [
   {
     "content": "Analyze current KYC admin panel structure and data flow",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Create backend DELETE endpoint for KYC applications",
