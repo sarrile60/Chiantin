@@ -66,6 +66,7 @@ class UserCreate(BaseModel):
     first_name: str
     last_name: str
     phone: Optional[str] = None
+    language: Optional[str] = 'en'
     
     @field_validator('email')
     @classmethod
