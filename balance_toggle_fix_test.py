@@ -356,7 +356,7 @@ class BalanceToggleFixTester:
         success, response = self.run_test(
             "GET /accounts",
             "GET",
-            "accounts",
+            "v1/accounts",
             200,
             headers=headers
         )
