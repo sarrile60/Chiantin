@@ -93,10 +93,20 @@ export function AdminNotificationBell({ onNavigate }) {
     setIsRead(true);
   };
 
-  const handleClearAll = () => {
-    setIsCleared(true);
-    setLastClearedTotal(counts.total);
-    setIsOpen(false);
+  const handleClearAll = async () => {
+    try {
+      const response = await api.post('/admin/notifications/clear');
+      if (response.data.success) {
+        // Store the cleared timestamp from the backend
+        setClearedAt(new Date(response.data.cleared_at));
+        setIsOpen(false);
+      }
+    } catch (err) {
+      console.error('Failed to clear notifications:', err);
+      // Fallback to local state if API fails
+      setClearedAt(new Date());
+      setIsOpen(false);
+    }
   };
 
   // Calculate badge count - show 0 if cleared or read
