@@ -1,11 +1,11 @@
 [
   {
     "content": "Investigate AdminNotificationBell.js to understand current clear logic",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Design backend solution (add last_cleared_at field to admin user or separate collection)",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Create backend API endpoint to save cleared notification timestamp",
