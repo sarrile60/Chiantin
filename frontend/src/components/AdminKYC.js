@@ -27,11 +27,7 @@ export function AdminKYCReview() {
   const [queueReason, setQueueReason] = useState('');
   const [queueLoading, setQueueLoading] = useState(false);
 
-  useEffect(() => {
-    fetchApplications();
-  }, []);
-
-  const fetchApplications = async () => {
+  const fetchApplications = useCallback(async () => {
     try {
       const response = await api.get('/admin/kyc/pending');
       setApplications(response.data);
@@ -41,7 +37,11 @@ export function AdminKYCReview() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
+
+  useEffect(() => {
+    fetchApplications();
+  }, [fetchApplications]);
 
   // Handle manual queue submission
   const handleManualQueue = async () => {
