@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """
-Backend testing for Admin Notification Bell Persistence Critical Bug Fix.
-Tests the CRITICAL UX fix where admin notification clear button was NOT persisting.
-When admin clicks checkmark to clear notifications, it must persist across logout/login.
+Backend testing for Smart Admin Notification Bell Enhancement.
+Tests the SMART notification counting that shows only NEW items after clear.
+When admin clears notifications, badge shows 0 for old items, but reappears when
+NEW items are created (KYC/transfers/tickets/cards submitted AFTER clear timestamp).
+CRITICAL: Must test with NEW admin user ONLY (never real admin).
 """
 import requests
 import sys
