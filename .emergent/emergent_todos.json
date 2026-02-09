@@ -1,11 +1,11 @@
 [
   {
     "content": "Explore codebase to find ALL locations where balance is displayed",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Create useBalanceVisibility hook with sessionStorage for state management",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Add balance toggle component with Eye/EyeOff icons from lucide-react",
