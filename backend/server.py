@@ -3449,10 +3449,27 @@ async def get_admin_notifications_cleared_at(
     Get the timestamp when admin last cleared notifications.
     Returns None if never cleared.
     """
+    # Handle both string and ObjectId formats like auth code does
+    from bson import ObjectId
+    from bson.errors import InvalidId
+    
+    user_id = current_user["id"]
+    
+    # First try as string
     user = await db.users.find_one(
-        {"_id": current_user["id"]},
+        {"_id": user_id},
         {"admin_notifications_cleared_at": 1}
     )
+    
+    # If not found and it looks like an ObjectId, try as ObjectId
+    if not user:
+        try:
+            user = await db.users.find_one(
+                {"_id": ObjectId(user_id)},
+                {"admin_notifications_cleared_at": 1}
+            )
+        except InvalidId:
+            pass
     
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
