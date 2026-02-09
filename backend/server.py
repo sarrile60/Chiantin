@@ -1660,6 +1660,13 @@ async def permanent_delete_user(
     current_user: dict = Depends(require_admin),
     db: AsyncIOMotorDatabase = Depends(get_database)
 ):
+    """
+    Permanently delete a user and all associated data.
+    This is a destructive operation that cannot be undone.
+    Only SUPER_ADMIN can perform this action.
+    """
+    from bson import ObjectId
+    from bson.errors import InvalidId
 
 
 @app.post("/api/v1/admin/users/{user_id}/demote")
