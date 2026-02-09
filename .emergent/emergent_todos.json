@@ -1,7 +1,7 @@
 [
   {
     "content": "Create ledger integrity check script to verify balance calculations and transfer linkages",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Run integrity check script and save report to /app/test_reports/",
