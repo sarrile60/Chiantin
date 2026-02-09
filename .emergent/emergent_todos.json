@@ -1,14 +1,22 @@
 [
   {
-    "content": "Fix CRITICAL bug: Balance toggle triggering payment submission in P2PTransfer form",
-    "status": "completed"
+    "content": "Check if backend has endpoint to change user roles",
+    "status": "pending"
   },
   {
-    "content": "Fix visual bug: Grey text with poor contrast in admin panel and forms",
-    "status": "completed"
+    "content": "Create backend endpoint to demote admin to user (if needed)",
+    "status": "pending"
   },
   {
-    "content": "Test fixes with NEW test user (never real clients)",
-    "status": "completed"
+    "content": "Add 'Demote to User' button in admin panel User Details section",
+    "status": "pending"
+  },
+  {
+    "content": "Add confirmation modal for demotion (security)",
+    "status": "pending"
+  },
+  {
+    "content": "Test with NEW test admin user (never real admin)",
+    "status": "pending"
   }
 ]
