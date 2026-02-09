@@ -61,6 +61,18 @@ export function AdminNotificationBell({ onNavigate }) {
     return () => clearInterval(interval);
   }, [fetchCounts]);
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+
   const handleItemClick = (section) => {
     setIsOpen(false);
     if (onNavigate) {
