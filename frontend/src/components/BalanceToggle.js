@@ -23,6 +23,7 @@ export const BalanceToggle = ({ isVisible, onToggle, isDark = false, size = 'def
 
   return (
     <button
+      type="button"
       onClick={onToggle}
       className={`
         ${sizeClasses[size]}
