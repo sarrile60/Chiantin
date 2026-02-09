@@ -3481,6 +3481,94 @@ async def get_admin_notifications_cleared_at(
     }
 
 
+@app.get("/api/v1/admin/notifications/counts-since-clear")
+async def get_admin_notification_counts_since_clear(
+    current_user: dict = Depends(require_admin),
+    db: AsyncIOMotorDatabase = Depends(get_database)
+):
+    """
+    Get counts of pending items created AFTER the last clear timestamp.
+    This allows the badge to show only NEW items while keeping old items cleared.
+    
+    Returns:
+    - kyc: Count of pending KYC applications submitted after clear
+    - cards: Count of pending card requests created after clear  
+    - transfers: Count of pending transfers created after clear
+    - tickets: Count of open tickets created after clear
+    - total: Sum of all counts
+    - cleared_at: The timestamp when notifications were last cleared (or null)
+    """
+    from bson import ObjectId
+    from bson.errors import InvalidId
+    
+    user_id = current_user["id"]
+    
+    # Get the cleared_at timestamp
+    user = await db.users.find_one(
+        {"_id": user_id},
+        {"admin_notifications_cleared_at": 1}
+    )
+    
+    if not user:
+        try:
+            user = await db.users.find_one(
+                {"_id": ObjectId(user_id)},
+                {"admin_notifications_cleared_at": 1}
+            )
+        except InvalidId:
+            pass
+    
+    cleared_at = user.get("admin_notifications_cleared_at") if user else None
+    
+    # If never cleared, count all items
+    if not cleared_at:
+        kyc_count = await db.kyc_applications.count_documents({
+            "status": {"$in": ["SUBMITTED", "UNDER_REVIEW", "NEEDS_MORE_INFO"]}
+        })
+        cards_count = await db.card_requests.count_documents({"status": "PENDING"})
+        transfers_count = await db.transfers.count_documents({"status": "SUBMITTED"})
+        tickets_count = await db.tickets.count_documents({
+            "status": {"$in": ["OPEN", "IN_PROGRESS"]}
+        })
+    else:
+        # Count only items created/submitted AFTER cleared_at
+        # KYC: Use submitted_at field
+        kyc_count = await db.kyc_applications.count_documents({
+            "status": {"$in": ["SUBMITTED", "UNDER_REVIEW", "NEEDS_MORE_INFO"]},
+            "submitted_at": {"$gt": cleared_at}
+        })
+        
+        # Card requests: Use created_at field
+        cards_count = await db.card_requests.count_documents({
+            "status": "PENDING",
+            "created_at": {"$gt": cleared_at}
+        })
+        
+        # Transfers: Use created_at field
+        transfers_count = await db.transfers.count_documents({
+            "status": "SUBMITTED",
+            "created_at": {"$gt": cleared_at}
+        })
+        
+        # Tickets: Use created_at field
+        tickets_count = await db.tickets.count_documents({
+            "status": {"$in": ["OPEN", "IN_PROGRESS"]},
+            "created_at": {"$gt": cleared_at}
+        })
+    
+    total = kyc_count + cards_count + transfers_count + tickets_count
+    
+    return {
+        "kyc": kyc_count,
+        "cards": cards_count,
+        "transfers": transfers_count,
+        "tickets": tickets_count,
+        "total": total,
+        "cleared_at": cleared_at.isoformat() if cleared_at else None
+    }
+
+
+
 # Health check endpoint at root path for deployment health checks
 @app.get("/health")
 async def root_health_check():
