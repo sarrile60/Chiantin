@@ -1,30 +1,26 @@
 [
   {
-    "content": "Investigate AdminNotificationBell.js to understand current clear logic",
-    "status": "completed"
+    "content": "Check database schemas for creation timestamp fields (KYC, transfers, tickets, cards)",
+    "status": "pending"
   },
   {
-    "content": "Design backend solution (add last_cleared_at field to admin user or separate collection)",
-    "status": "completed"
+    "content": "Create new backend API endpoint to get counts of items created AFTER cleared_at timestamp",
+    "status": "pending"
   },
   {
-    "content": "Create backend API endpoint to save cleared notification timestamp",
-    "status": "completed"
+    "content": "Update AdminNotificationBell.js to use new smart counting endpoint",
+    "status": "pending"
   },
   {
-    "content": "Update AdminNotificationBell.js to call backend API when clearing",
-    "status": "completed"
+    "content": "Update badge calculation to show count of NEW items only",
+    "status": "pending"
   },
   {
-    "content": "Update frontend to compare current counts with last cleared timestamp",
-    "status": "completed"
+    "content": "Test with NEW admin user - clear → create new items → verify badge reappears",
+    "status": "pending"
   },
   {
-    "content": "Test with NEW admin test user (never real admin)",
-    "status": "completed"
-  },
-  {
-    "content": "Verify persistence across logout/login and page reload",
-    "status": "completed"
+    "content": "Verify old items stay cleared while new items appear",
+    "status": "pending"
   }
 ]
