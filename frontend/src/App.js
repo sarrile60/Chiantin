@@ -1308,7 +1308,17 @@ function TransactionsPage() {
                 </div>
                 <div className="text-right">
                   <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{t('currentBalance')}</p>
-                  <p className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>{formatAmount(account.balance)}</p>
+                  <div className="flex items-center gap-3 justify-end">
+                    <p className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                      {formatBalance(account.balance, isBalanceVisible)}
+                    </p>
+                    <BalanceToggle 
+                      isVisible={isBalanceVisible} 
+                      onToggle={toggleBalanceVisibility} 
+                      isDark={isDark}
+                      size="default"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
