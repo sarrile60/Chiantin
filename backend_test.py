@@ -411,7 +411,7 @@ def main():
         print(f"   English user email: {english_email}")
         print("✅ Admin access to user details working")
 
-    # Step 5: Test Italian user tax hold flow
+    # Step 6: Test Italian user tax hold flow
     print("\n🇮🇹 TESTING ITALIAN USER TAX HOLD FLOW")
     print("-" * 50)
     
