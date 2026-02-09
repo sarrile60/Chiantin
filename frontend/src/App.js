@@ -1123,7 +1123,17 @@ function AccountsPage() {
                           <p className={`text-xs font-mono mt-1 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>{account.iban}</p>
                         </div>
                         <div className="text-right">
-                          <p className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>€{formatAmount(account.balance)}</p>
+                          <div className="flex items-center gap-2 justify-end">
+                            <p className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                              {formatBalance(account.balance, isBalanceVisible)}
+                            </p>
+                            <BalanceToggle 
+                              isVisible={isBalanceVisible} 
+                              onToggle={toggleBalanceVisibility} 
+                              isDark={isDark}
+                              size="small"
+                            />
+                          </div>
                           <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>{t('available')}</p>
                         </div>
                       </div>
