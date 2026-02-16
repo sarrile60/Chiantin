@@ -1850,6 +1850,7 @@ function AdminDashboard() {
     }
   }, [fetchUsers, currentPage, usersPerPage]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     fetchUsers(0, 1, usersPerPage, '');
   }, []);
