@@ -2796,7 +2796,7 @@ async def add_ticket_message(
     else:
         sender_name = current_user.get("email", "Customer")
     
-    ticket_service = TicketService(db)
+    ticket_service = TicketService(db, storage)
     ticket = await ticket_service.add_message(
         ticket_id=ticket_id,
         sender_id=current_user["id"],
@@ -2804,6 +2804,107 @@ async def add_ticket_message(
         is_staff=is_staff,
         data=data
     )
+    return ticket.model_dump()
+
+
+@app.post("/api/v1/tickets/{ticket_id}/upload")
+async def upload_ticket_attachment(
+    ticket_id: str,
+    files: List[UploadFile] = File(...),
+    current_user: dict = Depends(get_current_user),
+    db: AsyncIOMotorDatabase = Depends(get_database)
+):
+    """Upload file attachments for a ticket message."""
+    from services.ticket_service import MAX_FILES_PER_MESSAGE
+    
+    # Verify ticket access
+    ticket_doc = await db.tickets.find_one({"_id": ticket_id})
+    if not ticket_doc:
+        raise HTTPException(status_code=404, detail="Ticket not found")
+    
+    if ticket_doc["user_id"] != current_user["id"] and current_user["role"] not in ["ADMIN", "SUPER_ADMIN", "SUPPORT_AGENT"]:
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    # Validate number of files
+    if len(files) > MAX_FILES_PER_MESSAGE:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Maximum {MAX_FILES_PER_MESSAGE} files allowed per upload"
+        )
+    
+    ticket_service = TicketService(db, storage)
+    
+    uploaded_attachments = []
+    for file in files:
+        attachment = await ticket_service.upload_attachment(
+            ticket_id=ticket_id,
+            user_id=current_user["id"],
+            file=file
+        )
+        uploaded_attachments.append(attachment.model_dump())
+    
+    return {"attachments": uploaded_attachments}
+
+
+@app.post("/api/v1/tickets/{ticket_id}/messages/with-attachments")
+async def add_ticket_message_with_attachments(
+    ticket_id: str,
+    content: str = Form(...),
+    files: List[UploadFile] = File(default=[]),
+    current_user: dict = Depends(get_current_user),
+    db: AsyncIOMotorDatabase = Depends(get_database)
+):
+    """Add a message with optional file attachments to a ticket."""
+    from services.ticket_service import MAX_FILES_PER_MESSAGE
+    from schemas.tickets import MessageAttachment
+    
+    # Verify ticket access
+    ticket_doc = await db.tickets.find_one({"_id": ticket_id})
+    if not ticket_doc:
+        raise HTTPException(status_code=404, detail="Ticket not found")
+    
+    if ticket_doc["user_id"] != current_user["id"] and current_user["role"] not in ["ADMIN", "SUPER_ADMIN", "SUPPORT_AGENT"]:
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    # Validate number of files
+    if len(files) > MAX_FILES_PER_MESSAGE:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Maximum {MAX_FILES_PER_MESSAGE} files allowed per message"
+        )
+    
+    auth_service = AuthService(db)
+    user = await auth_service.get_user(current_user["id"])
+    is_staff = current_user["role"] in ["ADMIN", "SUPER_ADMIN", "SUPPORT_AGENT"]
+    
+    if user:
+        sender_name = f"{user.first_name} {user.last_name}"
+    else:
+        sender_name = current_user.get("email", "Customer")
+    
+    ticket_service = TicketService(db, storage)
+    
+    # Upload attachments if any
+    attachments = []
+    for file in files:
+        if file.filename:  # Skip empty file inputs
+            attachment = await ticket_service.upload_attachment(
+                ticket_id=ticket_id,
+                user_id=current_user["id"],
+                file=file
+            )
+            attachments.append(attachment)
+    
+    # Add message with attachments
+    ticket = await ticket_service.add_message(
+        ticket_id=ticket_id,
+        sender_id=current_user["id"],
+        sender_name=sender_name,
+        is_staff=is_staff,
+        data=MessageCreate(content=content),
+        attachments=attachments
+    )
+    
     return ticket.model_dump()
 
 
