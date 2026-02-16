@@ -833,15 +833,11 @@ export function ProfessionalDashboard({ user, logout }) {
                           {senderName && (
                             <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{t('from')}: {senderName}</p>
                           )}
-                          {description && (
-                            <p className={`text-xs truncate ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>{description}</p>
-                          )}
                           {reference && (
                             <p className={`text-xs font-mono ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>{t('ref')}: {reference}</p>
                           )}
-                          {!senderName && !description && (
-                            <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>{formatDate(txn.created_at)}</p>
-                          )}
+                          {/* Always show date for consistency */}
+                          <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>{formatDate(txn.created_at)}</p>
                         </div>
                         <div className="text-right flex-shrink-0">
                           <p className={`text-base font-bold ${isCredit ? 'text-green-600' : 'text-red-600'}`}>
