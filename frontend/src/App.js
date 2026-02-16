@@ -2369,7 +2369,7 @@ function AdminDashboard() {
                         <div className="flex-1">
                           <h4 className="font-semibold text-red-800">Account Restricted</h4>
                           <p className="text-sm text-red-700 mt-1">
-                            Tax Amount Due: <span className="font-bold">€{userTaxHold.tax_amount_due?.toLocaleString('en-EU', { minimumFractionDigits: 2 })}</span>
+                            Tax Amount Due: <span className="font-bold">€{userTaxHold.tax_amount_due?.toLocaleString('de-DE', { minimumFractionDigits: 2 })}</span>
                           </p>
                           <p className="text-sm text-red-600 mt-1">Reason: {userTaxHold.reason || 'Outstanding tax obligations'}</p>
                           {userTaxHold.blocked_at && (
