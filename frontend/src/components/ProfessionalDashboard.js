@@ -1191,18 +1191,13 @@ export function ProfessionalDashboard({ user, logout }) {
                       <p className={`text-3xl font-bold ${isCredit ? 'text-green-600' : 'text-red-600'}`}>
                         {isCredit ? '+' : '-'}€{formatAmount(amount)}
                       </p>
-                      <span className={`inline-block mt-2 px-3 py-1 rounded-full text-xs font-medium ${
-                        txn.status === 'POSTED' || txn.status === 'COMPLETED' ? 'bg-green-100 text-green-700' : 
-                        txn.status === 'PENDING' || txn.status === 'SUBMITTED' ? 'bg-yellow-100 text-yellow-700' : 
-                        txn.status === 'REJECTED' ? 'bg-red-100 text-red-700' :
-                        'bg-gray-100 text-gray-700'
+                      {/* Transaction type badge: Credit (green) / Debit (red) - Professional Banking Style */}
+                      <span className={`inline-flex items-center mt-2 px-3 py-1 rounded-full text-xs font-medium border ${
+                        isCredit 
+                          ? 'bg-green-50 border-green-200 text-green-700' 
+                          : 'bg-red-50 border-red-200 text-red-700'
                       }`}>
-                        {txn.status === 'POSTED' ? t('posted') : 
-                         txn.status === 'COMPLETED' ? t('completed') :
-                         txn.status === 'REJECTED' ? t('rejected') :
-                         txn.status === 'PENDING' ? t('pending') :
-                         txn.status === 'SUBMITTED' ? t('submitted') :
-                         (txn.status || t('posted'))}
+                        {isCredit ? t('credit') : t('debit')}
                       </span>
                       
                       {/* Rejection Reason */}
