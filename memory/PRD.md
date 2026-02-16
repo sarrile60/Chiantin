@@ -24,6 +24,18 @@ ecommbx is a full-stack EU-licensed digital banking platform built with React fr
 
 ## Recent Changes (February 2025)
 
+### Transaction Date Display Fix (Feb 16, 2025)
+**Problem:** Bank Transfer transactions with sender names were missing their dates in the Recent Activity list.
+
+**Root Cause:** Conditional logic `{!senderName && !description && (...)}` only showed dates when there was NO sender name AND NO description.
+
+**Solution:** Changed to always show the date for all transactions, regardless of other fields present.
+
+**Files Changed:**
+- `/app/frontend/src/components/ProfessionalDashboard.js` - Removed conditional, date now always displays
+
+**Verification:** Visual verification - all transactions now show dates consistently
+
 ### Recent Activity Layout Fix (Feb 16, 2025)
 **Problem:** Large empty space on the right side of transaction rows in Recent Activity section.
 
