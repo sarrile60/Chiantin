@@ -3,6 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import api from '../api';
 import { useToast } from './Toast';
 import { formatCurrency } from '../utils/currency';
+import { getStatusBadgeClasses } from '../utils/transactions';
 
 export function AdminTransfersQueue() {
   const toast = useToast();
