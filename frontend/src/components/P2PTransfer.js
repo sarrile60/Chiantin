@@ -210,7 +210,7 @@ export function P2PTransferForm({ onSuccess }) {
             </svg>
           </div>
           <h3 className={`text-2xl font-semibold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>{t('paymentSuccessful')}</h3>
-          <p className={`text-3xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>€{(transactionResult.amount / 100).toFixed(2)}</p>
+          <p className={`text-3xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>{formatCurrency(transactionResult.amount)}</p>
           <p className={`mb-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{t('sentTo')} {transactionResult.recipient}</p>
           {transactionResult.recipient_iban && (
             <p className={`text-sm font-mono mb-6 ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>{formatIBAN(transactionResult.recipient_iban)}</p>
