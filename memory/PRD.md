@@ -14,6 +14,7 @@ ecommbx is a full-stack EU-licensed digital banking platform built with React fr
 - Balance visibility toggle
 - **EU Currency Formatting (dot for thousands, comma for decimals)**
 - **Professional Banking Transaction Display (colored status badges)**
+- **Support Ticket File Attachments (clients and admins)**
 
 ## Technical Stack
 - **Frontend:** React.js with TailwindCSS
@@ -21,8 +22,33 @@ ecommbx is a full-stack EU-licensed digital banking platform built with React fr
 - **Database:** MongoDB
 - **Authentication:** JWT tokens
 - **Email:** Resend API
+- **File Storage:** Cloudinary (for KYC docs and ticket attachments)
 
 ## Recent Changes (February 2025)
+
+### Support Ticket File Attachments (Feb 16, 2025)
+**Feature:** Clients and admins can now attach files to support ticket messages.
+
+**Specifications:**
+- **File Types:** Images (png, jpg, jpeg, gif, webp, bmp), Documents (pdf, doc, docx, xls, xlsx, ppt, pptx, txt, rtf, odt, ods, odp), Other (csv, zip)
+- **Max File Size:** 25 MB per file
+- **Max Files per Message:** 5 files
+- **Storage:** Cloudinary cloud storage
+
+**Backend Changes:**
+- `/app/backend/schemas/tickets.py` - Added `MessageAttachment` schema
+- `/app/backend/services/ticket_service.py` - Added `upload_attachment()` method, file validation
+- `/app/backend/server.py` - Added endpoints:
+  - `POST /api/v1/tickets/{ticket_id}/messages/with-attachments` - Send message with files
+  - `POST /api/v1/tickets/{ticket_id}/upload` - Upload files only
+
+**Frontend Changes:**
+- `/app/frontend/src/components/Support.js` - Added file upload UI:
+  - Attach button with paperclip icon
+  - File preview with remove option
+  - Attachment display in messages with download links
+
+**Verification:** 100% test pass rate (15/15 backend tests, all UI elements verified)
 
 ### Transaction Date Display Fix (Feb 16, 2025)
 **Problem:** Bank Transfer transactions with sender names were missing their dates in the Recent Activity list.
