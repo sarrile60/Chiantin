@@ -335,10 +335,17 @@ function TransactionDetailsModal({ transaction, onClose }) {
       REVERSED: t('reversed'),
       PENDING: t('pending'),
       REJECTED: t('rejected'),
-      SUBMITTED: t('submitted')
+      SUBMITTED: t('submitted'),
+      COMPLETED: t('completed'),
+      PROCESSING: t('processing'),
+      FAILED: t('failed'),
+      CANCELLED: t('cancelled')
     };
     return labels[status] || status;
   };
+  
+  // Determine if credit or debit
+  const isCredit = isTransactionCredit(transaction);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
