@@ -713,43 +713,67 @@ function TicketDetails({ ticket, onUpdate, onDelete, isAdmin = false }) {
                         };
                         
                         const downloadUrl = getDownloadUrl(att.url, att.file_name);
+                        const viewUrl = att.url; // Original URL for viewing
                         
                         return (
-                          <a
+                          <div
                             key={attIdx}
-                            href={downloadUrl}
-                            download={att.file_name}
                             className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition ${
                               isDark 
-                                ? 'bg-gray-600 border-gray-500 hover:bg-gray-500 text-gray-200' 
-                                : 'bg-white border-gray-200 hover:bg-gray-50 text-gray-700'
+                                ? 'bg-gray-600 border-gray-500 text-gray-200' 
+                                : 'bg-white border-gray-200 text-gray-700'
                             }`}
                             data-testid={`attachment-${idx}-${attIdx}`}
                           >
-                            {isImage ? (
-                              <img 
-                                src={att.url} 
-                                alt={att.file_name}
-                                className="w-8 h-8 object-cover rounded"
-                              />
-                            ) : (
-                              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            {/* Left side: Clickable to VIEW/ZOOM (opens in new tab) */}
+                            <a
+                              href={viewUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={`flex items-center gap-2 flex-1 min-w-0 cursor-pointer ${
+                                isDark ? 'hover:text-blue-300' : 'hover:text-blue-600'
+                              }`}
+                              title="Click to view"
+                            >
+                              {isImage ? (
+                                <img 
+                                  src={att.url} 
+                                  alt={att.file_name}
+                                  className="w-8 h-8 object-cover rounded flex-shrink-0"
+                                />
+                              ) : (
+                                <svg className="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                              )}
+                              <div className="min-w-0">
+                                <p className="text-xs font-medium truncate max-w-[120px]">{att.file_name}</p>
+                                <p className="text-xs opacity-60">
+                                  {att.file_size < 1024 * 1024 
+                                    ? (att.file_size / 1024).toFixed(1) + ' KB'
+                                    : (att.file_size / (1024 * 1024)).toFixed(1) + ' MB'
+                                  }
+                                </p>
+                              </div>
+                            </a>
+                            
+                            {/* Right side: Download button */}
+                            <a
+                              href={downloadUrl}
+                              download={att.file_name}
+                              className={`p-1.5 rounded-lg transition flex-shrink-0 ${
+                                isDark 
+                                  ? 'hover:bg-gray-500 text-gray-300 hover:text-white' 
+                                  : 'hover:bg-gray-100 text-gray-500 hover:text-gray-700'
+                              }`}
+                              title="Download file"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                               </svg>
-                            )}
-                            <div className="min-w-0">
-                              <p className="text-xs font-medium truncate max-w-[120px]">{att.file_name}</p>
-                              <p className="text-xs opacity-60">
-                                {att.file_size < 1024 * 1024 
-                                  ? (att.file_size / 1024).toFixed(1) + ' KB'
-                                  : (att.file_size / (1024 * 1024)).toFixed(1) + ' MB'
-                                }
-                              </p>
-                            </div>
-                            <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                            </svg>
-                          </a>
+                            </a>
+                          </div>
                         );
                       })}
                     </div>
