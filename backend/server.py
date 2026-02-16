@@ -2853,7 +2853,8 @@ async def add_ticket_message_with_attachments(
     content: str = Form(...),
     files: List[UploadFile] = File(default=[]),
     current_user: dict = Depends(get_current_user),
-    db: AsyncIOMotorDatabase = Depends(get_database)
+    db: AsyncIOMotorDatabase = Depends(get_database),
+    storage: CloudinaryStorage = Depends(get_storage)
 ):
     """Add a message with optional file attachments to a ticket."""
     from services.ticket_service import MAX_FILES_PER_MESSAGE
