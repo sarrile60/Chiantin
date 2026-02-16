@@ -2436,7 +2436,7 @@ function AdminDashboard() {
                             >
                               Edit IBAN
                             </button>
-                            <p className="text-xl font-bold">€{(acc.balance / 100).toFixed(2)}</p>
+                            <p className="text-xl font-bold">{formatCurrency(acc.balance)}</p>
                           </div>
                         </div>
                         <EnhancedLedgerTools account={acc} onSuccess={() => viewUserDetails(selectedUser.user.id)} />
