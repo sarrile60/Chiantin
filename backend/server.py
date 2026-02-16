@@ -2775,7 +2775,8 @@ async def add_ticket_message(
     ticket_id: str,
     data: MessageCreate,
     current_user: dict = Depends(get_current_user),
-    db: AsyncIOMotorDatabase = Depends(get_database)
+    db: AsyncIOMotorDatabase = Depends(get_database),
+    storage: CloudinaryStorage = Depends(get_storage)
 ):
     """Add a message to a ticket."""
     # Verify ticket belongs to user or user is admin
