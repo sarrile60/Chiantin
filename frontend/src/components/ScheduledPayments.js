@@ -155,7 +155,7 @@ export function ScheduledPayments() {
                 <div>
                   <p className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>{p.reason}</p>
                   <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{t('to')}: {p.recipient_email}</p>
-                  <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>€{(p.amount / 100).toFixed(2)} - {getFrequencyLabel(p.frequency)}</p>
+                  <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{formatCurrency(p.amount)} - {getFrequencyLabel(p.frequency)}</p>
                 </div>
                 <div className="text-right">
                   <span className={`badge ${p.active ? 'badge-success' : 'badge-gray'}`}>
