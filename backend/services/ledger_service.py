@@ -245,10 +245,13 @@ class LedgerEngine:
         ).sort("created_at", -1).limit(limit)
         
         async for entry in entry_cursor:
-            txn_id = entry["transaction_id"]
+            txn_id = entry.get("transaction_id")
+            if not txn_id:
+                # Skip entries without transaction_id (legacy data)
+                continue
             entries_by_txn[txn_id] = {
-                "amount": entry["amount"],
-                "direction": entry["direction"]
+                "amount": entry.get("amount", 0),
+                "direction": entry.get("direction", "DEBIT")
             }
         
         if not entries_by_txn:
