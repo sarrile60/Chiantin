@@ -10,6 +10,17 @@ import { useState, useEffect } from 'react';
 
 const STORAGE_KEY = 'balance_visibility_state';
 
+/**
+ * Format number in EU style: dot for thousands, comma for decimals
+ * e.g., 24650.00 -> "24.650,00"
+ */
+const formatEU = (amount) => {
+  return amount.toLocaleString('de-DE', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+};
+
 export const useBalanceVisibility = () => {
   // Default to HIDDEN (false = hidden, true = visible)
   // Check sessionStorage on mount
@@ -44,28 +55,29 @@ export const useBalanceVisibility = () => {
 };
 
 /**
- * Format balance for display
- * If hidden: shows "€ •••.••"
- * If visible: shows actual amount formatted
+ * Format balance for display in EU format
+ * If hidden: shows "€ •••••"
+ * If visible: shows actual amount formatted (e.g., "€24.650,00")
  */
 export const formatBalance = (cents, isVisible, currency = '€') => {
   if (!isVisible) {
-    return `${currency} •••.••`;
+    return `${currency} •••••`;
   }
   
-  // Convert cents to euros and format
-  const amount = (cents / 100).toFixed(2);
-  return `${currency}${amount}`;
+  // Convert cents to euros and format in EU style
+  const amount = cents / 100;
+  return `${currency}${formatEU(amount)}`;
 };
 
 /**
- * Format amount only (no currency symbol)
+ * Format amount only (no currency symbol) in EU format
  * Used in contexts where currency is displayed separately
  */
 export const formatAmount = (cents, isVisible) => {
   if (!isVisible) {
-    return '•••.••';
+    return '•••••';
   }
   
-  return (cents / 100).toFixed(2);
+  const amount = cents / 100;
+  return formatEU(amount);
 };
