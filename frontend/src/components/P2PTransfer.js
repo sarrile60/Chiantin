@@ -5,6 +5,7 @@ import { useToast } from './Toast';
 import { useLanguage, useTheme } from '../contexts/AppContext';
 import { useBalanceVisibility, formatBalance } from '../hooks/useBalanceVisibility';
 import BalanceToggle from './BalanceToggle';
+import { formatCurrency, formatEuroAmount, formatCentsToNumber } from '../utils/currency';
 
 export function P2PTransferForm({ onSuccess }) {
   const toast = useToast();
