@@ -158,7 +158,7 @@ export function EnhancedLedgerTools({ account, onSuccess }) {
         amount: amountInCents,
         reason: simpleForm.reason
       });
-      toast.success(`€${parseFloat(simpleForm.amount).toFixed(2)} fee charged`);
+      toast.success(`${formatEuroAmount(parseFloat(simpleForm.amount))} fee charged`);
       setSimpleForm({ amount: '', reason: '', toAccountId: '' });
       setActiveOperation(null);
       onSuccess && onSuccess();
@@ -188,7 +188,7 @@ export function EnhancedLedgerTools({ account, onSuccess }) {
         amount: amountInCents,
         reason: simpleForm.reason
       });
-      toast.success(`€${parseFloat(simpleForm.amount).toFixed(2)} transferred`);
+      toast.success(`${formatEuroAmount(parseFloat(simpleForm.amount))} transferred`);
       setSimpleForm({ amount: '', reason: '', toAccountId: '' });
       setActiveOperation(null);
       onSuccess && onSuccess();
@@ -199,7 +199,7 @@ export function EnhancedLedgerTools({ account, onSuccess }) {
     }
   };
 
-  const formatAmountFromEuro = (euros) => `€${parseFloat(euros || 0).toFixed(2)}`;
+  const formatAmountFromEuro = (euros) => formatEuroAmount(parseFloat(euros || 0));
 
   const resetAndClose = () => {
     setActiveOperation(null);
