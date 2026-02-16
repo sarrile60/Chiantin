@@ -289,8 +289,16 @@ function TicketDetails({ ticket, onUpdate, onDelete, isAdmin = false }) {
   const [deleting, setDeleting] = useState(false);
   const [deletingMessageIndex, setDeletingMessageIndex] = useState(null);
   const [confirmDeleteMessage, setConfirmDeleteMessage] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [uploadingFiles, setUploadingFiles] = useState(false);
+  const fileInputRef = React.useRef(null);
   const { t } = useLanguage();
   const { isDark } = useTheme();
+
+  // File upload constants
+  const MAX_FILES = 5;
+  const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25 MB
+  const ALLOWED_EXTENSIONS = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'rtf', 'odt', 'ods', 'odp', 'csv', 'zip'];
 
   // Reset edit states when ticket changes
   useEffect(() => {
@@ -300,20 +308,114 @@ function TicketDetails({ ticket, onUpdate, onDelete, isAdmin = false }) {
     setEditedMessageContent('');
     setDeletingMessageIndex(null);
     setConfirmDeleteMessage(false);
+    setSelectedFiles([]);
   }, [ticket.id, ticket.subject]);
 
+  const handleFileSelect = (e) => {
+    const files = Array.from(e.target.files || []);
+    const validFiles = [];
+    const errors = [];
+
+    files.forEach(file => {
+      const ext = file.name.split('.').pop()?.toLowerCase() || '';
+      
+      if (!ALLOWED_EXTENSIONS.includes(ext)) {
+        errors.push(`${file.name}: File type not allowed`);
+        return;
+      }
+      
+      if (file.size > MAX_FILE_SIZE) {
+        errors.push(`${file.name}: File too large (max 25 MB)`);
+        return;
+      }
+      
+      if (selectedFiles.length + validFiles.length >= MAX_FILES) {
+        errors.push(`${file.name}: Maximum ${MAX_FILES} files allowed`);
+        return;
+      }
+      
+      validFiles.push(file);
+    });
+
+    if (errors.length > 0) {
+      alert(errors.join('\n'));
+    }
+
+    if (validFiles.length > 0) {
+      setSelectedFiles(prev => [...prev, ...validFiles].slice(0, MAX_FILES));
+    }
+    
+    // Reset input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const removeFile = (index) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const formatFileSize = (bytes) => {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  };
+
+  const getFileIcon = (filename) => {
+    const ext = filename.split('.').pop()?.toLowerCase() || '';
+    if (['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp'].includes(ext)) {
+      return (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      );
+    }
+    if (ext === 'pdf') {
+      return (
+        <svg className="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 2l5 5h-5V4zM8.5 13H10v5H8.5v-3.5L7 16H5.5l1.5-1.5L5.5 13H7l1.5 1.5V13zm3.5 0h2c.83 0 1.5.67 1.5 1.5v2c0 .83-.67 1.5-1.5 1.5h-2v-5zm1.5 4h.5a.5.5 0 00.5-.5v-2a.5.5 0 00-.5-.5h-.5v3z"/>
+        </svg>
+      );
+    }
+    return (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+    );
+  };
+
   const handleSendMessage = async () => {
-    if (!newMessage.trim()) return;
+    if (!newMessage.trim() && selectedFiles.length === 0) return;
 
     setSending(true);
+    setUploadingFiles(selectedFiles.length > 0);
+    
     try {
-      await api.post(`/tickets/${ticket.id}/messages`, { content: newMessage });
+      if (selectedFiles.length > 0) {
+        // Send message with attachments using FormData
+        const formData = new FormData();
+        formData.append('content', newMessage.trim() || '(Attachment)');
+        selectedFiles.forEach(file => {
+          formData.append('files', file);
+        });
+        
+        await api.post(`/tickets/${ticket.id}/messages/with-attachments`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+      } else {
+        // Send text-only message
+        await api.post(`/tickets/${ticket.id}/messages`, { content: newMessage });
+      }
+      
       setNewMessage('');
+      setSelectedFiles([]);
       onUpdate();
     } catch (err) {
-      alert('Failed to send message');
+      const errorMsg = err.response?.data?.detail || 'Failed to send message';
+      alert(errorMsg);
     } finally {
       setSending(false);
+      setUploadingFiles(false);
     }
   };
 
