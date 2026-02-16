@@ -1213,7 +1213,7 @@ function TransactionsPage() {
   };
 
   const formatAmount = (cents) => {
-    return `€${(cents / 100).toFixed(2)}`;
+    return formatCurrency(cents);
   };
 
   return (
