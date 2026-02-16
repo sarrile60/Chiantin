@@ -697,12 +697,26 @@ function TicketDetails({ ticket, onUpdate, onDelete, isAdmin = false }) {
                           att.file_name.split('.').pop()?.toLowerCase() || ''
                         );
                         
+                        // Create download URL - add fl_attachment for Cloudinary to force download
+                        const getDownloadUrl = (url, filename) => {
+                          if (url.includes('cloudinary.com')) {
+                            // Insert fl_attachment transformation
+                            // URL format: https://res.cloudinary.com/cloud/type/upload/v123/path
+                            const parts = url.split('/upload/');
+                            if (parts.length === 2) {
+                              return `${parts[0]}/upload/fl_attachment:${encodeURIComponent(filename)}/${parts[1]}`;
+                            }
+                          }
+                          return url;
+                        };
+                        
+                        const downloadUrl = getDownloadUrl(att.url, att.file_name);
+                        
                         return (
                           <a
                             key={attIdx}
-                            href={att.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                            href={downloadUrl}
+                            download={att.file_name}
                             className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition ${
                               isDark 
                                 ? 'bg-gray-600 border-gray-500 hover:bg-gray-500 text-gray-200' 
