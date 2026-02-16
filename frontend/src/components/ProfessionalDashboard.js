@@ -812,7 +812,7 @@ export function ProfessionalDashboard({ user, logout }) {
                   return (
                     <div 
                       key={txn.id} 
-                      className={`transaction-item cursor-pointer rounded-lg transition-colors -mx-2 px-3 py-3 ${isDark ? 'hover:bg-gray-700/50' : 'hover:bg-gray-50'}`}
+                      className={`w-full cursor-pointer rounded-lg transition-colors py-3 px-2 border-b last:border-b-0 ${isDark ? 'border-gray-700 hover:bg-gray-700/50' : 'border-gray-100 hover:bg-gray-50'}`}
                       onClick={() => {
                         if (taxHoldStatus?.is_blocked) {
                           alert(`${t('accountRestricted')}\n\n${t('accountRestrictedDesc')}\n\n${t('amountDue')}: €${taxHoldStatus.tax_amount_due?.toLocaleString('de-DE', { minimumFractionDigits: 2 })}\n\n${t('pleaseSettleAmount')}`);
@@ -822,7 +822,7 @@ export function ProfessionalDashboard({ user, logout }) {
                       }}
                       data-testid="transaction-item"
                     >
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between w-full gap-4">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
                             <p className={`text-sm font-medium truncate ${isDark ? 'text-white' : 'text-gray-900'}`}>{displayType}</p>
@@ -843,12 +843,10 @@ export function ProfessionalDashboard({ user, logout }) {
                             <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>{formatDate(txn.created_at)}</p>
                           )}
                         </div>
-                        <div className="text-right flex-shrink-0 ml-4">
-                          {/* Professional banking amount display: +/- with color */}
+                        <div className="text-right flex-shrink-0">
                           <p className={`text-base font-bold ${isCredit ? 'text-green-600' : 'text-red-600'}`}>
                             {formatTransactionAmount(amount, isCredit)}
                           </p>
-                          {/* Transaction type badge: Credit (green) / Debit (red) */}
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
                             isCredit 
                               ? 'bg-green-50 border-green-200 text-green-700' 
