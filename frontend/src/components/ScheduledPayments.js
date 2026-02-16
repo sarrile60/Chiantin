@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import api from '../api';
 import { useToast } from './Toast';
 import { useLanguage, useTheme } from '../contexts/AppContext';
+import { formatCurrency } from '../utils/currency';
 
 export function ScheduledPayments() {
   const toast = useToast();

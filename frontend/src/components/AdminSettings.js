@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import api from '../api';
 import { useToast } from './Toast';
 import { useLanguage, useTheme } from '../contexts/AppContext';
+import { formatCurrency } from '../utils/currency';
 
 export function AdminSettings() {
   const toast = useToast();
