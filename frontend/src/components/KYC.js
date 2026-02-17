@@ -447,22 +447,22 @@ export function KYCApplication() {
       {/* Step 3: Review & Submit */}
       {step === 3 && (
         <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold mb-4">{t('kycReviewSubmit')}</h3>
+          <h3 className="text-lg font-semibold mb-4 text-gray-900">{t('kycReviewSubmit')}</h3>
           <div className="space-y-6">
             <div>
-              <h4 className="font-medium mb-2">{t('kycPersonalInformation')}</h4>
+              <h4 className="font-medium mb-2 text-gray-900">{t('kycPersonalInformation')}</h4>
               <dl className="grid grid-cols-2 gap-2 text-sm">
                 <dt className="text-gray-600">{t('name')}:</dt>
-                <dd>{formData.full_name}</dd>
+                <dd className="text-gray-900">{formData.full_name}</dd>
                 <dt className="text-gray-600">{t('kycDateOfBirth')}:</dt>
-                <dd>{formData.date_of_birth}</dd>
+                <dd className="text-gray-900">{formData.date_of_birth}</dd>
                 <dt className="text-gray-600">{t('address')}:</dt>
-                <dd>{formData.street_address}, {formData.city}, {formData.postal_code}</dd>
+                <dd className="text-gray-900">{formData.street_address}, {formData.city}, {formData.postal_code}</dd>
               </dl>
             </div>
             
             <div>
-              <h4 className="font-medium mb-2">{t('kycConsents')}</h4>
+              <h4 className="font-medium mb-2 text-gray-900">{t('kycConsents')}</h4>
               <div className="space-y-2">
                 <label className="flex items-start space-x-2">
                   <input
@@ -473,7 +473,7 @@ export function KYCApplication() {
                     className="mt-1"
                     data-testid="kyc-terms"
                   />
-                  <span className="text-sm">{t('kycAcceptTerms')}</span>
+                  <span className="text-sm text-gray-900">{t('kycAcceptTerms')}</span>
                 </label>
                 <label className="flex items-start space-x-2">
                   <input
@@ -484,7 +484,7 @@ export function KYCApplication() {
                     className="mt-1"
                     data-testid="kyc-privacy"
                   />
-                  <span className="text-sm">{t('kycAcceptPrivacy')}</span>
+                  <span className="text-sm text-gray-900">{t('kycAcceptPrivacy')}</span>
                 </label>
               </div>
             </div>
@@ -493,7 +493,7 @@ export function KYCApplication() {
           <div className="mt-6 flex justify-between">
             <button
               onClick={() => setStep(2)}
-              className="px-6 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+              className="px-6 py-2 border border-gray-300 rounded-md hover:bg-gray-50 text-gray-900"
             >
               {t('back')}
             </button>
