@@ -21,11 +21,13 @@ export function KYCReviewPage({ user, logout }) {
 
   return (
     <div className={`min-h-screen ${isDark ? 'bg-gray-900' : 'bg-white'}`}>
-      <header className={`h-16 px-4 sm:px-6 flex items-center justify-between border-b ${isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}>
-        <h1 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}><StyledLogo isDark={isDark} /></h1>
-        <div className="flex items-center space-x-4">
-          <NotificationBell />
-          <button onClick={logout} className={`text-sm ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'}`}>{t('logout')}</button>
+      <header className={`h-16 border-b ${isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}>
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 h-full flex items-center justify-between">
+          <h1 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}><StyledLogo isDark={isDark} /></h1>
+          <div className="flex items-center space-x-4">
+            <NotificationBell />
+            <button onClick={logout} className={`text-sm ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'}`}>{t('logout')}</button>
+          </div>
         </div>
       </header>
 
