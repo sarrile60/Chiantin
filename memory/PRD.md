@@ -124,13 +124,14 @@ ecommbx is a full-stack EU-licensed digital banking platform built with React fr
 ## Known Issues / Backlog
 
 ### P0 - Critical
+- ~~Admin Dashboard showing all zeros~~ **FIXED Feb 17, 2025**
 - Domain SSL issue: `ecommbx.group` SSL certificate not provisioning
 
 ### P1 - High Priority
-- Dangerous transfer deletion endpoint without ledger reversal
+- **Dangerous transfer deletion endpoint without ledger reversal** - `DELETE /api/v1/admin/transfers/{transfer_id}` performs hard delete which risks data integrity. Should be refactored to soft delete or reversing ledger entry.
 
 ### P2 - Medium Priority
-- Refactor `server.py` into smaller routers
+- Refactor `server.py` into smaller routers (admin.py, transfers.py, tickets.py)
 
 ## Database Schema (Key Collections)
 - `users` - User accounts
