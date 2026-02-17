@@ -1503,7 +1503,7 @@ function CustomerDashboard() {
     <div className={`min-h-screen ${isDark ? 'bg-gray-900' : 'bg-white'}`}>
       {/* Simple Professional Header */}
       <header className={`h-16 ${isDark ? 'bg-gray-900 border-b border-gray-800' : 'bg-white border-b border-gray-200'}`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between">
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 h-full flex items-center justify-between">
           <h1 className={`header-logo font-bold text-xl ${isDark ? 'text-white' : 'text-gray-900'}`}><StyledLogo isDark={isDark} /></h1>
           <div className="flex items-center space-x-2 sm:space-x-4">
             {/* Language Toggle */}
