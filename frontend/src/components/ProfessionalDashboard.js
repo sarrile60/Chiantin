@@ -840,13 +840,13 @@ export function ProfessionalDashboard({ user, logout }) {
                           <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>{formatDate(txn.created_at)}</p>
                         </div>
                         <div className="text-right flex-shrink-0">
-                          <p className={`text-base font-bold ${isCredit ? 'text-green-600' : 'text-red-600'}`}>
+                          <p className={`text-base font-bold ${isCredit ? 'text-green-500' : 'text-red-500'}`}>
                             {formatTransactionAmount(amount, isCredit)}
                           </p>
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
                             isCredit 
-                              ? 'bg-green-50 border-green-200 text-green-700' 
-                              : 'bg-red-50 border-red-200 text-red-700'
+                              ? (isDark ? 'bg-green-900/30 border-green-700 text-green-400' : 'bg-green-50 border-green-200 text-green-700')
+                              : (isDark ? 'bg-red-900/30 border-red-700 text-red-400' : 'bg-red-50 border-red-200 text-red-700')
                           }`}>
                             {isCredit ? t('credit') : t('debit')}
                           </span>
