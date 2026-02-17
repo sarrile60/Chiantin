@@ -290,7 +290,7 @@ export function KYCApplication() {
       {/* Step 1: Personal Information */}
       {step === 1 && (
         <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold mb-4">{t('kycPersonalInformation')}</h3>
+          <h3 className="text-lg font-semibold mb-4 text-gray-900">{t('kycPersonalInformation')}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">{t('kycFullLegalName')}</label>
@@ -299,7 +299,7 @@ export function KYCApplication() {
                 name="full_name"
                 value={formData.full_name}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 bg-white"
                 data-testid="kyc-full-name"
               />
             </div>
@@ -310,7 +310,7 @@ export function KYCApplication() {
                 name="date_of_birth"
                 value={formData.date_of_birth}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 bg-white"
                 data-testid="kyc-dob"
               />
             </div>
@@ -322,7 +322,7 @@ export function KYCApplication() {
                 value={formData.nationality}
                 onChange={handleInputChange}
                 placeholder="e.g., DE"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 bg-white placeholder-gray-400"
                 data-testid="kyc-nationality"
               />
             </div>
@@ -334,7 +334,7 @@ export function KYCApplication() {
                 value={formData.country}
                 onChange={handleInputChange}
                 placeholder="e.g., Germany"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 bg-white placeholder-gray-400"
                 data-testid="kyc-country"
               />
             </div>
@@ -345,7 +345,7 @@ export function KYCApplication() {
                 name="street_address"
                 value={formData.street_address}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 bg-white"
                 data-testid="kyc-address"
               />
             </div>
@@ -356,7 +356,7 @@ export function KYCApplication() {
                 name="city"
                 value={formData.city}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 bg-white"
                 data-testid="kyc-city"
               />
             </div>
@@ -367,7 +367,7 @@ export function KYCApplication() {
                 name="postal_code"
                 value={formData.postal_code}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 bg-white"
                 data-testid="kyc-postal"
               />
             </div>
