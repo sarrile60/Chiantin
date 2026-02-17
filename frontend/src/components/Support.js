@@ -494,6 +494,10 @@ function TicketDetails({ ticket, onUpdate, onDelete, isAdmin = false, onRefreshT
       });
       setEditingMessageIndex(null);
       setEditedMessageContent('');
+      // Refresh the ticket to show updated message
+      if (onRefreshTicket) {
+        await onRefreshTicket(ticket.id);
+      }
       onUpdate();
     } catch (err) {
       alert('Failed to update message');
