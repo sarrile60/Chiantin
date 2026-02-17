@@ -33,6 +33,29 @@ export function SupportTickets({ isAdmin = false }) {
     }
   };
 
+  // Function to refresh a single ticket and update selectedTicket
+  const refreshSelectedTicket = async (ticketId) => {
+    try {
+      if (isAdmin) {
+        // For admin, fetch all tickets and find the updated one
+        const response = await api.get('/admin/tickets');
+        const updatedTicket = response.data.find(t => t.id === ticketId);
+        if (updatedTicket) {
+          setSelectedTicket(updatedTicket);
+        }
+      } else {
+        // For regular users, fetch their tickets and find the updated one
+        const response = await api.get('/tickets');
+        const updatedTicket = response.data.find(t => t.id === ticketId);
+        if (updatedTicket) {
+          setSelectedTicket(updatedTicket);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to refresh ticket:', err);
+    }
+  };
+
   const handleTicketCreated = () => {
     setShowCreateForm(false);
     fetchTickets();
