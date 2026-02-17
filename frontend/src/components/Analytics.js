@@ -42,6 +42,16 @@ export function AnalyticsDashboard() {
     }
   };
 
+  // Format currency in EU format
+  const formatEuroCurrency = (amount) => {
+    return new Intl.NumberFormat('de-DE', {
+      style: 'currency',
+      currency: 'EUR',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(amount);
+  };
+
   const userStatusData = [
     { name: 'Active', value: stats.activeUsers, color: '#2E7D32' },
     { name: 'Pending', value: stats.totalUsers - stats.activeUsers, color: '#F57C00' }
