@@ -1697,7 +1697,7 @@ function AdminUsersTable({ users, loading, onSelectUser, selectedUser }) {
 function AdminDashboard() {
   const { user, logout } = useAuth();
   const toast = useToast();
-  const [activeSection, setActiveSection] = useState('users');
+  const [activeSection, setActiveSection] = useState('overview');
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
