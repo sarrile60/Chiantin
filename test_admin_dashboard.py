@@ -54,10 +54,19 @@ async def test_admin_dashboard():
             print("\n3. Testing /admin/users endpoint...")
             users_response = await client.get(f"{API_URL}/admin/users", headers=headers)
             print(f"   Status: {users_response.status_code}")
+            users = []
             if users_response.status_code == 200:
-                users = users_response.json()
-                print(f"   Total users returned: {len(users)}")
-                print(f"   Sample user structure: {list(users[0].keys()) if users else 'empty'}")
+                users_data = users_response.json()
+                # Handle both dict (with users key) and list responses
+                if isinstance(users_data, dict):
+                    users = users_data.get('users', [])
+                    print(f"   Response type: dict with keys: {list(users_data.keys())}")
+                    print(f"   Total users: {len(users)}")
+                elif isinstance(users_data, list):
+                    users = users_data
+                    print(f"   Total users returned: {len(users)}")
+                if users:
+                    print(f"   Sample user keys: {list(users[0].keys())}")
             else:
                 print(f"   Error: {users_response.text}")
             
