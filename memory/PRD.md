@@ -26,6 +26,24 @@ ecommbx is a full-stack EU-licensed digital banking platform built with React fr
 
 ## Recent Changes (February 2025)
 
+### Admin Dashboard Analytics Fix (Feb 17, 2025)
+**Problem:** Admin Dashboard Overview page was showing all zeros for statistics (Total Users, Active Users, Pending KYC, Transactions).
+
+**Root Cause:** `Analytics.js` was calling `/admin/users` expecting an array response, but the endpoint was enhanced with pagination and now returns `{users: [...], pagination: {...}}`. The code `users.length` and `users.filter()` failed on the object.
+
+**Solution:**
+- Updated `Analytics.js` to use the existing `/admin/analytics/overview` endpoint which provides aggregated stats
+- Enhanced the backend endpoint to include:
+  - `kyc.approved` count
+  - `transfers.volume_cents` for total transaction volume
+- Added 5th KPI card showing Total Volume in EU format (€29.257.373,54)
+
+**Files Changed:**
+- `/app/frontend/src/components/Analytics.js` - Updated `fetchAnalytics()` to use analytics/overview endpoint
+- `/app/backend/server.py` - Enhanced `get_admin_analytics_overview()` with approved KYC and volume aggregation
+
+**Verification:** 100% test pass rate (iteration_75.json) - All 5 stat tiles display correct values, all 4 charts render correctly
+
 ### Support Ticket File Attachments (Feb 16, 2025)
 **Feature:** Clients and admins can now attach files to support ticket messages.
 
