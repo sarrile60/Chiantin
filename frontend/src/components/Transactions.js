@@ -446,7 +446,13 @@ function TransactionDetailsModal({ transaction, onClose }) {
               </div>
               <div className="flex justify-between">
                 <span className={`${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{t('status')}:</span>
-                <span className={`font-medium ${isDark ? 'text-gray-200' : 'text-gray-900'}`}>{getStatusLabel(transaction.status)}</span>
+                <span className={`font-medium px-2 py-0.5 rounded-full text-xs ${
+                  isCredit 
+                    ? 'bg-green-100 text-green-700' 
+                    : 'bg-red-100 text-red-700'
+                }`}>
+                  {isCredit ? t('credit') : t('debit')}
+                </span>
               </div>
               {transaction.reverses_txn_id && (
                 <div className={`flex justify-between border-t pt-2 ${isDark ? 'border-gray-600' : ''}`}>
