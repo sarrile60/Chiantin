@@ -109,30 +109,36 @@ export function AnalyticsDashboard() {
 
       {/* Charts */}
       <div className="grid grid-cols-2 gap-6">
-        {/* User Growth */}
+        {/* User Growth - Cumulative total users over time */}
         <div className="card p-6">
-          <h3 className="text-sm font-semibold text-gray-700 mb-4">User Growth</h3>
+          <h3 className="text-sm font-semibold text-gray-700 mb-4">User Growth (Last 6 Months)</h3>
           <ResponsiveContainer width="100%" height={250}>
             <LineChart data={monthlyData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#EEEEEE" />
               <XAxis dataKey="month" tick={{ fontSize: 12 }} />
               <YAxis tick={{ fontSize: 12 }} />
-              <Tooltip />
-              <Line type="monotone" dataKey="users" stroke="#D32F2F" strokeWidth={2} />
+              <Tooltip 
+                formatter={(value, name) => [value, name === 'cumulative_users' ? 'Total Users' : 'New Users']}
+                labelFormatter={(label) => `Month: ${label}`}
+              />
+              <Line type="monotone" dataKey="cumulative_users" name="Total Users" stroke="#D32F2F" strokeWidth={2} dot={{ fill: '#D32F2F' }} />
             </LineChart>
           </ResponsiveContainer>
         </div>
 
-        {/* Transaction Volume */}
+        {/* Monthly Transactions - New transactions each month */}
         <div className="card p-6">
-          <h3 className="text-sm font-semibold text-gray-700 mb-4">Monthly Transactions</h3>
+          <h3 className="text-sm font-semibold text-gray-700 mb-4">Monthly Transactions (Last 6 Months)</h3>
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={monthlyData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#EEEEEE" />
               <XAxis dataKey="month" tick={{ fontSize: 12 }} />
               <YAxis tick={{ fontSize: 12 }} />
-              <Tooltip />
-              <Bar dataKey="transactions" fill="#D32F2F" />
+              <Tooltip 
+                formatter={(value) => [value, 'Transactions']}
+                labelFormatter={(label) => `Month: ${label}`}
+              />
+              <Bar dataKey="transactions" name="Transactions" fill="#D32F2F" />
             </BarChart>
           </ResponsiveContainer>
         </div>
