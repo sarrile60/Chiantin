@@ -20,21 +20,17 @@ export function AnalyticsDashboard() {
 
   const fetchAnalytics = async () => {
     try {
-      const [usersRes, kycRes] = await Promise.all([
-        api.get('/admin/users'),
-        api.get('/admin/kyc/pending')
-      ]);
-      
-      const users = usersRes.data;
-      const kyc = kycRes.data;
+      // Use the analytics/overview endpoint which has comprehensive stats
+      const analyticsRes = await api.get('/admin/analytics/overview');
+      const analytics = analyticsRes.data;
       
       setStats({
-        totalUsers: users.length,
-        activeUsers: users.filter(u => u.status === 'ACTIVE').length,
-        pendingKYC: kyc.filter(k => k.status === 'SUBMITTED').length,
-        approvedKYC: kyc.filter(k => k.status === 'APPROVED').length,
-        totalTransactions: 0,
-        totalVolume: 0
+        totalUsers: analytics.users?.total || 0,
+        activeUsers: analytics.users?.active || 0,
+        pendingKYC: analytics.kyc?.pending || 0,
+        approvedKYC: 0, // Not tracked in overview endpoint
+        totalTransactions: analytics.transfers?.total || 0,
+        totalVolume: 0 // Volume calculation would need ledger data
       });
     } catch (err) {
       console.error('Failed to fetch analytics:', err);
