@@ -1922,6 +1922,58 @@ async def update_user_status(
     return {"success": True, "message": f"User status updated to {data.status}", "modified_count": result.modified_count}
 
 
+@app.post("/api/v1/admin/users/{user_id}/verify-email")
+async def admin_verify_user_email(
+    user_id: str,
+    current_user: dict = Depends(require_admin),
+    db: AsyncIOMotorDatabase = Depends(get_database)
+):
+    """Admin manually verifies a user's email (for users having trouble with verification emails)."""
+    from bson import ObjectId
+    from bson.errors import InvalidId
+    
+    # Find user (handle both string and ObjectId)
+    user_doc = await db.users.find_one({"_id": user_id})
+    if not user_doc:
+        try:
+            user_doc = await db.users.find_one({"_id": ObjectId(user_id)})
+        except InvalidId:
+            pass
+    
+    if not user_doc:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Check if already verified
+    if user_doc.get("email_verified", False):
+        return {"success": True, "message": "Email already verified", "already_verified": True}
+    
+    # Update email_verified to True
+    result = await db.users.update_one(
+        {"_id": user_doc["_id"]},
+        {"$set": {"email_verified": True, "updated_at": datetime.now(timezone.utc)}}
+    )
+    
+    # Clean up any pending verification tokens for this user
+    await db.email_verifications.delete_many({"user_id": str(user_doc["_id"])})
+    
+    # Audit: Admin email verification
+    await create_audit_log(
+        db=db,
+        action="ADMIN_EMAIL_VERIFIED",
+        entity_type="user",
+        entity_id=str(user_doc["_id"]),
+        description=f"Admin manually verified email for {user_doc['email']}",
+        performed_by=current_user["id"],
+        performed_by_role=current_user["role"],
+        performed_by_email=current_user["email"],
+        metadata={"user_email": user_doc["email"], "reason": "manual_verification"}
+    )
+    
+    logger.info(f"Admin {current_user['email']} manually verified email for user {user_doc['email']}")
+    
+    return {"success": True, "message": f"Email verified for {user_doc['email']}", "modified_count": result.modified_count}
+
+
 @app.delete("/api/v1/admin/users/{user_id}/permanent")
 async def permanent_delete_user(
     user_id: str,
