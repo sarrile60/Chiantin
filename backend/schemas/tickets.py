@@ -62,6 +62,9 @@ class Ticket(BaseModel):
     # Track when admin last read the ticket (for unread message counting)
     admin_last_read_at: Optional[datetime] = None
     
+    # Track when user/client last read the ticket (for unread message counting)
+    user_last_read_at: Optional[datetime] = None
+    
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     resolved_at: Optional[datetime] = None
