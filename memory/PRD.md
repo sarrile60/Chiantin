@@ -119,6 +119,32 @@ ecommbx is a full-stack EU-licensed digital banking platform built with React fr
 
 **Verification:** 100% test pass rate (iteration_82.json) - 11/11 backend tests, all frontend verification passed
 
+### SPA Behavior Fixes (Feb 18, 2025)
+**Bug Fix:** Fixed unwanted full page reloads after admin actions.
+
+**Problem Solved:** Delete transfer and send ticket message were causing full page reloads instead of smooth SPA updates.
+
+**Changes Made:**
+1. **Admin Transfers Queue:**
+   - Delete: Now removes row from local state, shows toast, background syncs
+   - Approve/Reject: Now removes from current list, shows toast, background syncs
+   - No more `fetchTransfers()` calls that set loading state
+
+2. **Support Tickets:**
+   - Send message: Clears input, refreshes ticket only (no full list refetch)
+   - Status change: Uses toast instead of alert, no full refetch
+   - Subject edit: Uses toast, no full refetch
+   - Message edit/delete: Uses toast, no full refetch
+   - Added `toast` import from sonner
+
+**Implementation Pattern:**
+- Local state updates for immediate UI response
+- `setTimeout` background refresh for data consistency
+- `onRefreshTicket(ticketId)` for single-ticket updates
+- Replaced `alert()` with `toast.success()` for better UX
+
+**Verification:** 100% test pass rate (iteration_84.json) - All frontend tests passed
+
 ### Admin Transfers Queue - Sender Information (Feb 18, 2025)
 **Enhancement:** Added sender information to the Admin Transfers Queue so admins can clearly see who initiated each transfer.
 
