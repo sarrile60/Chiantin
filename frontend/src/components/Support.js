@@ -1,5 +1,5 @@
 // Support Ticket Components
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import api from '../api';
 import { useLanguage, useTheme } from '../contexts/AppContext';
 
@@ -7,20 +7,46 @@ export function SupportTickets({ isAdmin = false }) {
   const [tickets, setTickets] = useState([]);
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [showAdminCreateForm, setShowAdminCreateForm] = useState(false);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const { t } = useLanguage();
   const { isDark } = useTheme();
 
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Fetch tickets when filters change
   useEffect(() => {
     fetchTickets();
-  }, [statusFilter]);
+  }, [statusFilter, debouncedSearch]);
 
-  const fetchTickets = async () => {
+  // Auto-refresh for admin every 30 seconds
+  useEffect(() => {
+    if (isAdmin) {
+      const interval = setInterval(() => {
+        fetchTickets(true); // Silent refresh
+      }, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [isAdmin, statusFilter, debouncedSearch]);
+
+  const fetchTickets = async (silent = false) => {
     try {
+      if (!silent) setLoading(true);
       if (isAdmin) {
-        const params = statusFilter !== 'all' ? `?status=${statusFilter}` : '';
-        const response = await api.get(`/admin/tickets${params}`);
+        let params = new URLSearchParams();
+        if (statusFilter !== 'all') params.append('status', statusFilter);
+        if (debouncedSearch) params.append('search', debouncedSearch);
+        const queryString = params.toString();
+        const response = await api.get(`/admin/tickets${queryString ? `?${queryString}` : ''}`);
         setTickets(response.data);
       } else {
         const response = await api.get('/tickets');
@@ -29,7 +55,7 @@ export function SupportTickets({ isAdmin = false }) {
     } catch (err) {
       console.error('Failed to fetch tickets:', err);
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
 
@@ -43,6 +69,7 @@ export function SupportTickets({ isAdmin = false }) {
         if (updatedTicket) {
           setSelectedTicket(updatedTicket);
         }
+        setTickets(response.data);
       } else {
         // For regular users, fetch their tickets and find the updated one
         const response = await api.get('/tickets');
@@ -50,6 +77,7 @@ export function SupportTickets({ isAdmin = false }) {
         if (updatedTicket) {
           setSelectedTicket(updatedTicket);
         }
+        setTickets(response.data);
       }
     } catch (err) {
       console.error('Failed to refresh ticket:', err);
@@ -58,7 +86,24 @@ export function SupportTickets({ isAdmin = false }) {
 
   const handleTicketCreated = () => {
     setShowCreateForm(false);
+    setShowAdminCreateForm(false);
     fetchTickets();
+  };
+
+  // Mark ticket as read when admin selects it
+  const handleSelectTicket = async (ticket) => {
+    setSelectedTicket(ticket);
+    if (isAdmin && ticket.unread_count > 0) {
+      try {
+        await api.post(`/admin/tickets/${ticket.id}/mark-read`);
+        // Update local state to reflect read status
+        setTickets(prev => prev.map(t => 
+          t.id === ticket.id ? { ...t, unread_count: 0 } : t
+        ));
+      } catch (err) {
+        console.error('Failed to mark ticket as read:', err);
+      }
+    }
   };
 
   const updateTicketStatus = async (ticketId, newStatus) => {
@@ -96,26 +141,68 @@ export function SupportTickets({ isAdmin = false }) {
             {t('createNewTicket')}
           </button>
         )}
+        {isAdmin && (
+          <button
+            onClick={() => setShowAdminCreateForm(true)}
+            className="btn-primary text-sm px-4 py-2 whitespace-nowrap w-full sm:w-auto flex items-center gap-2"
+            data-testid="admin-create-ticket-button"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Create Ticket for Client
+          </button>
+        )}
       </div>
 
       {isAdmin && (
         <div className={`card-enhanced p-4 ${isDark ? 'bg-gray-800 border-gray-700' : ''}`}>
-          <div className="flex items-center space-x-4">
-            <label className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{t('filterByStatus')}:</label>
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className={`input-enhanced ${isDark ? 'bg-gray-700 border-gray-600 text-white' : ''}`}
-              data-testid="admin-ticket-filter"
-            >
-              <option value="all">{t('allTickets')}</option>
-              <option value="OPEN">{t('open')}</option>
-              <option value="IN_PROGRESS">{t('inProgress')}</option>
-              <option value="WAITING">{t('waiting')}</option>
-              <option value="RESOLVED">{t('resolved')}</option>
-              <option value="CLOSED">{t('closed')}</option>
-            </select>
-            <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{tickets.length} {t('ticketCount')}</span>
+          <div className="flex flex-col md:flex-row md:items-center gap-4">
+            {/* Search Bar */}
+            <div className="flex-1">
+              <div className="relative">
+                <svg className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${isDark ? 'text-gray-400' : 'text-gray-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search by client email or name..."
+                  className={`input-enhanced w-full pl-10 ${isDark ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : ''}`}
+                  data-testid="admin-ticket-search"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-400 hover:text-gray-600'}`}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
+              </div>
+            </div>
+            
+            {/* Status Filter */}
+            <div className="flex items-center space-x-4">
+              <label className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{t('filterByStatus')}:</label>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className={`input-enhanced ${isDark ? 'bg-gray-700 border-gray-600 text-white' : ''}`}
+                data-testid="admin-ticket-filter"
+              >
+                <option value="all">{t('allTickets')}</option>
+                <option value="OPEN">{t('open')}</option>
+                <option value="IN_PROGRESS">{t('inProgress')}</option>
+                <option value="WAITING">{t('waiting')}</option>
+                <option value="RESOLVED">{t('resolved')}</option>
+                <option value="CLOSED">{t('closed')}</option>
+              </select>
+              <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{tickets.length} {t('ticketCount')}</span>
+            </div>
           </div>
         </div>
       )}
@@ -123,6 +210,13 @@ export function SupportTickets({ isAdmin = false }) {
       {showCreateForm && (
         <CreateTicketForm
           onClose={() => setShowCreateForm(false)}
+          onSuccess={handleTicketCreated}
+        />
+      )}
+
+      {showAdminCreateForm && (
+        <AdminCreateTicketForm
+          onClose={() => setShowAdminCreateForm(false)}
           onSuccess={handleTicketCreated}
         />
       )}
