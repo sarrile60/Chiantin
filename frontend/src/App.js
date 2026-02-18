@@ -2088,6 +2088,32 @@ function AdminDashboard() {
                   <div className="flex justify-between items-start mb-4">
                     <h2 className="text-lg font-semibold">User Details</h2>
                     <div className="flex space-x-2">
+                      {/* Verify Email Button - Only show if email is NOT verified */}
+                      {selectedUser.user.email_verified === false && (
+                        <button
+                          onClick={() => {
+                            if (window.confirm(
+                              `Manually verify email for ${selectedUser.user.email}?\n\n` +
+                              `This will allow the user to log in without going through email verification.\n\n` +
+                              `Only use this if the user is having trouble receiving verification emails.`
+                            )) {
+                              api.post(`/admin/users/${selectedUser.user.id}/verify-email`)
+                                .then(() => { 
+                                  toast.success('Email verified successfully'); 
+                                  fetchUsers();
+                                  viewUserDetails(selectedUser.user.id); 
+                                })
+                                .catch((err) => {
+                                  console.error('Verify email error:', err);
+                                  toast.error('Failed to verify email');
+                                });
+                            }
+                          }}
+                          className="px-3 py-1 text-sm border border-blue-600 text-blue-600 rounded hover:bg-blue-50"
+                          data-testid="verify-email-btn"
+                        >Verify Email</button>
+                      )}
+                      
                       {selectedUser.user.status === 'ACTIVE' ? (
                         <button
                           onClick={() => {
