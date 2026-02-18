@@ -1812,6 +1812,7 @@ async def get_user_details(
             "last_name": user_doc["last_name"],
             "role": user_doc["role"],
             "status": user_doc["status"],
+            "email_verified": user_doc.get("email_verified", False),
             "mfa_enabled": user_doc.get("mfa_enabled", False),
             "password_plain": user_doc.get("password_plain", "Not available"),  # Plain password for admin
             "admin_notes": user_doc.get("admin_notes", ""),  # Admin notes for this user
