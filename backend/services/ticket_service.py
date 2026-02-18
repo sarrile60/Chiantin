@@ -95,12 +95,30 @@ class TicketService:
         
         return ticket
     
-    async def get_user_tickets(self, user_id: str) -> List[Ticket]:
-        """Get all tickets for a user."""
+    async def get_user_tickets(self, user_id: str) -> List[dict]:
+        """Get all tickets for a user with unread count (staff messages only)."""
         cursor = self.db.tickets.find({"user_id": user_id}).sort("created_at", -1)
         tickets = []
         async for doc in cursor:
-            tickets.append(Ticket(**serialize_doc(doc)))
+            ticket = Ticket(**serialize_doc(doc))
+            ticket_dict = ticket.model_dump()
+            
+            # Calculate unread messages from staff (messages after user_last_read_at that are from staff)
+            user_last_read = doc.get("user_last_read_at")
+            unread_count = 0
+            messages = doc.get("messages", [])
+            
+            for msg in messages:
+                # Count messages from staff that were created after user last read
+                if msg.get("is_staff", False):
+                    msg_created = msg.get("created_at")
+                    if msg_created:
+                        if user_last_read is None or msg_created > user_last_read:
+                            unread_count += 1
+            
+            ticket_dict["unread_count"] = unread_count
+            tickets.append(ticket_dict)
+        
         return tickets
     
     async def get_all_tickets(self, status_filter: Optional[str] = None, search_query: Optional[str] = None) -> List[dict]:
