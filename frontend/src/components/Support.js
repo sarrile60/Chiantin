@@ -950,6 +950,11 @@ function TicketDetails({ ticket, onUpdate, onDelete, isAdmin = false, onRefreshT
             )}
             <p className={`text-sm mt-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
               {t('created')} {new Date(ticket.created_at).toLocaleString()}
+              {ticket.created_by_admin && (
+                <span className={`ml-2 text-xs px-2 py-0.5 rounded-full ${isDark ? 'bg-purple-900/50 text-purple-300' : 'bg-purple-100 text-purple-700'}`}>
+                  Created by Support
+                </span>
+              )}
             </p>
             {isAdmin && ticket.user_id && (
               <p className={`text-xs mt-1 ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
