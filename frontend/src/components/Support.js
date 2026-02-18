@@ -815,12 +815,12 @@ function TicketDetails({ ticket, onUpdate, onDelete, isAdmin = false, onRefreshT
   const handleStatusChange = async (newStatus) => {
     try {
       await api.patch(`/admin/tickets/${ticket.id}/status`, { status: newStatus });
-      alert('Status updated successfully');
-      // Refresh the ticket to show updated status
+      toast.success('Status updated successfully');
+      // Refresh only the selected ticket to show updated status
       if (onRefreshTicket) {
         await onRefreshTicket(ticket.id);
       }
-      onUpdate();
+      // No full refetch needed - ticket list will sync on next interaction
     } catch (err) {
       alert('Failed to update status');
     }
@@ -832,11 +832,12 @@ function TicketDetails({ ticket, onUpdate, onDelete, isAdmin = false, onRefreshT
     try {
       await api.patch(`/admin/tickets/${ticket.id}/subject`, { subject: editedSubject.trim() });
       setEditingSubject(false);
-      // Refresh the ticket to show updated subject
+      toast.success('Subject updated');
+      // Refresh only the selected ticket
       if (onRefreshTicket) {
         await onRefreshTicket(ticket.id);
       }
-      onUpdate();
+      // No full refetch needed
     } catch (err) {
       alert('Failed to update subject');
     } finally {
