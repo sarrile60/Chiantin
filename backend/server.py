@@ -2914,12 +2914,13 @@ async def add_ticket_message_with_attachments(
 @app.get("/api/v1/admin/tickets")
 async def get_all_tickets(
     status: Optional[str] = None,
+    search: Optional[str] = None,
     current_user: dict = Depends(require_admin),
     db: AsyncIOMotorDatabase = Depends(get_database)
 ):
-    """Get all tickets (admin) with user information."""
+    """Get all tickets (admin) with user information and unread counts."""
     ticket_service = TicketService(db)
-    tickets = await ticket_service.get_all_tickets(status_filter=status)
+    tickets = await ticket_service.get_all_tickets(status_filter=status, search_query=search)
     # tickets is already a list of dicts with user info included
     return tickets
 
