@@ -172,9 +172,12 @@ class TestDeleteUserUIIntegration:
                 headers=admin_headers
             )
             assert detail_response.status_code == 200, f"User details failed: {detail_response.status_code}"
-            user_data = detail_response.json()
-            assert "email" in user_data, "User details should include email"
-            assert "role" in user_data, "User details should include role"
+            data = detail_response.json()
+            # Response structure: { user: {...}, accounts: [...], kyc_status: ... }
+            assert "user" in data, "Response should include user object"
+            user_data = data["user"]
+            assert "email" in user_data, "User object should include email"
+            assert "role" in user_data, "User object should include role"
             print(f"User details working for user: {user_data.get('email')}")
         else:
             pytest.skip("No users found to test details endpoint")
