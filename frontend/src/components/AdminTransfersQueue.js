@@ -256,6 +256,7 @@ export function AdminTransfersQueue() {
             <thead>
               <tr>
                 <th>Date</th>
+                <th>Sender</th>
                 <th>Beneficiary</th>
                 <th>Amount</th>
                 <th>Status</th>
@@ -267,6 +268,10 @@ export function AdminTransfersQueue() {
               {transfers.map(t => (
                 <tr key={t.id} className="cursor-pointer hover:bg-gray-50" onClick={() => setSelectedTransfer(t)}>
                   <td className="text-xs">{new Date(t.created_at).toLocaleDateString()}</td>
+                  <td>
+                    <div className="text-sm font-medium">{t.sender_name || 'Unknown'}</div>
+                    {t.sender_email && <div className="text-xs text-gray-500">{t.sender_email}</div>}
+                  </td>
                   <td>{t.beneficiary_name}</td>
                   <td className="font-semibold">{formatCurrency(t.amount)}</td>
                   <td><span className={getStatusBadgeClasses(t.status, false)}>{t.status}</span></td>
