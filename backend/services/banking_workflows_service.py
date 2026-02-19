@@ -205,6 +205,9 @@ class BankingWorkflowsService:
         data: CreateTransfer
     ) -> Transfer:
         """User submits transfer - instant success, no waiting."""
+        from bson import ObjectId
+        from services.email_service import EmailService
+        
         # Validate account
         account = await self.db.bank_accounts.find_one({"_id": data.from_account_id})
         if not account or account["user_id"] != user_id:
@@ -229,6 +232,51 @@ class BankingWorkflowsService:
         
         trans_dict = transfer.model_dump(by_alias=True)
         await self.db.transfers.insert_one(trans_dict)
+        
+        # Send transfer confirmation email (only once per transfer)
+        try:
+            # Get user details for email
+            user = None
+            try:
+                user = await self.db.users.find_one({"_id": ObjectId(user_id)})
+            except:
+                user = await self.db.users.find_one({"_id": user_id})
+            
+            if user and user.get("email"):
+                email_service = EmailService()
+                
+                # Get user's preferred language (default to 'en')
+                language = user.get("language", "en") or "en"
+                
+                # Get sender account IBAN
+                sender_iban = account.get("iban", "N/A")
+                
+                # Send the confirmation email
+                email_sent = email_service.send_transfer_confirmation_email(
+                    to_email=user["email"],
+                    first_name=user.get("first_name", ""),
+                    reference_number=transfer.reference_number or transfer.id[:8].upper(),
+                    amount_cents=data.amount,
+                    beneficiary_name=data.beneficiary_name,
+                    beneficiary_iban=data.beneficiary_iban,
+                    sender_iban=sender_iban,
+                    transfer_type="SEPA Transfer",
+                    transfer_date=transfer.created_at,
+                    language=language
+                )
+                
+                # Update transfer to mark email as sent
+                if email_sent:
+                    await self.db.transfers.update_one(
+                        {"_id": transfer.id},
+                        {"$set": {"confirmation_email_sent": True}}
+                    )
+                    transfer.confirmation_email_sent = True
+        except Exception as e:
+            # Log error but don't fail the transfer
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Failed to send transfer confirmation email for transfer {transfer.id}: {str(e)}")
         
         return transfer
     
