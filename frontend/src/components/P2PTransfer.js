@@ -455,6 +455,83 @@ export function P2PTransferForm({ onSuccess }) {
             </div>
           )}
 
+          {/* Instant Transfer Toggle */}
+          <div className={`border rounded-lg p-4 ${isDark ? 'border-gray-600 bg-gray-700/50' : 'border-gray-200 bg-gray-50'}`}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isDark ? 'bg-blue-900/30' : 'bg-blue-50'}`}>
+                  <svg className={`w-5 h-5 ${isDark ? 'text-blue-400' : 'text-blue-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <div>
+                  <span className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>{t('instantTransfer')}</span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setInstantTransferEnabled(!instantTransferEnabled)}
+                className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                  instantTransferEnabled 
+                    ? 'bg-green-500' 
+                    : isDark ? 'bg-gray-600' : 'bg-gray-300'
+                }`}
+                role="switch"
+                aria-checked={instantTransferEnabled}
+                data-testid="instant-transfer-toggle"
+              >
+                <span
+                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                    instantTransferEnabled ? 'translate-x-5' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
+
+            {/* Instant Transfer Info Panel - shown when toggle is ON */}
+            {instantTransferEnabled && (
+              <div className={`mt-4 rounded-lg p-4 border ${isDark ? 'bg-amber-900/20 border-amber-700' : 'bg-amber-50 border-amber-200'}`}>
+                <div className="flex items-start gap-3">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${isDark ? 'bg-amber-900/50' : 'bg-amber-100'}`}>
+                    <svg className={`w-4 h-4 ${isDark ? 'text-amber-400' : 'text-amber-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <h4 className={`font-semibold text-sm ${isDark ? 'text-amber-300' : 'text-amber-800'}`}>
+                      {t('instantTransferUnavailableTitle')}
+                    </h4>
+                    <p className={`text-sm mt-1 ${isDark ? 'text-amber-200/80' : 'text-amber-700'}`}>
+                      {t('instantTransferUnavailableBody')}
+                    </p>
+                    <ul className={`mt-3 space-y-1 text-sm ${isDark ? 'text-amber-200/70' : 'text-amber-700'}`}>
+                      <li className="flex items-center gap-2">
+                        <span className={`w-1.5 h-1.5 rounded-full ${isDark ? 'bg-amber-400' : 'bg-amber-500'}`}></span>
+                        {t('instantTransferBullet1')}
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <span className={`w-1.5 h-1.5 rounded-full ${isDark ? 'bg-amber-400' : 'bg-amber-500'}`}></span>
+                        {t('instantTransferBullet2')}
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Standard SEPA Processing Notice - shown when instant toggle is ON */}
+          {instantTransferEnabled && (
+            <div className={`flex items-center gap-2 px-4 py-3 rounded-lg ${isDark ? 'bg-blue-900/20 border border-blue-800' : 'bg-blue-50 border border-blue-200'}`}>
+              <svg className={`w-5 h-5 flex-shrink-0 ${isDark ? 'text-blue-400' : 'text-blue-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span className={`text-sm font-medium ${isDark ? 'text-blue-300' : 'text-blue-700'}`}>
+                {t('processedAsStandardSepa')}
+              </span>
+            </div>
+          )}
+
           {/* Submit Button */}
           <button
             type="submit"
