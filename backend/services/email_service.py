@@ -582,46 +582,46 @@ class EmailService:
                             <td style="padding: 8px 0; text-align: right; font-family: monospace; color: #1a1a2e;">{masked_beneficiary_iban}</td>
                         </tr>
                         <tr>
-                            <td style="padding: 8px 0; color: #666; font-size: 14px;">{t('transfer_from_account')}</td>
+                            <td style="padding: 8px 0; color: #666666; font-size: 14px;">{t('transfer_from_account')}</td>
                             <td style="padding: 8px 0; text-align: right; font-family: monospace; color: #1a1a2e;">{masked_sender_iban}</td>
                         </tr>
                         <tr>
-                            <td style="padding: 8px 0; color: #666; font-size: 14px;">{t('transfer_date')}</td>
+                            <td style="padding: 8px 0; color: #666666; font-size: 14px;">{t('transfer_date')}</td>
                             <td style="padding: 8px 0; text-align: right; color: #1a1a2e;">{date_formatted} UTC</td>
                         </tr>
                         <tr>
-                            <td style="padding: 8px 0; color: #666; font-size: 14px;">{t('transfer_type')}</td>
+                            <td style="padding: 8px 0; color: #666666; font-size: 14px;">{t('transfer_type')}</td>
                             <td style="padding: 8px 0; text-align: right; color: #1a1a2e;">{transfer_type}</td>
                         </tr>
                         <tr>
-                            <td style="padding: 8px 0; color: #666; font-size: 14px;">{t('transfer_status')}</td>
+                            <td style="padding: 8px 0; color: #666666; font-size: 14px;">{t('transfer_status')}</td>
                             <td style="padding: 8px 0; text-align: right;">
-                                <span style="background: #ffc107; color: #212529; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">{t('transfer_status_processing')}</span>
+                                <span style="background-color: #ffc107; color: #212529; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">{t('transfer_status_processing')}</span>
                             </td>
                         </tr>
                     </table>
                 </div>
                 
                 <!-- Processing Notes -->
-                <div style="background: #e7f3ff; border-left: 4px solid #007bff; padding: 15px; margin: 20px 0; border-radius: 0 8px 8px 0;">
+                <div style="background-color: #e7f3ff; border-left: 4px solid #007bff; padding: 15px; margin: 20px 0; border-radius: 0 8px 8px 0;">
                     <p style="margin: 0 0 8px 0; font-size: 14px; color: #004085;">📋 {t('transfer_note_1')}</p>
                     <p style="margin: 0; font-size: 14px; color: #004085;">📊 {t('transfer_note_2')}</p>
                 </div>
                 
                 <!-- View Details Button -->
                 <p style="text-align: center;">
-                    <a href="{transactions_url}" style="display: inline-block; background: #dc3545; color: #ffffff; padding: 15px 40px; text-decoration: none; border-radius: 8px; font-weight: bold; margin: 15px 0;">{t('transfer_button')}</a>
+                    <a href="{transactions_url}" style="display: inline-block; background-color: #dc3545; color: #ffffff; padding: 15px 40px; text-decoration: none; border-radius: 8px; font-weight: bold; margin: 15px 0;">{t('transfer_button')}</a>
                 </p>
                 
                 <!-- Security Warning -->
-                <div style="background: #fff3cd; border: 1px solid #ffc107; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                <div style="background-color: #fff3cd; border: 1px solid #ffc107; padding: 15px; border-radius: 8px; margin: 20px 0;">
                     <p style="margin: 0; color: #856404; font-size: 13px;">⚠️ <strong>{t('transfer_security_warning')}</strong></p>
                 </div>
                 
                 <!-- Disclaimer -->
-                <p style="color: #999; font-size: 12px; text-align: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">{t('transfer_disclaimer')}</p>
+                <p style="color: #999999; font-size: 12px; text-align: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #eeeeee;">{t('transfer_disclaimer')}</p>
             </div>
-            <div style="text-align: center; margin-top: 20px; font-size: 12px; color: #666;">
+            <div style="text-align: center; margin-top: 20px; font-size: 12px; color: #666666;">
                 <p>{t('password_reset_footer')}</p>
             </div>
         </body>
