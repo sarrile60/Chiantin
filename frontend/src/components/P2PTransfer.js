@@ -28,6 +28,7 @@ export function P2PTransferForm({ onSuccess }) {
   const [recipientValid, setRecipientValid] = useState(null);
   const [showReference, setShowReference] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState(null);
+  const [instantTransferEnabled, setInstantTransferEnabled] = useState(false);
   
   // Password Authorization State
   const [showPasswordModal, setShowPasswordModal] = useState(false);
