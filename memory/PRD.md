@@ -71,6 +71,44 @@ ecommbx is a full-stack EU-licensed digital banking platform built with React fr
 - Dark mode: All text clearly readable with proper contrast
 - Light mode: No regression, original colors preserved
 
+### Instant Transfer Toggle Feature (Feb 19, 2025)
+**Feature:** Added Instant Transfer toggle to the Send Money (Transfer via IBAN) form for future instant transfer support.
+
+**Implementation:**
+1. **Toggle Placement:** Above "Make Payment" button, under "Details" section
+2. **Toggle Labels:**
+   - EN: "Instant transfer"
+   - IT: "Bonifico istantaneo"
+3. **Default State:** OFF (grey)
+4. **When ON:** Shows professional info panel explaining instant transfer is temporarily unavailable
+5. **Behavior:** Transfer still submits successfully as Standard SEPA
+
+**Info Panel Content (when toggle ON):**
+- EN Title: "Instant transfer temporarily unavailable"
+- EN Body: "Instant transfers are currently not available due to operational limitations. You can continue and your transfer will be processed as a standard SEPA transfer."
+- EN Bullets: "Standard SEPA transfers remain available." / "Instant transfers are not reversible once executed."
+- IT translations included
+
+**Status Line:** "This transfer will be processed as Standard SEPA" / "Questo bonifico verrà elaborato come SEPA standard"
+
+**Technical Details:**
+- `instant_requested: bool` field added to transfer request schema
+- Field stored for future use when instant transfers are enabled
+- Currently all transfers processed as standard SEPA regardless of toggle state
+
+**Files Changed:**
+- `/app/frontend/src/components/P2PTransfer.js` - Added toggle UI, state, and info panel
+- `/app/frontend/src/translations.js` - Added EN/IT translations for instant transfer
+- `/app/backend/schemas/transfers.py` - Added `instant_requested` field to P2PTransferRequest
+- `/app/backend/server.py` - Updated endpoint to pass instant_requested to service
+- `/app/backend/services/transfer_service.py` - Added instant_requested parameter (for future use)
+
+**Verification:** Tested on:
+- Desktop (1920px): Light mode ✓, Dark mode ✓
+- Mobile (375px): Light mode ✓
+- Italian language: All translations correct ✓
+- API: Accepts instant_requested field, processes transfer successfully ✓
+
 ### Domain Update & Email Styling Fix (Feb 19, 2025)
 **Fix:** Updated production domain from `ecommbx.io` to `ecommbx.group` and fixed email header text visibility.
 
