@@ -129,6 +129,9 @@ class Transfer(BaseModel):
     status: TransferStatus = TransferStatus.SUBMITTED
     reject_reason: Optional[str] = None
     
+    # Email confirmation tracking
+    confirmation_email_sent: bool = False
+    
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     admin_action_by: Optional[str] = None
