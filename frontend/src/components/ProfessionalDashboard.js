@@ -636,6 +636,7 @@ export function ProfessionalDashboard({ user, logout }) {
               <div className="space-y-3">
                 {accounts.slice(0, 2).map((account) => (
                   <div key={account.id} className="account-item">
+                    {/* Left side: Account info */}
                     <div className="flex-1 min-w-0">
                       <p className={`text-sm font-medium mb-1 ${isDark ? 'text-white' : 'text-gray-900'}`}>{t('eurEAccount')}</p>
                       <div className="flex items-center gap-2 flex-wrap">
@@ -685,9 +686,10 @@ export function ProfessionalDashboard({ user, logout }) {
                         )}
                       </div>
                     </div>
-                    <div className="text-right">
+                    {/* Right side: Balance and actions - fixed right alignment */}
+                    <div className="text-right flex-shrink-0 ml-4">
                       <div className="flex items-center justify-end gap-2">
-                        <p className="text-lg font-semibold text-gray-900">
+                        <p className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
                           {formatBalance(account.balance, isBalanceVisible)}
                         </p>
                       </div>
