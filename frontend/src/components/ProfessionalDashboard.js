@@ -1044,8 +1044,8 @@ export function ProfessionalDashboard({ user, logout }) {
             <div className="section-header">{t('thisMonth')}</div>
             <div className="card p-4">
               <div className="flex justify-between mb-3">
-                <span className="text-sm text-gray-600">{t('totalSpending')}</span>
-                <span className="text-lg font-bold" data-testid="monthly-spending-amount">€{formatAmount(monthlySpending.total)}</span>
+                <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{t('totalSpending')}</span>
+                <span className={`text-lg font-bold ${isDark ? 'text-white' : ''}`} data-testid="monthly-spending-amount">€{formatAmount(monthlySpending.total)}</span>
               </div>
               {Object.keys(monthlySpending.categories || {}).length > 0 && (
                 <div className="space-y-1 mb-3">
@@ -1064,8 +1064,8 @@ export function ProfessionalDashboard({ user, logout }) {
                     };
                     return (
                       <div key={category} className="flex justify-between text-xs">
-                        <span className="text-gray-500">{translateCategory(category)}</span>
-                        <span className="text-gray-700">€{formatAmount(amount)}</span>
+                        <span className={isDark ? 'text-gray-300' : 'text-gray-500'}>{translateCategory(category)}</span>
+                        <span className={isDark ? 'text-gray-100' : 'text-gray-700'}>€{formatAmount(amount)}</span>
                       </div>
                     );
                   })}
