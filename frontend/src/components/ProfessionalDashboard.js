@@ -638,49 +638,51 @@ export function ProfessionalDashboard({ user, logout }) {
                   <div key={account.id} className="account-item">
                     {/* Two-column flex layout */}
                     <div className="flex justify-between items-start gap-4">
-                      {/* Left block: Account info */}
-                      <div className="flex-1 min-w-0">
+                      {/* Left block: Account info - constrained width */}
+                      <div className="flex-1 min-w-0 max-w-[65%] sm:max-w-none">
                         <p className={`text-sm font-medium mb-1 ${isDark ? 'text-white' : 'text-gray-900'}`}>{t('eurEAccount')}</p>
-                        <div className="flex items-center gap-2 flex-nowrap">
+                        <div className="flex items-start gap-1">
                           <span className={`text-xs font-medium flex-shrink-0 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>IBAN:</span>
-                          <span className={`text-xs font-mono truncate ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{account.iban ? account.iban.match(/.{1,4}/g)?.join(' ') : 'N/A'}</span>
-                          {account.iban && (
-                            <button
-                              onClick={async (e) => {
-                                e.stopPropagation();
-                                const btn = e.currentTarget;
-                                const originalHTML = btn.innerHTML;
-                                try {
-                                  await navigator.clipboard.writeText(account.iban);
-                                  btn.innerHTML = '<span class="text-green-600 text-xs font-medium">✓</span>';
-                                  setTimeout(() => { btn.innerHTML = originalHTML; }, 1500);
-                                } catch (err) {
+                          <span className={`text-xs font-mono break-all ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                            {account.iban ? account.iban.match(/.{1,4}/g)?.join(' ') : 'N/A'}
+                            {account.iban && (
+                              <button
+                                onClick={async (e) => {
+                                  e.stopPropagation();
+                                  const btn = e.currentTarget;
+                                  const originalHTML = btn.innerHTML;
                                   try {
-                                    const tempInput = document.createElement('input');
-                                    tempInput.value = account.iban;
-                                    tempInput.style.position = 'fixed';
-                                    tempInput.style.left = '-9999px';
-                                    document.body.appendChild(tempInput);
-                                    tempInput.select();
-                                    tempInput.setSelectionRange(0, 99999);
-                                    document.execCommand('copy');
-                                    document.body.removeChild(tempInput);
+                                    await navigator.clipboard.writeText(account.iban);
                                     btn.innerHTML = '<span class="text-green-600 text-xs font-medium">✓</span>';
                                     setTimeout(() => { btn.innerHTML = originalHTML; }, 1500);
-                                  } catch (fallbackErr) {
-                                    window.prompt('Copy your IBAN:', account.iban);
+                                  } catch (err) {
+                                    try {
+                                      const tempInput = document.createElement('input');
+                                      tempInput.value = account.iban;
+                                      tempInput.style.position = 'fixed';
+                                      tempInput.style.left = '-9999px';
+                                      document.body.appendChild(tempInput);
+                                      tempInput.select();
+                                      tempInput.setSelectionRange(0, 99999);
+                                      document.execCommand('copy');
+                                      document.body.removeChild(tempInput);
+                                      btn.innerHTML = '<span class="text-green-600 text-xs font-medium">✓</span>';
+                                      setTimeout(() => { btn.innerHTML = originalHTML; }, 1500);
+                                    } catch (fallbackErr) {
+                                      window.prompt('Copy your IBAN:', account.iban);
+                                    }
                                   }
-                                }
-                              }}
-                              className="p-1 text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition touch-manipulation flex-shrink-0"
-                              title="Copy IBAN"
-                              data-testid="copy-iban-btn"
-                            >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                              </svg>
-                            </button>
-                          )}
+                                }}
+                                className="inline-flex items-center ml-1 p-1 text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition touch-manipulation align-middle"
+                                title="Copy IBAN"
+                                data-testid="copy-iban-btn"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                              </button>
+                            )}
+                          </span>
                         </div>
                       </div>
                       {/* Right block: Balance (top) + View transactions (below) - stacked vertically */}
