@@ -55,6 +55,130 @@ class TransferService:
             user = await self.db.users.find_one({"_id": str(user_id)})
         return user
     
+    async def _send_transfer_confirmation_email(
+        self,
+        transfer_id: str,
+        user_id: str,
+        reference_number: str,
+        amount: int,
+        beneficiary_name: str,
+        beneficiary_iban: str,
+        sender_iban: str,
+        transfer_type: str = "SEPA Transfer",
+        transfer_date: datetime = None
+    ) -> dict:
+        """
+        Send transfer confirmation email with comprehensive status tracking.
+        Updates the transfer record with email status.
+        Returns dict with success, provider_id, error, and email_warning.
+        """
+        from services.email_service import EmailService
+        
+        email_warning = None
+        result = {'success': False, 'provider_id': None, 'error': None, 'email_warning': None}
+        
+        try:
+            # Get user details for email
+            user = await self._get_user_details(user_id)
+            
+            if not user:
+                error_msg = f"User not found: {user_id}"
+                logger.error(f"[TRANSFER EMAIL] {error_msg}")
+                await self._update_transfer_email_status(transfer_id, False, None, error_msg)
+                result['error'] = error_msg
+                result['email_warning'] = f"Transfer submitted, but confirmation email could not be delivered: {error_msg}"
+                return result
+            
+            user_email = user.get("email")
+            if not user_email:
+                error_msg = "User email not found in record"
+                logger.error(f"[TRANSFER EMAIL] {error_msg} for user {user_id}")
+                await self._update_transfer_email_status(transfer_id, False, None, error_msg)
+                result['error'] = error_msg
+                result['email_warning'] = f"Transfer submitted, but confirmation email could not be delivered: {error_msg}"
+                return result
+            
+            email_service = EmailService()
+            
+            # Get user's preferred language (default to 'en')
+            language = user.get("language", "en") or "en"
+            first_name = user.get("first_name", "")
+            
+            logger.info(f"[TRANSFER EMAIL] Sending email: transferId={transfer_id}, recipient={user_email}, lang={language}, ref={reference_number}")
+            
+            # Send the confirmation email - returns dict with success, provider_id, error
+            email_result = email_service.send_transfer_confirmation_email(
+                to_email=user_email,
+                first_name=first_name,
+                reference_number=reference_number,
+                amount_cents=amount,
+                beneficiary_name=beneficiary_name,
+                beneficiary_iban=beneficiary_iban,
+                sender_iban=sender_iban or "N/A",
+                transfer_type=transfer_type,
+                transfer_date=transfer_date or datetime.now(timezone.utc),
+                language=language
+            )
+            
+            if email_result.get('success'):
+                # SUCCESS
+                await self._update_transfer_email_status(
+                    transfer_id, 
+                    True, 
+                    email_result.get('provider_id'),
+                    None
+                )
+                result['success'] = True
+                result['provider_id'] = email_result.get('provider_id')
+            else:
+                # FAILED
+                error_msg = email_result.get('error', 'Unknown error')
+                await self._update_transfer_email_status(transfer_id, False, None, error_msg)
+                result['error'] = error_msg
+                result['email_warning'] = f"Transfer submitted, but confirmation email could not be delivered: {error_msg}"
+                
+        except Exception as e:
+            error_msg = str(e)[:200]
+            logger.error(f"[TRANSFER EMAIL] Exception for transfer {transfer_id}: {error_msg}")
+            await self._update_transfer_email_status(transfer_id, False, None, error_msg)
+            result['error'] = error_msg
+            result['email_warning'] = f"Transfer submitted, but confirmation email could not be delivered: {error_msg}"
+        
+        return result
+    
+    async def _update_transfer_email_status(
+        self,
+        transfer_id: str,
+        success: bool,
+        provider_id: str = None,
+        error: str = None
+    ):
+        """Update transfer record with email status."""
+        now = datetime.now(timezone.utc)
+        
+        if success:
+            update_data = {
+                "confirmation_email_sent": True,
+                "confirmation_email_status": "sent",
+                "confirmation_email_sent_at": now,
+                "confirmation_email_provider_id": provider_id,
+                "confirmation_email_error": None
+            }
+        else:
+            update_data = {
+                "confirmation_email_sent": False,
+                "confirmation_email_status": "failed",
+                "confirmation_email_error": error
+            }
+        
+        try:
+            await self.db.transfers.update_one(
+                {"_id": transfer_id},
+                {"$set": update_data}
+            )
+        except Exception as e:
+            logger.error(f"[TRANSFER EMAIL] Failed to update email status for transfer {transfer_id}: {str(e)}")
+    
     async def p2p_transfer(
         self,
         from_user_id: str,
