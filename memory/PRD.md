@@ -29,6 +29,25 @@ ecommbx is a full-stack EU-licensed digital banking platform built with React fr
 
 ## Recent Changes (February 2025)
 
+### IBAN Copy Icon Inline Fix (Feb 19, 2025)
+**Fix:** Fixed the IBAN copy icon dropping to a new line on mobile devices in the Accounts card.
+
+**Problem:** On mobile viewports (especially narrow screens like 320px-375px), the copy IBAN icon was wrapping to a new line instead of staying inline with the IBAN text.
+
+**Solution:** Changed the button and SVG styling to use true inline display:
+1. Changed button from `inline-flex` to `display: inline` with `vertical-align: middle`
+2. Applied same `display: inline; vertical-align: middle` to the SVG icon inside
+3. Changed parent span from `break-all` to `word-break: break-word` for cleaner text wrapping
+4. This makes the icon flow with the text like a character, staying with the last segment of the IBAN
+
+**Files Changed:**
+- `/app/frontend/src/components/ProfessionalDashboard.js` - Updated IBAN section styling (lines 644-686)
+
+**Verification:** Tested on mobile (375px, 320px) and desktop (1920px) viewports:
+- Mobile: Icon stays inline with last IBAN segment even when text wraps to 2-3 lines
+- Desktop: Icon properly positioned after full IBAN on single line
+- Copy functionality works correctly (shows checkmark feedback)
+
 ### Domain Update & Email Styling Fix (Feb 19, 2025)
 **Fix:** Updated production domain from `ecommbx.io` to `ecommbx.group` and fixed email header text visibility.
 
