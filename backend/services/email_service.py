@@ -146,7 +146,7 @@ EMAIL_TRANSLATIONS = {
         'transfer_note_2': 'Puoi monitorare lo stato nella tua Cronologia Transazioni.',
         'transfer_button': 'Visualizza Dettagli Bonifico',
         'transfer_security_warning': 'Se non hai autorizzato questo bonifico, contatta immediatamente il nostro servizio clienti.',
-        'transfer_disclaimer': 'Si prega di non rispondere a questa email. Per assistenza, contattare support@ecommbx.group',
+        'transfer_disclaimer': 'Si prega di non rispondere a questa email. Per assistenza, contattare support@ecommbx.io',
     }
 }
 
