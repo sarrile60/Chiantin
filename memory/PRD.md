@@ -3,6 +3,8 @@
 ## Overview
 ecommbx is a full-stack EU-licensed digital banking platform built with React frontend, FastAPI backend, and MongoDB database.
 
+**Production Domain:** https://ecommbx.group
+
 ## Core Features
 - User authentication (JWT)
 - Bank accounts with ledger-based balance tracking
@@ -26,6 +28,18 @@ ecommbx is a full-stack EU-licensed digital banking platform built with React fr
 - **File Storage:** Cloudinary (for KYC docs and ticket attachments)
 
 ## Recent Changes (February 2025)
+
+### Domain Update & Email Styling Fix (Feb 19, 2025)
+**Fix:** Updated production domain from `ecommbx.io` to `ecommbx.group` and fixed email header text visibility.
+
+**Changes:**
+1. **Domain Update:** Changed `FRONTEND_URL` in backend `.env` from `https://ecommbx.io` to `https://ecommbx.group`
+2. **Email Header Fix:** Changed "ecomm" text color from `color: white` to `color: #FFFFFF !important` for better email client compatibility
+3. **Email Disclaimer:** Updated support email in translations from `support@ecommbx.io` to `support@ecommbx.group`
+
+**Files Changed:**
+- `/app/backend/.env` - Updated FRONTEND_URL
+- `/app/backend/services/email_service.py` - Updated text color and support email in translations
 
 ### Support Ticket System Upgrade (Feb 18, 2025)
 **Enhancement:** Major upgrade to the support ticket system with admin-focused features.
