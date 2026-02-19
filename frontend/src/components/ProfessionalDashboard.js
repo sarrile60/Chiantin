@@ -636,21 +636,20 @@ export function ProfessionalDashboard({ user, logout }) {
               <div className="space-y-3">
                 {accounts.slice(0, 2).map((account) => (
                   <div key={account.id} className="account-item">
-                    {/* 2-column grid layout that maintains structure on mobile */}
-                    <div className="grid grid-cols-[1fr_auto] gap-2 w-full items-start">
-                      {/* Left column: Account info */}
-                      <div className="min-w-0">
+                    {/* Two-column flex layout */}
+                    <div className="flex justify-between items-start gap-4">
+                      {/* Left block: Account info */}
+                      <div className="flex-1 min-w-0">
                         <p className={`text-sm font-medium mb-1 ${isDark ? 'text-white' : 'text-gray-900'}`}>{t('eurEAccount')}</p>
                         <div className="flex items-center gap-1 sm:gap-2">
                           <span className={`text-xs font-medium ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>IBAN:</span>
-                          <span className={`text-xs font-mono truncate ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{account.iban ? account.iban.match(/.{1,4}/g)?.join(' ') : 'N/A'}</span>
+                          <span className={`text-xs font-mono ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{account.iban ? account.iban.match(/.{1,4}/g)?.join(' ') : 'N/A'}</span>
                           {account.iban && (
                             <button
                               onClick={async (e) => {
                                 e.stopPropagation();
                                 const btn = e.currentTarget;
                                 const originalHTML = btn.innerHTML;
-                                
                                 try {
                                   await navigator.clipboard.writeText(account.iban);
                                   btn.innerHTML = '<span class="text-green-600 text-xs font-medium">✓</span>';
@@ -673,7 +672,7 @@ export function ProfessionalDashboard({ user, logout }) {
                                   }
                                 }
                               }}
-                              className="p-1 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-md transition touch-manipulation flex-shrink-0"
+                              className="p-1 text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition touch-manipulation flex-shrink-0"
                               title="Copy IBAN"
                               data-testid="copy-iban-btn"
                             >
@@ -684,9 +683,9 @@ export function ProfessionalDashboard({ user, logout }) {
                           )}
                         </div>
                       </div>
-                      {/* Right column: Balance and actions - always right-aligned */}
-                      <div className="text-right flex-shrink-0 pl-2">
-                        <p className={`text-lg font-semibold whitespace-nowrap ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                      {/* Right block: Balance (top) + View transactions (below) - stacked vertically */}
+                      <div className="flex flex-col items-end flex-shrink-0">
+                        <p className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
                           {formatBalance(account.balance, isBalanceVisible)}
                         </p>
                         <button 
@@ -697,7 +696,7 @@ export function ProfessionalDashboard({ user, logout }) {
                               navigate(`/accounts/${account.id}/transactions`);
                             }
                           }} 
-                          className="text-xs text-red-600 hover:text-red-700 font-medium mt-1 whitespace-nowrap"
+                          className="text-xs text-red-600 hover:text-red-700 font-medium mt-1"
                         >
                           {t('viewTransactions')}
                         </button>
