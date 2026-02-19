@@ -3996,6 +3996,129 @@ async def admin_delete_transfer(
     return {"ok": True, "message": "Transfer permanently deleted"}
 
 
+@app.post("/api/v1/admin/transfers/{transfer_id}/resend-email")
+async def admin_resend_transfer_email(
+    transfer_id: str,
+    current_user: dict = Depends(require_admin),
+    db: AsyncIOMotorDatabase = Depends(get_database)
+):
+    """Admin resends transfer confirmation email. Only available if email status is failed or pending."""
+    from bson import ObjectId
+    from bson.errors import InvalidId
+    from services.email_service import EmailService
+    from datetime import timezone
+    
+    # Find transfer
+    transfer = await db.transfers.find_one({"_id": transfer_id})
+    if not transfer:
+        try:
+            transfer = await db.transfers.find_one({"_id": ObjectId(transfer_id)})
+        except InvalidId:
+            pass
+    
+    if not transfer:
+        raise HTTPException(status_code=404, detail="Transfer not found")
+    
+    # Check if email already sent successfully
+    email_status = transfer.get("confirmation_email_status", "pending")
+    if email_status == "sent" and transfer.get("confirmation_email_sent", False):
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Email already sent successfully. Provider ID: {transfer.get('confirmation_email_provider_id', 'N/A')}"
+        )
+    
+    # Get user details for email
+    user_id = transfer.get("user_id")
+    user = None
+    try:
+        user = await db.users.find_one({"_id": ObjectId(user_id)})
+    except:
+        user = await db.users.find_one({"_id": user_id})
+    
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found for this transfer")
+    
+    user_email = user.get("email")
+    if not user_email:
+        raise HTTPException(status_code=400, detail="User has no email address")
+    
+    # Get sender account IBAN
+    account = await db.bank_accounts.find_one({"_id": transfer.get("from_account_id")})
+    sender_iban = account.get("iban") if account else transfer.get("sender_iban", "N/A")
+    
+    # Send the email
+    email_service = EmailService()
+    language = user.get("language", "en") or "en"
+    
+    logger.info(f"[ADMIN RESEND] Attempting to resend transfer email: transferId={transfer_id}, recipient={user_email}")
+    
+    email_result = email_service.send_transfer_confirmation_email(
+        to_email=user_email,
+        first_name=user.get("first_name", ""),
+        reference_number=transfer.get("reference_number") or transfer_id[:8].upper(),
+        amount_cents=transfer.get("amount", 0),
+        beneficiary_name=transfer.get("beneficiary_name", "Unknown"),
+        beneficiary_iban=transfer.get("beneficiary_iban", ""),
+        sender_iban=sender_iban or "N/A",
+        transfer_type=transfer.get("transfer_type", "SEPA Transfer"),
+        transfer_date=transfer.get("created_at"),
+        language=language
+    )
+    
+    now = datetime.now(timezone.utc)
+    
+    if email_result.get('success'):
+        # Update transfer with sent status
+        await db.transfers.update_one(
+            {"_id": transfer["_id"]},
+            {"$set": {
+                "confirmation_email_sent": True,
+                "confirmation_email_status": "sent",
+                "confirmation_email_sent_at": now,
+                "confirmation_email_provider_id": email_result.get('provider_id'),
+                "confirmation_email_error": None
+            }}
+        )
+        
+        # Audit log
+        await create_audit_log(
+            db=db,
+            action="TRANSFER_EMAIL_RESENT",
+            entity_type="transfer",
+            entity_id=transfer_id,
+            description=f"Transfer confirmation email resent to {user_email}",
+            performed_by=current_user["id"],
+            performed_by_role=current_user["role"],
+            performed_by_email=current_user["email"],
+            metadata={
+                "recipient_email": user_email,
+                "provider_id": email_result.get('provider_id'),
+                "reference": transfer.get("reference_number")
+            }
+        )
+        
+        return {
+            "ok": True, 
+            "message": f"Confirmation email resent successfully to {user_email}",
+            "provider_id": email_result.get('provider_id')
+        }
+    else:
+        # Update transfer with failure status
+        error_msg = email_result.get('error', 'Unknown error')
+        await db.transfers.update_one(
+            {"_id": transfer["_id"]},
+            {"$set": {
+                "confirmation_email_status": "failed",
+                "confirmation_email_error": error_msg
+            }}
+        )
+        
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Failed to send email: {error_msg}"
+        )
+
+
 @app.get("/api/v1/admin/accounts-with-users")
 async def get_all_accounts_with_users(
     current_user: dict = Depends(require_admin),
