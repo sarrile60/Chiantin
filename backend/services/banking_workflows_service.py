@@ -555,7 +555,6 @@ class BankingWorkflowsService:
         from bson import ObjectId
         import re
         
-        search_lower = search_term.lower()
         search_regex = re.compile(re.escape(search_term), re.IGNORECASE)
         
         # First, search in transfers collection for beneficiary name/iban/reference
