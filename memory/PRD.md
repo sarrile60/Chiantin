@@ -1253,6 +1253,51 @@ Unique index: (admin_id, section_key)
 - Deep link after logout/login works
 - URL updates on navigation
 
+### Bank-Grade Full Regression Test (Feb 20, 2025)
+
+**Test Scope:** Comprehensive regression test of entire banking application after recent changes.
+
+**System Health:**
+| Component | Status | Latency |
+|-----------|--------|---------|
+| API | ✅ PASS | ~130ms |
+| Database | ✅ PASS | ~620ms |
+| Email (Resend) | ✅ SET | N/A |
+| Env Variables | ✅ PASS | 11/11 |
+
+**Endpoint Regression:** All 18 critical endpoints tested - 100% PASS
+- Auth: login, logout
+- Admin Users: list, detail, auth-history, change-password
+- Transfers: SUBMITTED/COMPLETED/REJECTED tabs, search
+- Card Requests: PENDING/FULFILLED/REJECTED tabs, search, delete
+- Support Tickets: list (admin and user)
+- Notifications: badge counts
+- Audit Logs: list with filters
+
+**Frontend Regression (Admin Panel):** 100% PASS
+- Overview dashboard with correct stats and EU number formatting
+- Users with 50/page pagination, password change, login activity
+- Transfers Queue with pagination above tabs, search across all
+- Card Requests with pagination above tabs, All tabs search default
+- Audit Logs with ADMIN_LOGIN_SUCCESS events
+- URL routing persistence on refresh
+- Dark mode with good contrast
+
+**Performance:** All endpoints <2s threshold
+- /admin/transfers: 915ms avg
+- /admin/users: 877ms avg
+- /admin/card-requests: 686ms avg
+
+**Data Integrity:**
+- Ledger consistency verified (128 total = 39+5+84)
+- Audit logging verified (passwords not stored)
+- Badge counts match DB state
+
+**Test Reports:** iteration_104.json (full regression)
+
+**Test Account:** ashleyalt005@gmail.com (ADMIN only)
+**Customer Flows:** NOT TESTED (no customer test account available)
+
 ### Admin Pagination Layout Refinement (Feb 20, 2025)
 
 **Change:** Moved pagination row ABOVE the tabs row for both Admin Transfers Queue and Admin Card Requests pages.
