@@ -948,6 +948,29 @@ ecommbx is a full-stack EU-licensed digital banking platform built with React fr
 - Re-rejection returns 400 error ✅
 - Approval does NOT trigger rejection email ✅
 
+### Transfer Email Disclaimer Removal (Feb 20, 2025)
+
+**Change:** Removed the "do not reply / contact support@..." footer line from ALL transfer-related emails.
+
+**Reason:** No bank support email address exists - clients should use in-app Support page only.
+
+**What Was Removed:**
+- EN: "Please do not reply to this email. For assistance, contact support@ecommbx.io"
+- IT: "Si prega di non rispondere a questa email. Per assistenza, contattare support@ecommbx.io"
+
+**What Was Kept:**
+- Security warning section (with warning icon)
+- "Contact Support" / "View Transfer Details" CTA button (linking to in-app pages)
+- All transfer details, branding, and footer copyright
+
+**Files Changed:**
+- `/app/backend/services/email_service.py` - Removed `{t('transfer_disclaimer')}` from both:
+  - `send_transfer_confirmation_email()` HTML template
+  - `send_transfer_rejected_email()` HTML template
+- Translation keys remain in `EMAIL_TRANSLATIONS` (unused, safe to keep)
+
+**Verification:** 100% test pass rate (iteration_95.json) - 19/19 tests passed. Both transfer confirmation and rejection emails verified to no longer contain disclaimer footer.
+
 ## Known Issues / Backlog
 
 ### P0 - Critical
