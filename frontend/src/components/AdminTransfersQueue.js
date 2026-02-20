@@ -465,9 +465,6 @@ export function AdminTransfersQueue() {
               </tbody>
             </table>
           </div>
-          
-          {/* Pagination Controls */}
-          {pagination.total > 0 && <PaginationControls />}
         </>
       )}
     </div>
