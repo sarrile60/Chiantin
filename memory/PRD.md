@@ -886,6 +886,68 @@ ecommbx is a full-stack EU-licensed digital banking platform built with React fr
 
 **Verification:** 100% test pass rate (iteration_93.json) - All spending consistency tests passed.
 
+### Transfer Rejection Email Feature (Feb 20, 2025)
+
+**Feature:** Professional transactional email sent to customers ONLY when a transfer is REJECTED by an admin.
+
+**Product Requirements Implemented:**
+1. **Trigger:** Email sent immediately and only when status changes to REJECTED
+2. **Idempotency:** `rejection_email_sent` flag guarantees one email per rejection
+3. **Content:**
+   - Subject: "Transfer rejected – action may be required"
+   - Body: Professional message stating no funds were sent
+   - Details: Rejection timestamp, amount, beneficiary name, masked IBAN (first 4 + last 4), reference
+   - **No rejection reason** included (as specified)
+4. **CTA:** "Contact Support" button linking to `/support` page
+5. **Security Note:** Warning about unauthorized requests
+6. **Localization:** Full EN and IT support based on user's `language` preference
+7. **Error Handling:** Email failures logged but don't block rejection flow
+
+**Technical Implementation:**
+
+**Email Service Changes:**
+- Added `send_transfer_rejected_email()` method to `EmailService`
+- Returns detailed status dict: `{success, provider_id, error}`
+- Uses existing Resend API integration
+- Professional HTML template matching ecommbx branding
+
+**Transfer Schema Changes:**
+- Added `rejection_email_sent: bool` (default: False)
+- Added `rejection_email_sent_at: datetime` (optional)
+- Added `rejection_email_provider_id: str` (optional)
+- Added `rejection_email_error: str` (optional)
+
+**Workflow Changes:**
+- `reject_transfer()` in `banking_workflows_service.py` now:
+  1. Checks idempotency flag before sending
+  2. Fetches user details and language preference
+  3. Calls `send_transfer_rejected_email()`
+  4. Updates transfer document with email status
+  5. Logs success/failure without blocking rejection
+
+**Translations Added:**
+- English:
+  - `transfer_rejected_subject`: "Transfer rejected – action may be required"
+  - `transfer_rejected_title`: "Transfer Rejected"
+  - `transfer_rejected_body`: "We are writing to inform you that your recent transfer request could not be completed. No funds have been sent from your account."
+  - `transfer_rejected_button`: "Contact Support"
+  - `transfer_rejected_security_warning`: "If you did not authorize this transfer request, please contact our support team immediately."
+- Italian: Full translations for all keys
+
+**Files Changed:**
+- `/app/backend/services/email_service.py` - Added `send_transfer_rejected_email()` method and EN/IT translations
+- `/app/backend/services/banking_workflows_service.py` - Integrated email sending in `reject_transfer()`
+- `/app/backend/schemas/banking_workflows.py` - Added rejection email tracking fields to Transfer model
+- `/app/backend/tests/test_transfer_rejection_email.py` - Comprehensive test suite (22 tests)
+
+**Verification:** 100% test pass rate (iteration_94.json) - 22/22 tests passed:
+- Transfer rejection triggers email ✅
+- Idempotency flag prevents duplicate emails ✅
+- Email content verified (no rejection reason, masked IBAN, CTA link) ✅
+- EN and IT localization working ✅
+- Re-rejection returns 400 error ✅
+- Approval does NOT trigger rejection email ✅
+
 ## Known Issues / Backlog
 
 ### P0 - Critical
