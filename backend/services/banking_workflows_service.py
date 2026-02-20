@@ -479,6 +479,145 @@ class BankingWorkflowsService:
             }
         }
     
+    async def _search_transfers(self, search_term: str) -> dict:
+        """Search transfers across the ENTIRE database (all statuses).
+        
+        Searches by: beneficiary name, sender name, sender email, IBAN, reference number.
+        Returns ALL matching results without pagination.
+        
+        Args:
+            search_term: The search string to match
+            
+        Returns:
+            Dictionary with 'transfers' list and 'pagination' info (search mode)
+        """
+        from bson import ObjectId
+        import re
+        
+        search_lower = search_term.lower()
+        search_regex = re.compile(re.escape(search_term), re.IGNORECASE)
+        
+        # First, search in transfers collection for beneficiary name/iban/reference
+        transfer_query = {
+            "$or": [
+                {"beneficiary_name": {"$regex": search_regex}},
+                {"beneficiary_iban": {"$regex": search_regex}},
+                {"reference_number": {"$regex": search_regex}},
+                {"details": {"$regex": search_regex}}
+            ]
+        }
+        
+        # Get matching transfers from direct fields
+        direct_matches = await self.db.transfers.find(transfer_query).sort("created_at", -1).to_list(500)
+        direct_match_ids = {str(doc["_id"]) for doc in direct_matches}
+        
+        # Also search by sender name/email - need to find matching users first
+        user_query = {
+            "$or": [
+                {"email": {"$regex": search_regex}},
+                {"first_name": {"$regex": search_regex}},
+                {"last_name": {"$regex": search_regex}}
+            ]
+        }
+        matching_users = await self.db.users.find(user_query).to_list(100)
+        matching_user_ids = [str(u["_id"]) for u in matching_users]
+        
+        # Find transfers from matching users
+        user_transfers = []
+        if matching_user_ids:
+            user_transfer_cursor = self.db.transfers.find({"user_id": {"$in": matching_user_ids}}).sort("created_at", -1)
+            user_transfers = await user_transfer_cursor.to_list(500)
+        
+        # Combine results, avoiding duplicates
+        all_transfer_docs = list(direct_matches)
+        for doc in user_transfers:
+            if str(doc["_id"]) not in direct_match_ids:
+                all_transfer_docs.append(doc)
+        
+        # Sort combined results by created_at descending
+        all_transfer_docs.sort(key=lambda x: x.get("created_at", datetime.min), reverse=True)
+        
+        if not all_transfer_docs:
+            return {
+                "transfers": [],
+                "pagination": {
+                    "page": 1,
+                    "limit": len(all_transfer_docs),
+                    "total": 0,
+                    "total_pages": 1,
+                    "has_next": False,
+                    "has_prev": False,
+                    "search_mode": True
+                }
+            }
+        
+        # Collect all unique user_ids and account_ids for bulk lookup
+        user_ids = set()
+        account_ids = set()
+        
+        for doc in all_transfer_docs:
+            user_id = doc.get("user_id")
+            if user_id:
+                try:
+                    user_ids.add(ObjectId(user_id))
+                except:
+                    user_ids.add(user_id)
+            
+            from_account_id = doc.get("from_account_id")
+            if from_account_id:
+                account_ids.add(from_account_id)
+        
+        # BULK LOOKUP: Fetch all users in ONE query
+        users_map = {}
+        if user_ids:
+            users_cursor = self.db.users.find({"_id": {"$in": list(user_ids)}})
+            async for user in users_cursor:
+                users_map[str(user["_id"])] = user
+        
+        # BULK LOOKUP: Fetch all accounts in ONE query
+        accounts_map = {}
+        if account_ids:
+            accounts_cursor = self.db.bank_accounts.find({"_id": {"$in": list(account_ids)}})
+            async for account in accounts_cursor:
+                accounts_map[str(account["_id"])] = account
+        
+        # Build the response
+        transfers = []
+        for doc in all_transfer_docs:
+            transfer = Transfer(**serialize_doc(doc))
+            transfer_dict = transfer.model_dump()
+            
+            # Get sender info from pre-fetched map
+            user_id = doc.get("user_id")
+            user = users_map.get(str(user_id)) if user_id else None
+            
+            if user:
+                transfer_dict["sender_name"] = f"{user.get('first_name', '')} {user.get('last_name', '')}".strip()
+                transfer_dict["sender_email"] = user.get("email", "")
+            else:
+                transfer_dict["sender_name"] = "Unknown User" if user_id else "Unknown"
+                transfer_dict["sender_email"] = ""
+            
+            # Get sender IBAN from pre-fetched map
+            from_account_id = doc.get("from_account_id")
+            account = accounts_map.get(str(from_account_id)) if from_account_id else None
+            transfer_dict["sender_iban"] = account.get("iban", "N/A") if account else "N/A"
+            
+            transfers.append(transfer_dict)
+        
+        return {
+            "transfers": transfers,
+            "pagination": {
+                "page": 1,
+                "limit": len(transfers),
+                "total": len(transfers),
+                "total_pages": 1,
+                "has_next": False,
+                "has_prev": False,
+                "search_mode": True
+            }
+        }
+    
     async def approve_transfer(
         self,
         transfer_id: str,
