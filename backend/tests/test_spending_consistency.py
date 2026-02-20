@@ -163,13 +163,14 @@ class TestSpendingConsistency:
         assert response.status_code == 200, f"Failed: {response.text}"
         data = response.json()
         
-        # Verify key stats are present (new structure)
+        # Verify key stats are present (actual structure)
         assert "users" in data, "Missing users section"
         assert "accounts" in data, "Missing accounts section"
-        assert "transactions" in data, "Missing transactions section"
+        assert "transfers" in data, "Missing transfers section"
         
         users = data.get("users", {})
-        print(f"✓ Admin Overview: {users.get('total')} users, {users.get('active')} active")
+        transfers = data.get("transfers", {})
+        print(f"✓ Admin Overview: {users.get('total')} users, {users.get('active')} active, {transfers.get('total')} transfers")
     
     def test_customer_dashboard_data(self, customer_token):
         """Verify customer can fetch all dashboard data"""
