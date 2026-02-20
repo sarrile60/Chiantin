@@ -639,9 +639,6 @@ class EmailService:
                 <div style="background-color: #fff3cd; border: 1px solid #ffc107; padding: 15px; border-radius: 8px; margin: 20px 0;">
                     <p style="margin: 0; color: #856404; font-size: 13px;">⚠️ <strong>{t('transfer_security_warning')}</strong></p>
                 </div>
-                
-                <!-- Disclaimer -->
-                <p style="color: #999999; font-size: 12px; text-align: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #eeeeee;">{t('transfer_disclaimer')}</p>
             </div>
             <div style="text-align: center; margin-top: 20px; font-size: 12px; color: #666666;">
                 <p>{t('password_reset_footer')}</p>
