@@ -1755,6 +1755,18 @@ function AdminDashboard() {
   // Password visibility state
   const [showPassword, setShowPassword] = useState(false);
   
+  // Password change modal state
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordChangeLoading, setPasswordChangeLoading] = useState(false);
+  const [passwordChangeError, setPasswordChangeError] = useState('');
+  
+  // Auth history state
+  const [authHistory, setAuthHistory] = useState([]);
+  const [authHistoryLoading, setAuthHistoryLoading] = useState(false);
+  const [showAuthHistory, setShowAuthHistory] = useState(false);
+  
   // Delete user state
   const [deleteUserLoading, setDeleteUserLoading] = useState(false);
   
