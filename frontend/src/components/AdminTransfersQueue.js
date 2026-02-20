@@ -1,5 +1,6 @@
 // Admin Transfers Queue with Pagination
 import React, { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import api from '../api';
 import { useToast } from './Toast';
 import { formatCurrency } from '../utils/currency';
@@ -7,7 +8,24 @@ import { getStatusBadgeClasses } from '../utils/transactions';
 
 export function AdminTransfersQueue() {
   const toast = useToast();
-  const [activeTab, setActiveTab] = useState('SUBMITTED');
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Initialize state from URL params
+  const getInitialTab = () => {
+    const urlTab = searchParams.get('tab');
+    return ['SUBMITTED', 'COMPLETED', 'REJECTED'].includes(urlTab) ? urlTab : 'SUBMITTED';
+  };
+  const getInitialPage = () => {
+    const urlPage = parseInt(searchParams.get('page'));
+    return !isNaN(urlPage) && urlPage > 0 ? urlPage : 1;
+  };
+  const getInitialPageSize = () => {
+    const urlSize = parseInt(searchParams.get('pageSize'));
+    return [20, 50, 100].includes(urlSize) ? urlSize : 20;
+  };
+  const getInitialSearch = () => searchParams.get('search') || '';
+  
+  const [activeTab, setActiveTabInternal] = useState(getInitialTab);
   const [transfers, setTransfers] = useState([]);
   const [selectedTransfer, setSelectedTransfer] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -18,13 +36,13 @@ export function AdminTransfersQueue() {
   const [deletingTransfer, setDeletingTransfer] = useState(false);
   
   // Search state
-  const [searchQuery, setSearchQuery] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [isSearchMode, setIsSearchMode] = useState(false);
+  const [searchQuery, setSearchQuery] = useState(getInitialSearch);
+  const [debouncedSearch, setDebouncedSearch] = useState(getInitialSearch);
+  const [isSearchMode, setIsSearchMode] = useState(!!getInitialSearch());
   
   // Pagination state
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(20);
+  const [currentPage, setCurrentPageInternal] = useState(getInitialPage);
+  const [pageSize, setPageSizeInternal] = useState(getInitialPageSize);
   const [pagination, setPagination] = useState({
     total: 0,
     page: 1,
@@ -34,17 +52,59 @@ export function AdminTransfersQueue() {
     has_prev: false
   });
 
+  // Update URL when state changes
+  const updateUrlParams = useCallback((updates) => {
+    const newParams = new URLSearchParams(searchParams);
+    // Keep the section param
+    if (!newParams.has('section')) {
+      newParams.set('section', 'transfers');
+    }
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value === null || value === undefined || value === '' || (key === 'page' && value === 1) || (key === 'pageSize' && value === 20) || (key === 'tab' && value === 'SUBMITTED')) {
+        newParams.delete(key);
+      } else {
+        newParams.set(key, value);
+      }
+    });
+    setSearchParams(newParams, { replace: true });
+  }, [searchParams, setSearchParams]);
+
+  // Wrapper functions to update state and URL
+  const setActiveTab = useCallback((tab) => {
+    setActiveTabInternal(tab);
+    setCurrentPageInternal(1);
+    updateUrlParams({ tab, page: null, search: null });
+  }, [updateUrlParams]);
+
+  const setCurrentPage = useCallback((page) => {
+    setCurrentPageInternal(page);
+    updateUrlParams({ page });
+  }, [updateUrlParams]);
+
+  const setPageSize = useCallback((size) => {
+    setPageSizeInternal(size);
+    setCurrentPageInternal(1);
+    updateUrlParams({ pageSize: size, page: null });
+  }, [updateUrlParams]);
+
   // Debounce search input
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(searchQuery);
+      if (searchQuery) {
+        updateUrlParams({ search: searchQuery, page: null });
+      } else {
+        updateUrlParams({ search: null });
+      }
     }, 300);
     return () => clearTimeout(timer);
-  }, [searchQuery]);
+  }, [searchQuery, updateUrlParams]);
 
   // Reset page when search, tab, or page size changes
   useEffect(() => {
-    setCurrentPage(1);
+    if (currentPage !== 1) {
+      setCurrentPageInternal(1);
+    }
   }, [debouncedSearch, activeTab, pageSize]);
 
   const fetchTransfers = useCallback(async () => {
