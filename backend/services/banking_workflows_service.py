@@ -356,27 +356,34 @@ class BankingWorkflowsService:
             return None
         return Transfer(**serialize_doc(doc))
     
-    async def get_admin_transfers(self, status: Optional[str] = None, page: int = 1, limit: int = 50) -> dict:
+    async def get_admin_transfers(self, status: Optional[str] = None, page: int = 1, limit: int = 50, search: Optional[str] = None) -> dict:
         """Admin: Get transfers filtered by status with sender information.
         
         PERFORMANCE OPTIMIZED: Uses bulk lookups instead of N+1 queries.
-        Added pagination support for better performance with large datasets.
+        Added pagination and search support for better performance with large datasets.
         
         Args:
             status: Optional status filter (e.g., 'SUBMITTED', 'COMPLETED', 'REJECTED')
             page: Page number (1-indexed)
             limit: Items per page (default 50, max 100)
+            search: Optional search term (searches beneficiary name, sender name, email, IBAN, reference)
             
         Returns:
             Dictionary with 'transfers' list and 'pagination' info
         """
         from bson import ObjectId
+        import re
         
         # Validate and cap limit
         if limit > 100:
             limit = 100
         if limit < 1:
             limit = 50
+        
+        # If search is provided, we need to search across ALL transfers (ignore status filter)
+        # and return ALL matching results (no pagination for search)
+        if search and search.strip():
+            return await self._search_transfers(search.strip())
         
         query = {}
         if status:
