@@ -1151,6 +1151,31 @@ Unique index: (admin_id, section_key)
 - Search with pagination working
 - Status tab switching with pagination working
 
+### Admin Pagination UI Improvement (Feb 20, 2025)
+
+**Change:** Moved pagination controls from BOTTOM to TOP of the table for both Admin Card Requests and Admin Transfers Queue pages.
+
+**Problem:** Admins had to scroll down to change pages, which was unprofessional and inefficient.
+
+**Solution:** Relocated pagination controls to directly under the tabs, above the data table:
+- "Showing X-Y of Z results/transfers/requests" text
+- "Show: N per page" dropdown (20/50/100)
+- Page navigation: First / Previous / Page N of M / Next / Last
+
+**Style:** Matches the Users tab professional admin style with:
+- Gray background buttons (`bg-gray-200 hover:bg-gray-300`)
+- Disabled state styling (`bg-gray-100 text-gray-400 cursor-not-allowed`)
+- Horizontal flex layout with responsive wrapping
+
+**Files Changed:**
+- `/app/frontend/src/components/AdminTransfersQueue.js` - Pagination moved to top, bottom removed
+- `/app/frontend/src/components/AdminCardRequestsQueue.js` - Pagination moved to top, bottom removed
+
+**Verification:** 100% test pass rate (iteration_100.json) - Full UI regression testing confirmed:
+- Pagination controls at TOP for both pages
+- No pagination at bottom (single instance only)
+- All functionality preserved: search, tabs, page navigation, page size selector, delete action
+
 ## Known Issues / Backlog
 
 ### P0 - Critical
