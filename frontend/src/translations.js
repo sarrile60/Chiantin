@@ -541,6 +541,7 @@ const translations = {
     instantTransferUnavailableShort: 'Instant transfer is currently unavailable.',
     instantTransferOk: 'OK',
     instantTransferCancel: 'Cancel',
+    instantTransferUnderstood: 'Understood',
     processedAsStandardSepa: 'This transfer will be processed as Standard SEPA',
     makePayment: 'Make Payment',
     processing: 'Processing...',
