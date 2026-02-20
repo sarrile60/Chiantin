@@ -715,10 +715,12 @@ class BankingWorkflowsService:
         admin_id: str,
         reason: str
     ):
-        """Admin rejects transfer - returns money to user's account."""
+        """Admin rejects transfer - returns money to user's account and sends rejection email."""
         from services.ledger_service import LedgerEngine
+        from services.email_service import EmailService
         from core.ledger import EntryDirection, AccountType
         from datetime import timezone
+        from bson import ObjectId
         
         trans_doc = await self.db.transfers.find_one({"_id": transfer_id})
         if not trans_doc:
@@ -727,6 +729,12 @@ class BankingWorkflowsService:
         # Only reject if status is SUBMITTED
         if trans_doc.get("status") != "SUBMITTED":
             raise HTTPException(status_code=400, detail="Transfer cannot be rejected - not in SUBMITTED status")
+        
+        # Idempotency check: Ensure rejection email hasn't already been sent
+        if trans_doc.get("rejection_email_sent", False):
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.warning(f"[REJECT TRANSFER] Rejection email already sent for transfer {transfer_id}, skipping email")
         
         # Get user's bank account to return the money
         user_id = trans_doc.get("user_id")
@@ -740,7 +748,6 @@ class BankingWorkflowsService:
         if not bank_account and user_id:
             bank_account = await self.db.bank_accounts.find_one({"user_id": user_id})
             if not bank_account:
-                from bson import ObjectId
                 from bson.errors import InvalidId
                 try:
                     bank_account = await self.db.bank_accounts.find_one({"user_id": ObjectId(user_id)})
@@ -832,6 +839,93 @@ class BankingWorkflowsService:
             entity_type="transfer",
             entity_id=transaction_id
         )
+        
+        # Send rejection email - ONLY if not already sent (idempotency)
+        if not trans_doc.get("rejection_email_sent", False):
+            import logging
+            logger = logging.getLogger(__name__)
+            
+            try:
+                # Get user details for email
+                user = None
+                try:
+                    user = await self.db.users.find_one({"_id": ObjectId(user_id)})
+                except:
+                    user = await self.db.users.find_one({"_id": user_id})
+                
+                if user and user.get("email"):
+                    email_service = EmailService()
+                    
+                    # Get user's preferred language (default to 'en')
+                    language = user.get("language", "en") or "en"
+                    
+                    # Get reference number for email
+                    reference_number = trans_doc.get("reference_number") or transfer_id[:8].upper()
+                    
+                    # Send the rejection email
+                    email_result = email_service.send_transfer_rejected_email(
+                        to_email=user["email"],
+                        first_name=user.get("first_name", ""),
+                        reference_number=reference_number,
+                        amount_cents=amount,
+                        beneficiary_name=trans_doc.get("beneficiary_name", "Unknown"),
+                        beneficiary_iban=trans_doc.get("beneficiary_iban", ""),
+                        rejection_timestamp=now,
+                        language=language
+                    )
+                    
+                    if email_result.get('success'):
+                        # SUCCESS - Update transfer with sent status
+                        await self.db.transfers.update_one(
+                            {"_id": transfer_id},
+                            {"$set": {
+                                "rejection_email_sent": True,
+                                "rejection_email_sent_at": now,
+                                "rejection_email_provider_id": email_result.get('provider_id'),
+                                "rejection_email_error": None
+                            }}
+                        )
+                        logger.info(f"[REJECT TRANSFER] Rejection email sent successfully for transfer {transfer_id}")
+                    else:
+                        # FAILED - Log error but don't fail the rejection
+                        error_msg = email_result.get('error', 'Unknown error')
+                        await self.db.transfers.update_one(
+                            {"_id": transfer_id},
+                            {"$set": {
+                                "rejection_email_sent": False,
+                                "rejection_email_error": error_msg
+                            }}
+                        )
+                        logger.error(f"[REJECT TRANSFER] Failed to send rejection email for transfer {transfer_id}: {error_msg}")
+                else:
+                    # No user email found
+                    logger.warning(f"[REJECT TRANSFER] No email found for user {user_id}, skipping rejection email")
+                    await self.db.transfers.update_one(
+                        {"_id": transfer_id},
+                        {"$set": {
+                            "rejection_email_sent": False,
+                            "rejection_email_error": "User email not found"
+                        }}
+                    )
+                    
+            except Exception as e:
+                # Log error but don't fail the transfer rejection
+                import logging
+                logger = logging.getLogger(__name__)
+                error_msg = str(e)[:200]
+                logger.error(f"[REJECT TRANSFER] Exception sending rejection email for transfer {transfer_id}: {error_msg}")
+                
+                # Update transfer with failure status
+                try:
+                    await self.db.transfers.update_one(
+                        {"_id": transfer_id},
+                        {"$set": {
+                            "rejection_email_sent": False,
+                            "rejection_email_error": error_msg
+                        }}
+                    )
+                except:
+                    pass
         
         return True
     
