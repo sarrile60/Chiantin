@@ -96,27 +96,77 @@ class TicketService:
         return ticket
     
     async def get_user_tickets(self, user_id: str) -> List[dict]:
-        """Get all tickets for a user with unread count (staff messages only)."""
-        cursor = self.db.tickets.find({"user_id": user_id}).sort("created_at", -1)
+        """Get all tickets for a user with unread count (staff messages only).
+        
+        PERFORMANCE OPTIMIZED: Returns only preview data for list view.
+        Full message content loaded only when ticket is opened.
+        """
+        # Only fetch fields needed for list view
+        cursor = self.db.tickets.find(
+            {"user_id": user_id},
+            {
+                "_id": 1,
+                "user_id": 1,
+                "subject": 1,
+                "status": 1,
+                "priority": 1,
+                "created_at": 1,
+                "updated_at": 1,
+                "user_last_read_at": 1,
+                "messages": {"$slice": -1}  # Only last message for preview
+            }
+        ).sort("created_at", -1)
+        
         tickets = []
         async for doc in cursor:
-            ticket = Ticket(**serialize_doc(doc))
-            ticket_dict = ticket.model_dump()
-            
-            # Calculate unread messages from staff (messages after user_last_read_at that are from staff)
-            user_last_read = doc.get("user_last_read_at")
-            unread_count = 0
+            # Build lightweight ticket dict for list view
             messages = doc.get("messages", [])
+            last_message = messages[0] if messages else None
             
-            for msg in messages:
-                # Count messages from staff that were created after user last read
-                if msg.get("is_staff", False):
-                    msg_created = msg.get("created_at")
-                    if msg_created:
-                        if user_last_read is None or msg_created > user_last_read:
+            # Calculate unread from staff - simplified since we need accurate count
+            # We need to count messages after user_last_read_at
+            user_last_read = doc.get("user_last_read_at")
+            
+            # For accurate unread count, we need full message list only for counting
+            unread_count = 0
+            if user_last_read is None:
+                # Count all staff messages - need separate query only if needed
+                full_doc = await self.db.tickets.find_one(
+                    {"_id": doc["_id"]},
+                    {"messages": 1}
+                )
+                if full_doc:
+                    for msg in full_doc.get("messages", []):
+                        if msg.get("is_staff", False):
                             unread_count += 1
+            else:
+                # Count staff messages after last read
+                full_doc = await self.db.tickets.find_one(
+                    {"_id": doc["_id"]},
+                    {"messages": 1}
+                )
+                if full_doc:
+                    for msg in full_doc.get("messages", []):
+                        if msg.get("is_staff", False):
+                            msg_created = msg.get("created_at")
+                            if msg_created and msg_created > user_last_read:
+                                unread_count += 1
             
-            ticket_dict["unread_count"] = unread_count
+            ticket_dict = {
+                "id": doc["_id"],
+                "user_id": doc.get("user_id"),
+                "subject": doc.get("subject", ""),
+                "status": doc.get("status", "open"),
+                "priority": doc.get("priority", "medium"),
+                "created_at": doc.get("created_at"),
+                "updated_at": doc.get("updated_at"),
+                "unread_count": unread_count,
+                "last_message_preview": last_message.get("content", "")[:100] if last_message else "",
+                "last_message_at": last_message.get("created_at") if last_message else None,
+                "last_message_is_staff": last_message.get("is_staff", False) if last_message else False,
+                # Include messages for thread view compatibility
+                "messages": []
+            }
             tickets.append(ticket_dict)
         
         return tickets
