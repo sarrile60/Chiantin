@@ -3780,12 +3780,27 @@ async def cancel_scheduled_payment(
 @app.get("/api/v1/insights/spending")
 async def get_spending_insights(
     days: int = 30,
+    period: str = None,
     current_user: dict = Depends(get_current_user),
     db: AsyncIOMotorDatabase = Depends(get_database)
 ):
-    """Get spending breakdown by category from real ledger data."""
+    """Get spending breakdown by category from real ledger data.
+    
+    Args:
+        days: Number of days to look back (7, 30, 90). Ignored if period is set.
+        period: Optional period override. Use 'this_month' for calendar month (same as Overview).
+    
+    When period='this_month', uses the SAME calculation as the Overview "THIS MONTH" widget
+    to ensure consistency.
+    """
     ledger_engine = LedgerEngine(db)
     advanced_service = AdvancedBankingService(db, ledger_engine)
+    
+    # If period is 'this_month', use the same logic as monthly-spending for consistency
+    if period == 'this_month':
+        spending = await advanced_service.get_monthly_spending(current_user["id"])
+        return spending
+    
     breakdown = await advanced_service.get_spending_by_category(current_user["id"], days)
     return breakdown
 
