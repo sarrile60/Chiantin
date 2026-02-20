@@ -3846,14 +3846,24 @@ async def admin_reject_card_request(
 @app.get("/api/v1/admin/transfers")
 async def admin_get_transfers(
     status: str = None,
+    page: int = 1,
+    limit: int = 50,
     current_user: dict = Depends(require_admin),
     db: AsyncIOMotorDatabase = Depends(get_database)
 ):
-    """Admin: Get transfers with sender information."""
+    """Admin: Get transfers with sender information.
+    
+    PERFORMANCE OPTIMIZED: Uses bulk lookups and pagination.
+    
+    Query params:
+    - status: Filter by status (SUBMITTED, COMPLETED, REJECTED)
+    - page: Page number (1-indexed, default 1)
+    - limit: Items per page (default 50, max 100)
+    """
     workflows = BankingWorkflowsService(db)
-    transfers = await workflows.get_admin_transfers(status)
-    # transfers is now a list of dicts with sender info included
-    return {"ok": True, "data": transfers}
+    result = await workflows.get_admin_transfers(status, page, limit)
+    # Result now includes 'transfers' list and 'pagination' info
+    return {"ok": True, "data": result["transfers"], "pagination": result["pagination"]}
 
 
 @app.post("/api/v1/admin/transfers/{transfer_id}/approve")
