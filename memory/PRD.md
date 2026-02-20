@@ -71,6 +71,28 @@ ecommbx is a full-stack EU-licensed digital banking platform built with React fr
 - Dark mode: All text clearly readable with proper contrast
 - Light mode: No regression, original colors preserved
 
+### Support Ticket Message Formatting Fix (Feb 20, 2025)
+**Fix:** Preserved line breaks and paragraph formatting in Support Ticket messages.
+
+**Problem:** When users or admins typed messages with line breaks (like emails with paragraphs), the UI collapsed all whitespace and displayed the message as one continuous sentence.
+
+**Solution:** Added `whitespace-pre-wrap` CSS class to the message content `<p>` element in `Support.js`.
+
+**Technical Change:**
+- File: `/app/frontend/src/components/Support.js` (line 1105)
+- Changed: `<p className="text-sm ...">` to `<p className="text-sm whitespace-pre-wrap ...">`
+- This CSS property preserves newlines while still allowing normal text wrapping
+
+**Example:**
+- Input: "Hello,\n\nWelcome to the bank!!!\n\nThis is amazing"
+- Before fix: "Hello, Welcome to the bank!!! This is amazing"
+- After fix: Three separate lines with paragraph breaks
+
+**Verification:** Tested on:
+- Desktop (1920px): Line breaks preserved ✓
+- Mobile (375px): Line breaks preserved ✓
+- Both client and admin/support messages display correctly
+
 ### Instant Transfer Toggle Feature (Feb 19, 2025)
 **Feature:** Added Instant Transfer toggle to the Send Money (Transfer via IBAN) form for future instant transfer support.
 
