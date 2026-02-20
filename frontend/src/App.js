@@ -90,9 +90,17 @@ function AuthProvider({ children }) {
     return response.data;
   };
 
-  const logout = () => {
+  const logout = async () => {
+    // Call logout API to create audit log (fire and forget)
+    try {
+      await api.post('/auth/logout');
+    } catch (err) {
+      // Ignore errors - logout should always succeed on client side
+      console.log('Logout API call failed, continuing with local logout');
+    }
     localStorage.removeItem('access_token');
     localStorage.removeItem('user');
+    localStorage.removeItem('kyc_status');
     setUser(null);
   };
 
