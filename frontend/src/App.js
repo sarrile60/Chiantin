@@ -1715,10 +1715,13 @@ function AdminDashboard() {
   const toast = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
   
+  // Valid sections - include both sidebar IDs and URL-friendly names
+  // Sidebar uses: overview, users, kyc, accounts, card_requests, ledger, support, audit, settings
+  const validSections = ['overview', 'users', 'kyc', 'accounts', 'card_requests', 'card-requests', 'ledger', 'transfers', 'support', 'tickets', 'audit', 'settings'];
+  
   // Get initial section from URL or default to 'overview'
   const getInitialSection = () => {
     const urlSection = searchParams.get('section');
-    const validSections = ['overview', 'users', 'kyc', 'accounts', 'card-requests', 'transfers', 'tickets', 'audit', 'settings'];
     return validSections.includes(urlSection) ? urlSection : 'overview';
   };
   
@@ -1747,11 +1750,10 @@ function AdminDashboard() {
   // Sync with URL on browser back/forward
   useEffect(() => {
     const urlSection = searchParams.get('section') || 'overview';
-    const validSections = ['overview', 'users', 'kyc', 'accounts', 'card-requests', 'transfers', 'tickets', 'audit', 'settings'];
     if (validSections.includes(urlSection) && urlSection !== activeSection) {
       setActiveSectionInternal(urlSection);
     }
-  }, [searchParams]);
+  }, [searchParams, activeSection]);
   
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
