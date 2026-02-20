@@ -158,6 +158,17 @@ EMAIL_TRANSLATIONS = {
         'transfer_button': 'Visualizza Dettagli Bonifico',
         'transfer_security_warning': 'Se non hai autorizzato questo bonifico, contatta immediatamente il nostro servizio clienti.',
         'transfer_disclaimer': 'Si prega di non rispondere a questa email. Per assistenza, contattare support@ecommbx.io',
+        
+        # Transfer Rejected Email
+        'transfer_rejected_subject': 'Bonifico rifiutato – potrebbe essere necessaria un\'azione',
+        'transfer_rejected_title': 'Bonifico Rifiutato',
+        'transfer_rejected_greeting': 'Gentile',
+        'transfer_rejected_body': 'La informiamo che la sua recente richiesta di bonifico non ha potuto essere completata. Nessun fondo è stato trasferito dal suo conto.',
+        'transfer_rejected_summary': 'Dettagli Bonifico',
+        'transfer_rejected_timestamp': 'Data e Ora Rifiuto',
+        'transfer_rejected_note': 'Se ritiene che questo rifiuto sia stato effettuato per errore o se ha domande, la preghiamo di contattare il nostro servizio clienti.',
+        'transfer_rejected_button': 'Contatta il Supporto',
+        'transfer_rejected_security_warning': 'Se non ha autorizzato questa richiesta di bonifico, contatti immediatamente il nostro servizio clienti.',
     }
 }
 
