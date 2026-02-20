@@ -962,14 +962,20 @@ ecommbx is a full-stack EU-licensed digital banking platform built with React fr
 - Refactor `server.py` into smaller routers (admin.py, transfers.py, tickets.py)
 
 ## Database Schema (Key Collections)
-- `users` - User accounts
+- `users` - User accounts (includes `language` field for email localization)
 - `bank_accounts` - Bank accounts
 - `ledger_transactions` - Financial transactions
 - `transfers` - Transfer records with email status fields:
-  - `confirmation_email_status` (pending/sent/failed)
-  - `confirmation_email_sent_at` (datetime)
-  - `confirmation_email_provider_id` (Resend ID)
-  - `confirmation_email_error` (error message)
+  - **Confirmation Email:**
+    - `confirmation_email_status` (pending/sent/failed)
+    - `confirmation_email_sent_at` (datetime)
+    - `confirmation_email_provider_id` (Resend ID)
+    - `confirmation_email_error` (error message)
+  - **Rejection Email:**
+    - `rejection_email_sent` (bool, default: False)
+    - `rejection_email_sent_at` (datetime, optional)
+    - `rejection_email_provider_id` (Resend ID, optional)
+    - `rejection_email_error` (error message, optional)
 - `tax_holds` - Tax hold information
 
 ## Test Files
