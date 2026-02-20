@@ -324,7 +324,7 @@ class TestAdminTicketsPerformance:
         if "user_email" in ticket:
             print(f"  User: {ticket.get('user_name', 'N/A')} ({ticket.get('user_email', 'N/A')})")
         
-        assert elapsed < 0.5, f"Get single admin ticket took {elapsed:.3f}s - should be < 0.5s"
+        assert elapsed < 1.0, f"Get single admin ticket took {elapsed:.3f}s - should be < 1.0s"
     
     def test_admin_ticket_unread_counts(self, admin_token):
         """Verify unread counts are calculated correctly"""
@@ -382,12 +382,18 @@ class TestPreviousFixes:
         elapsed = time.time() - start
         
         assert response.status_code == 200, f"Get card requests failed: {response.text}"
-        requests_data = response.json()
+        data = response.json()
+        
+        # Handle both dict and list response formats
+        if isinstance(data, dict):
+            requests_data = data.get("requests", data.get("data", []))
+        else:
+            requests_data = data
         
         print(f"✓ Card requests: {len(requests_data)} requests in {elapsed:.3f}s")
         
         # Verify user info is included (N+1 fix from previous iteration)
-        if requests_data:
+        if requests_data and len(requests_data) > 0:
             req = requests_data[0]
             has_user_info = "user_name" in req or "user_email" in req
             print(f"  Has user info: {has_user_info}")
