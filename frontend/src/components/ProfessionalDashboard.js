@@ -1071,7 +1071,7 @@ export function ProfessionalDashboard({ user, logout }) {
                   })}
                 </div>
               )}
-              <button onClick={() => navigate('/insights')} className="text-xs text-red-600 hover:text-red-700 font-medium">
+              <button onClick={() => navigate('/insights?period=this_month')} className="text-xs text-red-600 hover:text-red-700 font-medium">
                 {t('viewFullBreakdown')}
               </button>
             </div>
