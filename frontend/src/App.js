@@ -3463,13 +3463,16 @@ function InsightsPage() {
 // Protected Route with KYC Onboarding
 function ProtectedRoute({ children, adminOnly = false }) {
   const { user, loading } = useAuth();
+  const location = useLocation();
 
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
 
   if (!user) {
-    return <Navigate to="/login" replace />;
+    // Save the intended destination for redirect after login
+    const returnUrl = location.pathname + location.search;
+    return <Navigate to={`/login?returnUrl=${encodeURIComponent(returnUrl)}`} replace />;
   }
 
   if (adminOnly && user.role === 'CUSTOMER') {
