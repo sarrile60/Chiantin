@@ -172,17 +172,48 @@ export function AdminTransfersQueue() {
   return (
     <div>
       <h2 className="text-2xl font-semibold mb-6">Transfers Queue</h2>
-      <div className="flex space-x-4 mb-6">
-        {['SUBMITTED', 'COMPLETED', 'REJECTED'].map(tab => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 rounded ${activeTab === tab ? 'bg-red-600 text-white' : 'bg-gray-100'}`}
-          >
-            {tab}
-          </button>
-        ))}
+      
+      {/* Search Bar */}
+      <div className="mb-4">
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Search by beneficiary, sender, email, IBAN, reference... (searches ALL statuses)"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+            data-testid="transfers-search-input"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+        {isSearchMode && (
+          <div className="mt-2 text-sm text-gray-500">
+            Showing {transfers.length} results across all statuses
+          </div>
+        )}
       </div>
+      
+      {/* Tabs - only show when not searching */}
+      {!isSearchMode && (
+        <div className="flex space-x-4 mb-6">
+          {['SUBMITTED', 'COMPLETED', 'REJECTED'].map(tab => (
+            <button
+              key={tab}
+              onClick={() => handleTabClick(tab)}
+              className={`px-4 py-2 rounded ${activeTab === tab ? 'bg-red-600 text-white' : 'bg-gray-100'}`}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
+      )}
 
       {loading ? (
         <div className="skeleton-card h-64"></div>
