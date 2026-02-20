@@ -192,85 +192,15 @@ export function AdminCardRequestsQueue() {
     setCurrentPage(1);
   };
 
-  // Pagination component
-  const PaginationControls = () => (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4 pt-4 border-t border-gray-200">
-      <div className="flex items-center gap-4">
-        <span className="text-sm text-gray-600">
-          Showing {requests.length} of {pagination.total} results
-        </span>
-        <div className="flex items-center gap-2">
-          <label className="text-sm text-gray-600">Per page:</label>
-          <select
-            value={pageSize}
-            onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-            className="border border-gray-300 rounded px-2 py-1 text-sm"
-            data-testid="page-size-select"
-          >
-            <option value={20}>20</option>
-            <option value={50}>50</option>
-            <option value={100}>100</option>
-          </select>
-        </div>
-      </div>
-      
-      <div className="flex items-center gap-2">
-        <button
-          onClick={() => handlePageChange(1)}
-          disabled={!pagination.has_prev}
-          className={`px-3 py-1 text-sm rounded ${
-            pagination.has_prev 
-              ? 'bg-gray-100 hover:bg-gray-200 text-gray-700' 
-              : 'bg-gray-50 text-gray-400 cursor-not-allowed'
-          }`}
-          data-testid="pagination-first"
-        >
-          First
-        </button>
-        <button
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={!pagination.has_prev}
-          className={`px-3 py-1 text-sm rounded ${
-            pagination.has_prev 
-              ? 'bg-gray-100 hover:bg-gray-200 text-gray-700' 
-              : 'bg-gray-50 text-gray-400 cursor-not-allowed'
-          }`}
-          data-testid="pagination-prev"
-        >
-          Prev
-        </button>
-        
-        <span className="px-3 py-1 text-sm text-gray-700">
-          Page {pagination.page} of {pagination.total_pages}
-        </span>
-        
-        <button
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={!pagination.has_next}
-          className={`px-3 py-1 text-sm rounded ${
-            pagination.has_next 
-              ? 'bg-gray-100 hover:bg-gray-200 text-gray-700' 
-              : 'bg-gray-50 text-gray-400 cursor-not-allowed'
-          }`}
-          data-testid="pagination-next"
-        >
-          Next
-        </button>
-        <button
-          onClick={() => handlePageChange(pagination.total_pages)}
-          disabled={!pagination.has_next}
-          className={`px-3 py-1 text-sm rounded ${
-            pagination.has_next 
-              ? 'bg-gray-100 hover:bg-gray-200 text-gray-700' 
-              : 'bg-gray-50 text-gray-400 cursor-not-allowed'
-          }`}
-          data-testid="pagination-last"
-        >
-          Last
-        </button>
-      </div>
-    </div>
-  );
+  // Calculate showing range
+  const getShowingRange = () => {
+    if (pagination.total === 0) return { start: 0, end: 0 };
+    const start = (currentPage - 1) * pageSize + 1;
+    const end = Math.min(start + requests.length - 1, pagination.total);
+    return { start, end };
+  };
+
+  const showingRange = getShowingRange();
 
   // Delete confirmation modal
   const DeleteModal = () => {
