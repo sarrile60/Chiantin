@@ -1176,6 +1176,31 @@ Unique index: (admin_id, section_key)
 - No pagination at bottom (single instance only)
 - All functionality preserved: search, tabs, page navigation, page size selector, delete action
 
+### Admin Pagination Layout Refinement (Feb 20, 2025)
+
+**Change:** Moved pagination row ABOVE the tabs row for both Admin Transfers Queue and Admin Card Requests pages.
+
+**Problem:** Pagination row was positioned below the tabs, which looked unprofessional.
+
+**Solution:** Reordered the layout components:
+- **Before:** Search → Tabs → Pagination → Table
+- **After:** Search → Pagination → Tabs → Table
+
+**Layout Order (top to bottom):**
+1. Search bar
+2. Pagination row (Showing X-Y of Z, Show: N per page, First/Previous/Page/Next/Last)
+3. Tabs row (SUBMITTED/COMPLETED/REJECTED or PENDING/FULFILLED/REJECTED)
+4. Data table
+
+**Files Changed:**
+- `/app/frontend/src/components/AdminTransfersQueue.js` - Pagination moved above tabs
+- `/app/frontend/src/components/AdminCardRequestsQueue.js` - Pagination moved above tabs
+
+**Verification:** 100% test pass rate (iteration_101.json) - Layout and functionality verified:
+- Y-positions confirmed: Search=161, Pagination=224, Tabs=286
+- Page navigation, page size selector, search, tab switching all working
+- Delete action modal working on Card Requests
+
 ## Known Issues / Backlog
 
 ### P0 - Critical
