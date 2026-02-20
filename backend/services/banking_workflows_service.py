@@ -50,19 +50,80 @@ class BankingWorkflowsService:
             requests.append(CardRequest(**serialize_doc(doc)))
         return requests
     
-    async def get_pending_card_requests(self, status_filter: str = None) -> List[CardRequest]:
-        """Admin: Get card requests by status."""
+    async def get_pending_card_requests(self, status_filter: str = None) -> dict:
+        """Admin: Get card requests by status with user information.
+        
+        PERFORMANCE OPTIMIZED: Returns user info with each request to avoid N+1 frontend queries.
+        
+        Args:
+            status_filter: Optional status filter (PENDING, FULFILLED, REJECTED)
+            
+        Returns:
+            Dictionary with 'requests' list (including user_name, user_email) and 'pagination' info
+        """
+        from bson import ObjectId
+        
         query = {}
         if status_filter:
             query["status"] = status_filter
         else:
             query["status"] = "PENDING"  # Default to PENDING if no filter
         
-        cursor = self.db.card_requests.find(query).sort("created_at", 1)
+        cursor = self.db.card_requests.find(query).sort("created_at", -1)
+        request_docs = await cursor.to_list(length=500)
+        
+        if not request_docs:
+            return {
+                "requests": [],
+                "pagination": {
+                    "total": 0,
+                    "status": status_filter or "PENDING"
+                }
+            }
+        
+        # Collect all unique user_ids for bulk lookup
+        user_ids = set()
+        for doc in request_docs:
+            user_id = doc.get("user_id")
+            if user_id:
+                try:
+                    user_ids.add(ObjectId(user_id))
+                except:
+                    user_ids.add(user_id)
+        
+        # BULK LOOKUP: Fetch all users in ONE query
+        users_map = {}
+        if user_ids:
+            users_cursor = self.db.users.find({"_id": {"$in": list(user_ids)}})
+            async for user in users_cursor:
+                users_map[str(user["_id"])] = user
+        
+        # Build response with user info included
         requests = []
-        async for doc in cursor:
-            requests.append(CardRequest(**serialize_doc(doc)))
-        return requests
+        for doc in request_docs:
+            request = CardRequest(**serialize_doc(doc))
+            request_dict = request.model_dump()
+            
+            # Add user info from pre-fetched map (O(1) lookup)
+            user_id = doc.get("user_id")
+            user = users_map.get(str(user_id)) if user_id else None
+            
+            if user:
+                request_dict["user_name"] = f"{user.get('first_name', '')} {user.get('last_name', '')}".strip()
+                request_dict["user_email"] = user.get("email", "")
+            else:
+                request_dict["user_name"] = "Unknown User"
+                request_dict["user_email"] = ""
+            
+            requests.append(request_dict)
+        
+        return {
+            "requests": requests,
+            "pagination": {
+                "total": len(requests),
+                "status": status_filter or "PENDING"
+            }
+        }
     
     async def fulfill_card_request(
         self,
