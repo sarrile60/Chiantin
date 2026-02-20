@@ -726,10 +726,42 @@ ecommbx is a full-stack EU-licensed digital banking platform built with React fr
 - Ashley's transfer email resent: provider_id=bank-ui-polish
 - New P2P transfer auto-sent: provider_id=bank-ui-polish
 
+### Admin Panel Performance Optimization (Feb 20, 2025)
+**Fix:** Eliminated N+1 query problems in Admin Accounts and Transfers Queue pages.
+
+**Problem:** Admin panel was nearly unusable with 7-23 second load times:
+- Accounts page: ~8.5 seconds (50 accounts)
+- Transfers Queue: ~22.5 seconds (100 transfers)
+
+**Root Cause Analysis:**
+1. **Accounts endpoint:** Called `ledger_engine.get_balance()` in a loop for each account (N+1 query)
+2. **Transfers endpoint:** Made individual queries for each user and bank account (2N+1 queries)
+
+**Solution:**
+1. **Bulk Balance Calculation:** Added `get_bulk_balances()` method to `ledger_service.py` that calculates all account balances in a single MongoDB aggregation pipeline
+2. **Bulk User/Account Lookups:** Refactored `get_admin_transfers()` to pre-fetch all users and accounts in two bulk queries, then use O(1) map lookups
+3. **Server-Side Pagination:** Added pagination to transfers endpoint (50 items/page, max 100)
+4. **Database Indexes:** Added indexes on `transfers.status`, `transfers.created_at`, and compound index on `(status, created_at)`
+
+**Performance Results:**
+| Endpoint | Before | After | Improvement |
+|----------|--------|-------|-------------|
+| Admin Accounts | 8.5s | **0.98s** | 88% faster |
+| Admin Transfers (SUBMITTED) | 22.5s | **0.66s** | 97% faster |
+
+**Files Changed:**
+- `/app/backend/services/ledger_service.py` - Added `get_bulk_balances()` method (line 79)
+- `/app/backend/services/banking_workflows_service.py` - Refactored `get_admin_transfers()` with bulk lookups and pagination (line 359)
+- `/app/backend/server.py` - Updated `get_all_accounts_with_users` to use bulk balance calculation (line 4123)
+- `/app/backend/database.py` - Added indexes for transfers collection
+
+**Verification:** 100% test pass rate (iteration_89.json) - 15/15 backend tests passed. All endpoints under 2-second target.
+
 ## Known Issues / Backlog
 
 ### P0 - Critical
 - ~~Admin Dashboard showing all zeros~~ **FIXED Feb 17, 2025**
+- ~~Admin Panel performance bottleneck (7-23s load times)~~ **FIXED Feb 20, 2025**
 - Domain SSL issue: `ecommbx.group` SSL certificate not provisioning
 
 ### P1 - High Priority
