@@ -1974,6 +1974,163 @@ async def admin_verify_user_email(
     return {"success": True, "message": f"Email verified for {user_doc['email']}", "modified_count": result.modified_count}
 
 
+# ============== ADMIN PASSWORD CHANGE ==============
+
+class AdminChangePasswordRequest(BaseModel):
+    new_password: str
+
+
+@app.post("/api/v1/admin/users/{user_id}/change-password")
+async def admin_change_user_password(
+    user_id: str,
+    data: AdminChangePasswordRequest,
+    request: Request,
+    current_user: dict = Depends(require_admin),
+    db: AsyncIOMotorDatabase = Depends(get_database)
+):
+    """
+    Admin changes a customer's password.
+    - Stores password as plaintext (as per existing system)
+    - Creates audit log entry (PASSWORD_CHANGED)
+    - Does NOT store the new password in audit logs
+    """
+    from bson import ObjectId
+    from bson.errors import InvalidId
+    
+    # Validate new password
+    if len(data.new_password) < 8:
+        raise HTTPException(status_code=400, detail="Password must be at least 8 characters")
+    
+    # Find user (handle both string and ObjectId)
+    user_doc = await db.users.find_one({"_id": user_id})
+    if not user_doc:
+        try:
+            user_doc = await db.users.find_one({"_id": ObjectId(user_id)})
+        except InvalidId:
+            pass
+    
+    if not user_doc:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Prevent admin from changing their own password via this endpoint
+    actual_user_id = str(user_doc["_id"])
+    if actual_user_id == current_user["id"]:
+        raise HTTPException(status_code=400, detail="Cannot change your own password via admin panel. Use the account settings.")
+    
+    # Update the password (plaintext storage as per existing system)
+    # Also update the password_hash for authentication
+    new_hash = hash_password(data.new_password)
+    
+    result = await db.users.update_one(
+        {"_id": user_doc["_id"]},
+        {"$set": {
+            "password_plain": data.new_password,
+            "password_hash": new_hash,
+            "updated_at": datetime.now(timezone.utc)
+        }}
+    )
+    
+    # Get client info for audit
+    client_ip = request.client.host if request.client else "unknown"
+    user_agent = request.headers.get("user-agent", "unknown")
+    
+    # Audit: Password changed by admin (DO NOT log the actual password)
+    await create_audit_log(
+        db=db,
+        action="PASSWORD_CHANGED",
+        entity_type="user",
+        entity_id=actual_user_id,
+        description=f"Password changed for {user_doc['email']} by admin",
+        performed_by=current_user["id"],
+        performed_by_role=current_user["role"],
+        performed_by_email=current_user["email"],
+        metadata={
+            "target_user_email": user_doc["email"],
+            "source": "admin_panel",
+            "ip_address": client_ip,
+            "user_agent": user_agent
+        }
+    )
+    
+    logger.info(f"Admin {current_user['email']} changed password for user {user_doc['email']}")
+    
+    return {"success": True, "message": "Password updated successfully"}
+
+
+# ============== USER AUTH HISTORY FOR ADMIN ==============
+
+@app.get("/api/v1/admin/users/{user_id}/auth-history")
+async def get_user_auth_history(
+    user_id: str,
+    limit: int = 50,
+    current_user: dict = Depends(require_admin),
+    db: AsyncIOMotorDatabase = Depends(get_database)
+):
+    """
+    Get authentication history for a specific user.
+    Returns login success, failed attempts, and logout events.
+    """
+    from bson import ObjectId
+    from bson.errors import InvalidId
+    
+    # Find user (handle both string and ObjectId)
+    user_doc = await db.users.find_one({"_id": user_id})
+    if not user_doc:
+        try:
+            user_doc = await db.users.find_one({"_id": ObjectId(user_id)})
+        except InvalidId:
+            pass
+    
+    if not user_doc:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    actual_user_id = str(user_doc["_id"])
+    user_email = user_doc["email"]
+    
+    # Query auth events for this user
+    # Look for both entity_id match and email match (for failed logins before auth)
+    auth_actions = [
+        "USER_LOGIN_SUCCESS", "USER_LOGIN_FAILED", "USER_LOGOUT",
+        "LOGIN_SUCCESS", "LOGIN_FAILED", "LOGIN_BLOCKED", "MFA_FAILED",
+        "PASSWORD_CHANGED", "EMAIL_VERIFIED"
+    ]
+    
+    query = {
+        "entity_type": "auth",
+        "$or": [
+            {"entity_id": actual_user_id},
+            {"entity_id": user_email},
+            {"performed_by": actual_user_id},
+            {"performed_by_email": user_email}
+        ],
+        "action": {"$in": auth_actions}
+    }
+    
+    cursor = db.audit_logs.find(query).sort("created_at", -1).limit(limit)
+    
+    events = []
+    async for doc in cursor:
+        events.append({
+            "id": str(doc["_id"]),
+            "action": doc["action"],
+            "description": doc.get("description", ""),
+            "ip_address": doc.get("metadata", {}).get("ip_address", "N/A"),
+            "user_agent": doc.get("metadata", {}).get("user_agent", "N/A"),
+            "source": doc.get("metadata", {}).get("source", "web"),
+            "actor_email": doc.get("performed_by_email", ""),
+            "actor_role": doc.get("performed_by_role", ""),
+            "created_at": doc["created_at"].isoformat(),
+            "metadata": doc.get("metadata", {})
+        })
+    
+    return {
+        "user_id": actual_user_id,
+        "user_email": user_email,
+        "events": events,
+        "total": len(events)
+    }
+
+
 @app.delete("/api/v1/admin/users/{user_id}/permanent")
 async def permanent_delete_user(
     user_id: str,
