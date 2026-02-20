@@ -55,9 +55,9 @@ export function AdminTransfersQueue() {
   // Update URL when state changes
   const updateUrlParams = useCallback((updates) => {
     const newParams = new URLSearchParams(searchParams);
-    // Keep the section param
+    // Keep the section param (sidebar uses 'ledger' for Transfers Queue)
     if (!newParams.has('section')) {
-      newParams.set('section', 'transfers');
+      newParams.set('section', 'ledger');
     }
     Object.entries(updates).forEach(([key, value]) => {
       if (value === null || value === undefined || value === '' || (key === 'page' && value === 1) || (key === 'pageSize' && value === 20) || (key === 'tab' && value === 'SUBMITTED')) {
