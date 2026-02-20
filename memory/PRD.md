@@ -857,6 +857,35 @@ ecommbx is a full-stack EU-licensed digital banking platform built with React fr
 
 **Verification:** 100% test pass rate (iteration_92.json) - 18/18 backend tests passed. All expected values verified (87 users, 108 transactions, €35M+ volume).
 
+### Spending Consistency Fix (Feb 20, 2025)
+
+**Problem:** Overview "THIS MONTH" showed €168,580.99 but Spending Insights showed €174,080.99 when clicking "View full breakdown".
+
+**Root Cause:**
+- Overview used calendar month (Feb 1 - now)
+- Spending Insights defaulted to "Last 30 days" (rolling 30-day window)
+- Different calculation logic (monthly excluded rejected transfers, Insights didn't)
+
+**Solution:**
+1. Added `period` parameter to `/api/v1/insights/spending` endpoint
+2. When `period=this_month`, uses exact same calculation as `/api/v1/insights/monthly-spending`
+3. "View full breakdown" now navigates to `/insights?period=this_month`
+4. Spending Insights reads URL param and pre-selects "This Month" in dropdown
+
+**Verification:**
+| Endpoint | Value |
+|----------|-------|
+| Overview "THIS MONTH" | €168,580.99 ✅ |
+| Spending Insights "This Month" | €168,580.99 ✅ |
+| Spending Insights "Last 30 days" | €174,080.99 (correctly different) |
+
+**Files Changed:**
+- `/app/backend/server.py` - Added `period` param to spending endpoint
+- `/app/frontend/src/components/SpendingInsights.js` - Reads URL params, added "This Month" option
+- `/app/frontend/src/components/ProfessionalDashboard.js` - Links to `/insights?period=this_month`
+
+**Verification:** 100% test pass rate (iteration_93.json) - All spending consistency tests passed.
+
 ## Known Issues / Backlog
 
 ### P0 - Critical
