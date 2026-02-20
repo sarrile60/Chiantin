@@ -93,6 +93,44 @@ ecommbx is a full-stack EU-licensed digital banking platform built with React fr
 - Mobile (375px): Line breaks preserved ✓
 - Both client and admin/support messages display correctly
 
+### Instant Transfer Toggle UX Improvement (Feb 20, 2025)
+**Feature:** Improved the Instant Transfer toggle with a professional confirmation popup instead of inline warning panel.
+
+**Previous Behavior:** When toggle was turned ON, it showed an inline warning panel and kept the toggle ON (green).
+
+**New Behavior:**
+1. When user taps the toggle → Shows a centered modal popup
+2. Modal displays the "Instant transfer temporarily unavailable" message with:
+   - Warning icon
+   - Explanation body text
+   - Bullet points about Standard SEPA and irreversibility
+   - Note: "You can continue with Standard SEPA."
+   - Two buttons: "OK" / "Ho capito" and "Cancel" / "Annulla"
+3. After clicking OK → Modal closes, toggle stays OFF
+4. A subtle info line shows below toggle: "Instant transfer is currently unavailable."
+
+**Technical Changes:**
+- Added state `showInstantTransferModal` to control modal visibility
+- Toggle always stays OFF (grey) since feature is unavailable
+- Modal is centered and responsive (buttons stack on mobile)
+- Full dark mode support
+
+**New Translations:**
+- `instantTransferContinueNote`: EN: "You can continue with Standard SEPA." / IT: "Puoi continuare con il bonifico SEPA standard."
+- `instantTransferUnavailableShort`: EN: "Instant transfer is currently unavailable." / IT: "Il bonifico istantaneo non è al momento disponibile."
+- `instantTransferOk`: EN: "OK" / IT: "Ho capito"
+- `instantTransferCancel`: EN: "Cancel" / IT: "Annulla"
+
+**Files Changed:**
+- `/app/frontend/src/components/P2PTransfer.js` - Replaced inline panel with modal
+- `/app/frontend/src/translations.js` - Added new translations for EN and IT
+
+**Verification:** Tested on:
+- Desktop (1920px) light mode ✓
+- Desktop (1920px) dark mode ✓
+- Mobile (375px) ✓
+- Italian language ✓
+
 ### Instant Transfer Toggle Feature (Feb 19, 2025)
 **Feature:** Added Instant Transfer toggle to the Send Money (Transfer via IBAN) form for future instant transfer support.
 
