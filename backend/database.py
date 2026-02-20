@@ -157,6 +157,8 @@ async def create_indexes():
         # Support Tickets
         ("tickets", "user_id", {}),
         ("tickets", "status", {}),
+        ("tickets", "updated_at", {}),
+        ("tickets", "created_at", {}),
         
         # Idempotency
         ("idempotency_keys", "key", {"unique": True, "expireAfterSeconds": 86400}),
@@ -179,6 +181,9 @@ async def create_indexes():
         ("transfers", [('status', 1), ('created_at', -1)], {}),
         # PERFORMANCE: Compound index for card requests admin queries
         ("card_requests", [('status', 1), ('created_at', -1)], {}),
+        # PERFORMANCE: Compound index for ticket queries
+        ("tickets", [('user_id', 1), ('created_at', -1)], {}),
+        ("tickets", [('status', 1), ('updated_at', -1)], {}),
     ]
     
     created = 0
