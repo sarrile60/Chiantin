@@ -384,7 +384,12 @@ async def login(
             description=f"Login blocked for disabled account: {user.email}",
             performed_by=user.id,
             performed_by_email=user.email,
-            metadata={"ip_address": client_ip, "reason": "account_disabled"}
+            metadata={
+                "ip_address": client_ip, 
+                "reason": "account_disabled",
+                "user_agent": request.headers.get("user-agent", "unknown"),
+                "source": "web"
+            }
         )
         raise HTTPException(status_code=403, detail="Account is disabled. Please contact support.")
     
@@ -393,13 +398,18 @@ async def login(
         # Audit: Unverified email login attempt
         await create_audit_log(
             db=db,
-            action="LOGIN_BLOCKED",
+            action="USER_LOGIN_BLOCKED",
             entity_type="auth",
             entity_id=user.id,
             description=f"Login blocked for unverified email: {user.email}",
             performed_by=user.id,
             performed_by_email=user.email,
-            metadata={"ip_address": client_ip, "reason": "email_not_verified"}
+            metadata={
+                "ip_address": client_ip, 
+                "reason": "email_not_verified",
+                "user_agent": request.headers.get("user-agent", "unknown"),
+                "source": "web"
+            }
         )
         raise HTTPException(
             status_code=403, 
@@ -415,13 +425,17 @@ async def login(
             # Audit: Failed MFA
             await create_audit_log(
                 db=db,
-                action="MFA_FAILED",
+                action="USER_MFA_FAILED",
                 entity_type="auth",
                 entity_id=user.id,
                 description=f"Failed MFA verification for {user.email}",
                 performed_by=user.id,
                 performed_by_email=user.email,
-                metadata={"ip_address": client_ip}
+                metadata={
+                    "ip_address": client_ip,
+                    "user_agent": request.headers.get("user-agent", "unknown"),
+                    "source": "web"
+                }
             )
             raise HTTPException(status_code=401, detail="Invalid MFA token")
     
