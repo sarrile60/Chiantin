@@ -8,6 +8,10 @@ import { getStatusBadgeClasses } from '../utils/transactions';
 
 export function AdminTransfersQueue() {
   const toast = useToast();
+  // Use ref to keep toast stable and prevent fetchTransfers from being recreated
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+  
   const [searchParams, setSearchParams] = useSearchParams();
   
   // Initialize state from URL params
