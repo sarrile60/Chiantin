@@ -820,18 +820,6 @@ async def verify_user_password(
     return {"success": True, "message": "Password verified successfully"}
 
 
-# Password Reset Request Schema
-class ForgotPasswordRequest(BaseModel):
-    email: str
-    language: Optional[str] = "en"
-
-
-# Password Reset Schema
-class ResetPasswordRequest(BaseModel):
-    token: str
-    new_password: str
-
-
 @app.post("/api/v1/auth/forgot-password")
 async def forgot_password(
     data: ForgotPasswordRequest,
