@@ -51,7 +51,7 @@ from schemas.banking_workflows import (
     CreateCardRequest, FulfillCardRequest, CreateRecipient, CreateTransfer
 )
 from providers import LocalS3Storage, CloudinaryStorage
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from core.ledger import EntryDirection
 from core.auth import hash_password, verify_password
 from bson import ObjectId
