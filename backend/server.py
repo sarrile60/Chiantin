@@ -2223,7 +2223,6 @@ async def get_user_auth_history(
             "created_at": format_timestamp_utc(doc["created_at"]),
             "metadata": doc.get("metadata", {})
         })
-        })
     
     return {
         "user_id": actual_user_id,
