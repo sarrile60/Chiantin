@@ -4803,7 +4803,19 @@ async def admin_delete_transfer(
     current_user: dict = Depends(require_admin),
     db: AsyncIOMotorDatabase = Depends(get_database)
 ):
-    """Admin permanently deletes a transfer (any status)."""
+    """Admin soft-deletes a transfer (any status).
+    
+    SOFT DELETE: Transfer record is NOT physically removed from the database.
+    Instead, it is marked as deleted with metadata for auditability:
+    - is_deleted: True
+    - deleted_at: UTC timestamp
+    - deleted_by: Admin user ID
+    - deleted_by_email: Admin email
+    - previous_status: Status before deletion (for audit trail)
+    
+    The transfer will be excluded from normal queries but can be found with
+    explicit include_deleted=true flag if needed for investigation.
+    """
     from bson import ObjectId
     from bson.errors import InvalidId
     
@@ -4822,36 +4834,56 @@ async def admin_delete_transfer(
     if not transfer:
         raise HTTPException(status_code=404, detail="Transfer not found")
     
+    # Check if already soft-deleted (idempotent behavior)
+    if transfer.get("is_deleted", False):
+        return {
+            "ok": True, 
+            "message": "Transfer already deleted",
+            "already_deleted": True
+        }
+    
     transfer_status = transfer.get("status", "UNKNOWN")
     transfer_amount = transfer.get("amount", 0)
     beneficiary = transfer.get("beneficiary_name", "Unknown")
     
-    # Delete the transfer
-    result = await db.transfers.delete_one({"_id": transfer["_id"]})
+    # SOFT DELETE: Update transfer with deletion metadata instead of removing
+    soft_delete_result = await db.transfers.update_one(
+        {"_id": transfer["_id"]},
+        {
+            "$set": {
+                "is_deleted": True,
+                "deleted_at": datetime.now(timezone.utc),
+                "deleted_by": current_user["id"],
+                "deleted_by_email": current_user["email"],
+                "previous_status": transfer_status  # Preserve status for audit trail
+            }
+        }
+    )
     
-    if result.deleted_count == 0:
+    if soft_delete_result.modified_count == 0:
         raise HTTPException(status_code=500, detail="Failed to delete transfer")
     
-    # Audit log
+    # Audit log - updated to reflect soft delete
     await create_audit_log(
         db=db,
-        action="TRANSFER_PERMANENTLY_DELETED",
+        action="TRANSFER_SOFT_DELETED",
         entity_type="transfer",
         entity_id=str(transfer["_id"]),
-        description=f"Transfer to {beneficiary} (€{transfer_amount/100:.2f}) permanently deleted",
+        description=f"Transfer to {beneficiary} (€{transfer_amount/100:.2f}) soft-deleted. Previous status: {transfer_status}",
         performed_by=current_user["id"],
         performed_by_role=current_user["role"],
         performed_by_email=current_user["email"],
         metadata={
-            "status": transfer_status,
+            "previous_status": transfer_status,
             "amount": transfer_amount,
-            "beneficiary": beneficiary
+            "beneficiary": beneficiary,
+            "soft_delete": True
         }
     )
     
-    logger.info(f"Transfer {transfer_id} permanently deleted by admin {current_user['email']}")
+    logger.info(f"Transfer {transfer_id} soft-deleted by admin {current_user['email']} (previous status: {transfer_status})")
     
-    return {"ok": True, "message": "Transfer permanently deleted"}
+    return {"ok": True, "message": "Transfer deleted successfully"}
 
 
 @app.post("/api/v1/admin/transfers/{transfer_id}/resend-email")
