@@ -124,6 +124,17 @@ export function AdminTransfersQueue() {
     }
   }, [debouncedSearch, activeTab, pageSize]);
 
+  // Delayed skeleton - only show after 150ms to prevent flash on fast loads
+  useEffect(() => {
+    let timer;
+    if (loading) {
+      timer = setTimeout(() => setShowSkeleton(true), 150);
+    } else {
+      setShowSkeleton(false);
+    }
+    return () => clearTimeout(timer);
+  }, [loading]);
+
   const fetchTransfers = useCallback(async () => {
     setLoading(true);
     try {
@@ -152,6 +163,7 @@ export function AdminTransfersQueue() {
       setTransfers([]);
     } finally {
       setLoading(false);
+      isInitialMount.current = false;
     }
   }, [activeTab, debouncedSearch, currentPage, pageSize]);
 
