@@ -30,6 +30,7 @@ import { AdminAccountsControl } from './components/AdminAccountsControl';
 import { AdminNotificationBell } from './components/AdminNotificationBell';
 import { LandingPage } from './components/LandingPage';
 import { AdminUsersTable, StatusBadge, KycBadge, CopyPhoneButton, CopyEmailButton } from './components/AdminUsersSection';
+import AdminUserDetails from './components/AdminUserDetails';
 import { useLanguage, useTheme } from './contexts/AppContext';
 import { useBalanceVisibility, formatBalance } from './hooks/useBalanceVisibility';
 import BalanceToggle from './components/BalanceToggle';
