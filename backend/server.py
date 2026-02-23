@@ -3850,11 +3850,14 @@ async def get_admin_notification_counts(
         })
     
     async def get_transfers_new():
-        """Count transfers submitted since last seen, with status SUBMITTED."""
+        """Count transfers submitted since last seen, with status SUBMITTED.
+        SOFT DELETE: Excludes soft-deleted transfers.
+        """
         last_seen = last_seen_map.get('transfers', default_last_seen)
         return await db.transfers.count_documents({
             "status": "SUBMITTED",
-            "created_at": {"$gt": last_seen}
+            "created_at": {"$gt": last_seen},
+            "$or": [{"is_deleted": {"$exists": False}}, {"is_deleted": False}]
         })
     
     async def get_tickets_new():
