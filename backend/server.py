@@ -1730,12 +1730,6 @@ async def get_all_users(
     # Get total count for pagination info
     total_count = await db.users.count_documents(query)
     
-    # Get all active tax holds for quick lookup
-    tax_holds_cursor = db.tax_holds.find({"is_active": True})
-    tax_hold_user_ids = set()
-    async for hold in tax_holds_cursor:
-        tax_hold_user_ids.add(hold["user_id"])
-    
     # When searching, return ALL matching users (no pagination)
     # This ensures the admin can find any user regardless of page
     if search and search.strip():
@@ -1745,8 +1739,22 @@ async def get_all_users(
         skip = (page - 1) * limit
         cursor = db.users.find(query).sort("created_at", -1).skip(skip).limit(limit)
     
+    # Collect user docs first
+    user_docs = await cursor.to_list(length=limit if not (search and search.strip()) else 1000)
+    
+    # PERFORMANCE: Only lookup tax holds for users on THIS page (not all users)
+    user_ids = [str(doc["_id"]) for doc in user_docs]
+    tax_hold_user_ids = set()
+    if user_ids:
+        tax_holds_cursor = db.tax_holds.find({
+            "user_id": {"$in": user_ids},
+            "is_active": True
+        }, {"user_id": 1})
+        async for hold in tax_holds_cursor:
+            tax_hold_user_ids.add(hold["user_id"])
+    
     users = []
-    async for doc in cursor:
+    for doc in user_docs:
         user_id = str(doc["_id"])
         users.append({
             "id": user_id,
