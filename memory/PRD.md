@@ -1567,6 +1567,65 @@ const SECTION_LABELS = {
 - ~~Audit Logs timestamps 1 hour behind (timezone issue)~~ **FIXED Feb 23, 2025**
 - Domain SSL issue: `ecommbx.group` SSL certificate not provisioning
 
+### Copy Phone Button in Admin Panel (Feb 23, 2025)
+**Feature:** Added "Copy phone" button next to phone numbers in admin Users UI.
+
+**Problem:** Admins had to manually select and copy phone numbers when calling clients.
+
+**Solution:** Created reusable `CopyPhoneButton` component with clipboard and toast integration.
+
+**Component (App.js:47-87):**
+```jsx
+<CopyPhoneButton phone={phone} toast={toast} size="sm|md" />
+```
+- Returns `null` if no phone (button hidden)
+- Uses `navigator.clipboard.writeText()` for copy
+- `e.stopPropagation()` prevents row click in table
+- Toast success/error feedback
+- Green checkmark icon after successful copy
+- Two sizes: `sm` (table), `md` (details)
+
+**Integration Points:**
+1. Users table phone cell (lines 1893-1905)
+2. User Details phone field (lines 2648-2660)
+
+**Behavior:**
+- Users WITH phone: Shows phone number + copy button
+- Users WITHOUT phone: Shows "—" (table) or "Not provided" (details), NO button
+
+**Testing:** All passed (iteration_118.json) - 14/14 features verified
+
+### Phone DB Index - Already Exists (Feb 23, 2025)
+**Status:** ✅ No action needed - index already exists at `database.py` line 127:
+```python
+("users", "phone", {}),
+```
+
+### App.js Refactor - Analysis Complete (Feb 23, 2025)
+**Status:** Documented for future staged refactoring
+
+**Current State:**
+- App.js: 3,937 lines total
+- AdminDashboard: ~1,614 lines (lines 1939-3553)
+- Already extracted: AdminLayout, AdminKYC, AdminTransfersQueue, AdminCardRequestsQueue, AdminSettings, AuditLogs
+
+**Remaining to Extract (Future):**
+1. AdminUsersSection (largest, ~600 lines)
+2. AdminSupportSection (~200 lines)
+3. AdminOverviewSection (~150 lines)
+
+**Staged Refactor Plan (P3, Future):**
+- Stage 1: Extract shared hooks (useAdminUsers, useUserDetails)
+- Stage 2: Extract AdminUsersSection with state
+- Stage 3: Extract remaining sections
+- Stage 4: Simplify AdminDashboard to routing only
+
+**Risk Notes:**
+- High coupling with shared state
+- Performance optimizations embedded
+- Must preserve: navigation, loading states, caching
+- Test thoroughly after each extraction
+
 ### Users Search by Phone Number (Feb 23, 2025)
 **Feature:** Enable admin Users search bar to search by phone number in addition to name/email.
 
