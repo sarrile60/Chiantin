@@ -1342,6 +1342,70 @@ Unique index: (admin_id, section_key)
 - Tab switching: PASSED (SUBMITTED/COMPLETED/REJECTED switching stable)
 - Close panel: PASSED (no reload when closing detail panel)
 
+### Admin Panel Navigation Performance Optimization (Feb 23, 2025)
+
+**Problem:** Admin sidebar navigation took 2-3 seconds per section click. Target: <=1 second.
+
+**Root Causes Found:**
+1. `handleSectionChange` in `AdminLayout.js` was async and WAITED for badge API call before changing section
+2. `fetchUsers` in `AdminDashboard` ran on component mount regardless of active section
+3. `toast` object from `useToast()` wasn't memoized, causing useCallback recreation cascades
+
+**Optimizations Implemented:**
+
+1. **Instant Sidebar Feedback (AdminLayout.js)**
+   ```javascript
+   // BEFORE: Section change waited for API call
+   const handleSectionChange = useCallback(async (sectionId) => {
+     await markSectionSeen(sectionId); // BLOCKED HERE
+     onSectionChange(sectionId);
+   }, [...]);
+   
+   // AFTER: Section change is instant, badge API is fire-and-forget
+   const handleSectionChange = useCallback((sectionId) => {
+     onSectionChange(sectionId); // INSTANT
+     markSectionSeen(sectionId).catch(() => {}); // Background
+   }, [...]);
+   ```
+
+2. **Lazy User Data Loading (App.js line 1925)**
+   ```javascript
+   // BEFORE: fetchUsers ran on every AdminDashboard mount
+   useEffect(() => {
+     fetchUsers(0, 1, usersPerPage, '');
+   }, []);
+   
+   // AFTER: fetchUsers only when users section is active
+   useEffect(() => {
+     if (activeSection === 'users' && users.length === 0 && !loading) {
+       fetchUsers(0, 1, usersPerPage, '');
+     }
+   }, [activeSection]);
+   ```
+
+3. **Toast Memoization (Toast.js)**
+   - Added `useMemo` to keep toast object reference stable
+   - Prevents downstream useCallback recreation
+
+4. **toastRef Pattern (AdminKYC.js, AdminTransfersQueue.js, AdminCardRequestsQueue.js)**
+   - Used `useRef` to keep toast reference stable in useCallback dependencies
+
+**Performance Results (iteration_107.json):**
+| Section | Load Time (ms) | Target | Status |
+|---------|---------------|--------|--------|
+| Overview | 69 | <1000 | ✅ PASS |
+| Users | 102 | <1000 | ✅ PASS |
+| KYC Queue | 94 | <1000 | ✅ PASS |
+| Accounts | 89 | <1000 | ✅ PASS |
+| Card Requests | 101 | <1000 | ✅ PASS |
+| Transfers Queue | 98 | <1000 | ✅ PASS |
+| Support Tickets | 89 | <1000 | ✅ PASS |
+| Audit Logs | 93 | <1000 | ✅ PASS |
+
+**Rapid-Fire Test:** 6 section switches in 738ms, no errors.
+**F5 Refresh:** URL state preserved correctly.
+**Stability:** No random reloads detected after 10 second observation.
+
 ### Admin Pagination Layout Refinement (Feb 20, 2025)
 
 **Change:** Moved pagination row ABOVE the tabs row for both Admin Transfers Queue and Admin Card Requests pages.
