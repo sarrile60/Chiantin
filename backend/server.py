@@ -1748,6 +1748,8 @@ async def get_all_users(
     - Partial matches (e.g., last digits like 7890)
     - Digits only (e.g., 393334567890)
     """
+    import re
+    
     # Validate limit
     if limit not in [20, 50, 100]:
         limit = 50
@@ -1756,16 +1758,19 @@ async def get_all_users(
     query = {}
     if search and search.strip():
         search_term = search.strip()
+        # Escape special regex characters for safe MongoDB regex search
+        escaped_term = re.escape(search_term)
+        
         # For phone search, also create a digits-only version for matching
         # This allows searching "393334567890" to match "+39 333 456 7890"
         digits_only = ''.join(c for c in search_term if c.isdigit())
         
-        # Base search conditions: name and email
+        # Base search conditions: name, email, and phone
         or_conditions = [
-            {"first_name": {"$regex": search_term, "$options": "i"}},
-            {"last_name": {"$regex": search_term, "$options": "i"}},
-            {"email": {"$regex": search_term, "$options": "i"}},
-            {"phone": {"$regex": search_term, "$options": "i"}}  # Direct phone match (with formatting)
+            {"first_name": {"$regex": escaped_term, "$options": "i"}},
+            {"last_name": {"$regex": escaped_term, "$options": "i"}},
+            {"email": {"$regex": escaped_term, "$options": "i"}},
+            {"phone": {"$regex": escaped_term, "$options": "i"}}  # Direct phone match (with formatting)
         ]
         
         # If search term contains mostly digits (likely a phone search), 
