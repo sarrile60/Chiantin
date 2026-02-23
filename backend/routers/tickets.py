@@ -27,12 +27,8 @@ from .dependencies import get_current_user, require_admin, create_audit_log
 # Storage provider dependency (imported from server.py pattern)
 def get_storage():
     """Get the configured storage provider."""
-    from config import settings
-    if settings.STORAGE_PROVIDER == "cloudinary":
-        return CloudinaryStorage()
-    else:
-        from providers import LocalS3Storage
-        return LocalS3Storage()
+    # Always use Cloudinary for this application
+    return CloudinaryStorage()
 
 
 # Router definitions
