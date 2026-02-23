@@ -3031,6 +3031,9 @@ async def admin_reset_password(
         "success": True,
         "temp_password": temp_password,
         "message": f"Password reset. Temp password: {temp_password} (also sent to {user_doc['email']})"
+    }
+
+
 # ==================== ADMIN ANALYTICS ====================
 
 @app.get("/api/v1/admin/analytics/overview")
