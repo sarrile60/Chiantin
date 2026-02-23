@@ -1776,6 +1776,7 @@ async def get_all_users(
             "email": doc["email"],
             "first_name": doc["first_name"],
             "last_name": doc["last_name"],
+            "phone": doc.get("phone"),  # Phone number (may be None for older users)
             "role": doc["role"],
             "status": doc["status"],
             "created_at": format_timestamp_utc(doc["created_at"]),
@@ -1903,6 +1904,7 @@ async def get_user_details(
             "email": user_doc["email"],
             "first_name": user_doc["first_name"],
             "last_name": user_doc["last_name"],
+            "phone": user_doc.get("phone"),  # Phone number (may be None for older users)
             "role": user_doc["role"],
             "status": user_doc["status"],
             "email_verified": user_doc.get("email_verified", False),
