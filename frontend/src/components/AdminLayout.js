@@ -204,12 +204,14 @@ export function AdminSidebar({ activeSection, onSectionChange, user, logout }) {
   
   const { getBadgeCount, markSectionSeen, refresh, isInitialized } = useBadgeManager(apiUrl, token);
   
-  // Handle section change - mark as seen via API and change section
-  const handleSectionChange = useCallback(async (sectionId) => {
-    // Mark section as seen (API call to database)
-    await markSectionSeen(sectionId);
-    // Change the active section
+  // Handle section change - change section IMMEDIATELY, mark as seen in background
+  const handleSectionChange = useCallback((sectionId) => {
+    // Change the active section FIRST (instant response)
     onSectionChange(sectionId);
+    // Mark section as seen in background (fire-and-forget, don't block UI)
+    markSectionSeen(sectionId).catch(() => {
+      // Silently ignore badge update failures - non-critical
+    });
   }, [markSectionSeen, onSectionChange]);
   
   // Sections that should show badges
