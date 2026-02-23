@@ -2689,7 +2689,13 @@ function AdminDashboard() {
                   </div>
                   <dl className="grid grid-cols-2 gap-4">
                     <div><dt className="text-sm text-gray-700 font-medium">Name</dt><dd className="font-semibold mt-1">{selectedUser.user.first_name} {selectedUser.user.last_name}</dd></div>
-                    <div><dt className="text-sm text-gray-700 font-medium">Email</dt><dd className="font-semibold mt-1">{selectedUser.user.email}</dd></div>
+                    <div>
+                      <dt className="text-sm text-gray-700 font-medium">Email</dt>
+                      <dd className="font-semibold mt-1 flex items-center gap-1" data-testid="user-detail-email">
+                        <span>{selectedUser.user.email}</span>
+                        <CopyEmailButton email={selectedUser.user.email} toast={toast} size="md" />
+                      </dd>
+                    </div>
                     <div>
                       <dt className="text-sm text-gray-700 font-medium">Phone</dt>
                       <dd className="font-semibold mt-1 flex items-center gap-1" data-testid="user-detail-phone">
