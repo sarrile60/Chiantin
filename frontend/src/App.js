@@ -1852,7 +1852,7 @@ function CustomerDashboard() {
 }
 
 // Admin Users Table Component
-function AdminUsersTable({ users, loading, onSelectUser, selectedUser }) {
+function AdminUsersTable({ users, loading, onSelectUser, selectedUser, toast }) {
   if (loading) {
     return <div className="card p-8 text-center">Loading users...</div>;
   }
