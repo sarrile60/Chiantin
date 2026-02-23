@@ -91,7 +91,7 @@ async def user_mark_ticket_read(
     if ticket_doc["user_id"] != current_user["id"]:
         raise HTTPException(status_code=403, detail="Access denied")
     
-    result = await db.tickets.update_one(
+    await db.tickets.update_one(
         {"_id": ticket_id},
         {"$set": {"user_last_read_at": datetime.now(timezone.utc)}}
     )
