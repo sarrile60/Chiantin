@@ -1480,6 +1480,56 @@ const SECTION_LABELS = {
 - F5 refresh preserves correct header
 - Navigation remains fast (82ms avg)
 
+### Visual Flicker Fix - Delayed Skeleton Loading (Feb 23, 2025)
+
+**Bug:** Visual glitch/flicker when switching between admin sidebar sections - content briefly flashed/disappeared.
+
+**Root Causes:**
+1. Skeleton loading state shown immediately on component mount, causing brief flash
+2. URL sync useEffect running redundantly after programmatic navigation
+3. Content area had no stable layout wrapper
+
+**Fixes Applied:**
+
+1. **Delayed Skeleton Pattern (AdminTransfersQueue.js, AdminCardRequestsQueue.js):**
+   ```javascript
+   const [showSkeleton, setShowSkeleton] = useState(false);
+   
+   useEffect(() => {
+     let timer;
+     if (loading) {
+       timer = setTimeout(() => setShowSkeleton(true), 150);
+     } else {
+       setShowSkeleton(false);
+     }
+     return () => clearTimeout(timer);
+   }, [loading]);
+   
+   // Render skeleton only if showSkeleton is true (after 150ms delay)
+   {showSkeleton ? <Skeleton /> : <Content />}
+   ```
+   This prevents skeleton flash on fast network responses (< 150ms).
+
+2. **Optimized URL Sync (App.js):**
+   - URL sync useEffect only runs for browser back/forward navigation
+   - Excludes `activeSection` from deps to prevent loop
+
+3. **Stable Content Wrapper (App.css):**
+   ```css
+   .admin-section-content {
+     min-height: calc(100vh - 140px);
+     position: relative;
+   }
+   ```
+   Prevents layout shift during section switches.
+
+**Verification:** Testing agent verified (iteration_111.json) - 100% pass:
+- Users to Accounts switch: PASS - No flicker
+- Support to Transfers switch: PASS - No flicker
+- Rapid switching (10 times): PASS - 1.22s for 10 switches
+- F5 refresh: PASS - URL state preserved
+- All header labels: PASS - Correct for all 8 sections
+
 ### Admin Pagination Layout Refinement (Feb 20, 2025)
 
 **Change:** Moved pagination row ABOVE the tabs row for both Admin Transfers Queue and Admin Card Requests pages.
