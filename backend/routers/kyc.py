@@ -354,7 +354,7 @@ async def review_kyc(
                 message="Your KYC verification has been approved. You can now use all banking features.",
                 action_url="/dashboard"
             )
-    elif data.status == ApplicationStatus.REJECTED:
+    elif data.status == KYCStatus.REJECTED:
         # Create notification for rejected KYC
         if user_id:
             notification_service = NotificationService(db)
