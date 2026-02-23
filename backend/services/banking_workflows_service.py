@@ -422,6 +422,7 @@ class BankingWorkflowsService:
         
         PERFORMANCE OPTIMIZED: Uses bulk lookups instead of N+1 queries.
         Added pagination and search support for better performance with large datasets.
+        SOFT DELETE: Excludes soft-deleted transfers by default.
         
         Args:
             status: Optional status filter (e.g., 'SUBMITTED', 'COMPLETED', 'REJECTED')
@@ -444,7 +445,8 @@ class BankingWorkflowsService:
         if search and search.strip():
             return await self._search_transfers(search.strip(), page, limit)
         
-        query = {}
+        # Build query - ALWAYS exclude soft-deleted transfers
+        query = {"$or": [{"is_deleted": {"$exists": False}}, {"is_deleted": False}]}
         if status:
             query["status"] = status
         
