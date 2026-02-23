@@ -1,0 +1,84 @@
+{
+  "summary": "Soft Delete Transfers Feature Testing Complete - All 17 backend tests passed. P1 Critical feature verified: transfers are now soft-deleted (marked is_deleted=true) instead of hard-deleted.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_soft_delete_transfers.py",
+    "/app/test_reports/pytest/soft_delete_transfers_results.xml"
+  ],
+  "features_tested": {
+    "soft_delete_core": [
+      {"feature": "SUPER_ADMIN can soft-delete transfers via DELETE endpoint", "status": "PASS"},
+      {"feature": "Transfer record remains in database with is_deleted=true", "status": "PASS"},
+      {"feature": "Soft-deleted transfer disappears from Transfers Queue list", "status": "PASS"},
+      {"feature": "Audit log shows TRANSFER_SOFT_DELETED action", "status": "PASS"},
+      {"feature": "Repeat delete on same transfer is idempotent (returns already_deleted=true)", "status": "PASS"}
+    ],
+    "soft_delete_filtering": [
+      {"feature": "Transfer search excludes soft-deleted transfers", "status": "PASS"},
+      {"feature": "Notification counts exclude soft-deleted transfers", "status": "PASS"}
+    ],
+    "authorization": [
+      {"feature": "Non-SUPER_ADMIN returns 403 Forbidden when trying to delete", "status": "PASS"},
+      {"feature": "Delete non-existent transfer returns 404", "status": "PASS"}
+    ],
+    "regression": [
+      {"feature": "Transfers Queue SUBMITTED tab loads correctly", "status": "PASS"},
+      {"feature": "Transfers Queue COMPLETED tab loads correctly", "status": "PASS"},
+      {"feature": "Transfers Queue REJECTED tab loads correctly", "status": "PASS"},
+      {"feature": "Transfer pagination works correctly", "status": "PASS"},
+      {"feature": "Transfer search by beneficiary/email/IBAN works", "status": "PASS"}
+    ]
+  },
+  "implementation_verified": {
+    "backend_changes": [
+      "DELETE /api/v1/admin/transfers/{transfer_id} - Changed from delete_one() to update_one() with soft-delete fields",
+      "Soft-delete fields: is_deleted=true, deleted_at, deleted_by, deleted_by_email, previous_status",
+      "Audit log action changed from TRANSFER_PERMANENTLY_DELETED to TRANSFER_SOFT_DELETED",
+      "get_admin_transfers() now excludes is_deleted=true",
+      "_search_transfers() now excludes is_deleted=true",
+      "notification-counts now excludes is_deleted=true"
+    ],
+    "database_changes": [
+      "Added index for is_deleted field in transfers collection",
+      "Added compound index for (is_deleted, status, created_at)"
+    ]
+  },
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Soft delete implementation is correct - uses update_one with $set instead of delete_one",
+    "Idempotent behavior implemented correctly - repeat deletes return already_deleted=true",
+    "All transfer query endpoints properly exclude soft-deleted records with the filter: {$or: [{is_deleted: {$exists: false}}, {is_deleted: false}]}",
+    "Audit trail captures previous_status field for audit recovery if needed"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_soft_delete_transfers.py"
+  ],
+  "success_rate": {
+    "backend": "100% (17/17 tests passed)",
+    "frontend": "Verified via screenshots - Admin dashboard and sidebar navigation working"
+  },
+  "test_credentials": {
+    "super_admin_email": "admin@ecommbx.io",
+    "super_admin_password": "Admin@123456",
+    "regular_admin_email": "ashleyalt005@gmail.com",
+    "regular_admin_password": "123456789"
+  },
+  "seed_data_creation": "Used existing test transfers from test user ashleyalt005@gmail.com for soft delete testing",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Soft delete for transfers is now implemented and working. All 17 tests pass. The TRANSFER_SOFT_DELETED audit log entry is created when a transfer is soft-deleted. One test transfer was soft-deleted during testing: b7579d79-a63a-4853-98ec-d8f48b89ccf0 (Badge Test Recipient). The transfer list queries now properly exclude soft-deleted records.",
+  "audit_log_sample": {
+    "action": "TRANSFER_SOFT_DELETED",
+    "entity_id": "b7579d79-a63a-4853-98ec-d8f48b89ccf0",
+    "description": "Transfer to Badge Test Recipient (€1.00) soft-deleted. Previous status: SUBMITTED",
+    "performed_by_email": "admin@ecommbx.io"
+  }
+}
