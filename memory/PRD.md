@@ -1567,8 +1567,40 @@ const SECTION_LABELS = {
 - ~~Audit Logs timestamps 1 hour behind (timezone issue)~~ **FIXED Feb 23, 2025**
 - Domain SSL issue: `ecommbx.group` SSL certificate not provisioning
 
+### Admin User Phone Number Display (Feb 23, 2025)
+**Feature:** Display client phone numbers in Admin panel (Users section).
+
+**Problem:** Phone numbers captured during user registration were stored in the database but not visible to admins in the Admin panel.
+
+**Solution:** Added phone field to both admin API endpoints and frontend views:
+
+**Backend Changes:**
+1. `/api/v1/admin/users` - Added `phone` field to user list response (returns `null` for users without phone)
+2. `/api/v1/admin/users/{user_id}` - Added `phone` field to user detail response
+
+**Frontend Changes:**
+1. **AdminUsersTable** (`App.js:1651-1717`) - Added "Phone" column between Email and Role columns
+   - Users with phone: Shows phone number (e.g., `+393276106073`)
+   - Users without phone: Shows dash (`—`) placeholder
+   - Added `data-testid="user-phone-{id}"` for testing
+   
+2. **User Detail View** (`App.js:2410-2425`) - Added "Phone" field in details grid
+   - Users with phone: Shows phone number
+   - Users without phone: Shows "Not provided" in italic gray text
+   - Added `data-testid="user-detail-phone"` for testing
+
+**Files Changed:**
+- `/app/backend/server.py` - Lines 1771-1785, 1901-1917
+- `/app/frontend/src/App.js` - Lines 1651-1717, 2410-2425
+
+**Testing:** All tests passed (iteration_114.json):
+- Backend: 9/9 tests passed (100%)
+- Frontend: All UI tests passed (100%)
+- Test file: `/app/backend/tests/test_admin_user_phone.py`
+
 ### P1 - High Priority
 - ~~**Dangerous transfer deletion endpoint without ledger reversal**~~ **FIXED Feb 23, 2025** - Refactored from hard delete to soft delete. Transfers are now marked with `is_deleted=true` instead of being physically removed.
+- **Transfer Restore Feature** - Ability to restore soft-deleted transfers. Would require new endpoint `POST /api/v1/admin/transfers/{id}/restore` and UI for viewing/restoring deleted transfers.
 
 ### P2 - Medium Priority
 - Refactor `server.py` into smaller routers (admin.py, transfers.py, tickets.py)
