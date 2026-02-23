@@ -1568,7 +1568,7 @@ const SECTION_LABELS = {
 - Domain SSL issue: `ecommbx.group` SSL certificate not provisioning
 
 ### P1 - High Priority
-- **Dangerous transfer deletion endpoint without ledger reversal** - `DELETE /api/v1/admin/transfers/{transfer_id}` performs hard delete which risks data integrity. Should be refactored to soft delete or reversing ledger entry.
+- ~~**Dangerous transfer deletion endpoint without ledger reversal**~~ **FIXED Feb 23, 2025** - Refactored from hard delete to soft delete. Transfers are now marked with `is_deleted=true` instead of being physically removed.
 
 ### P2 - Medium Priority
 - Refactor `server.py` into smaller routers (admin.py, transfers.py, tickets.py)
