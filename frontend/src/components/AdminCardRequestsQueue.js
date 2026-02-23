@@ -49,6 +49,9 @@ export function AdminCardRequestsQueue() {
   const [searchScope, setSearchScopeInternal] = useState(getInitialScope);
   const [debouncedSearch, setDebouncedSearch] = useState(getInitialSearch);
   
+  // Track previous search to prevent unnecessary URL updates
+  const prevSearchRef = useRef(getInitialSearch());
+  
   // Delete modal state
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [requestToDelete, setRequestToDelete] = useState(null);
