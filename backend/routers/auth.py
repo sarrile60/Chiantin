@@ -554,4 +554,157 @@ async def signup(
         raise HTTPException(status_code=500, detail=f"Registration failed: {str(e)} | DB: {db.name if db else 'None'}")
 
 
-# NOTE: More endpoints will be moved here incrementally in subsequent phases
+# ==================== Login (HIGHEST RISK - Extracted LAST) ====================
+
+@router.post("/login", response_model=TokenResponse)
+async def login(
+    credentials: UserLogin,
+    response: Response,
+    request: Request,
+    db: AsyncIOMotorDatabase = Depends(get_database)
+):
+    """Login with email and password."""
+    auth_service = AuthService(db)
+    client_ip = request.client.host if request.client else "unknown"
+    
+    # Authenticate
+    user = await auth_service.authenticate_user(
+        credentials.email,
+        credentials.password
+    )
+    if not user:
+        # Audit: Failed login attempt
+        await create_audit_log(
+            db=db,
+            action="USER_LOGIN_FAILED",
+            entity_type="auth",
+            entity_id=credentials.email,
+            description=f"Failed login attempt for {credentials.email}",
+            metadata={
+                "ip_address": client_ip, 
+                "reason": "invalid_credentials",
+                "user_agent": request.headers.get("user-agent", "unknown"),
+                "source": "web"
+            }
+        )
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    
+    # Check if user is disabled
+    if user.status == "DISABLED":
+        # Audit: Disabled account login attempt
+        await create_audit_log(
+            db=db,
+            action="USER_LOGIN_BLOCKED",
+            entity_type="auth",
+            entity_id=user.id,
+            description=f"Login blocked for disabled account: {user.email}",
+            performed_by=user.id,
+            performed_by_email=user.email,
+            metadata={
+                "ip_address": client_ip, 
+                "reason": "account_disabled",
+                "user_agent": request.headers.get("user-agent", "unknown"),
+                "source": "web"
+            }
+        )
+        raise HTTPException(status_code=403, detail="Account is disabled. Please contact support.")
+    
+    # Check if email is verified
+    if not user.email_verified:
+        # Audit: Unverified email login attempt
+        await create_audit_log(
+            db=db,
+            action="USER_LOGIN_BLOCKED",
+            entity_type="auth",
+            entity_id=user.id,
+            description=f"Login blocked for unverified email: {user.email}",
+            performed_by=user.id,
+            performed_by_email=user.email,
+            metadata={
+                "ip_address": client_ip, 
+                "reason": "email_not_verified",
+                "user_agent": request.headers.get("user-agent", "unknown"),
+                "source": "web"
+            }
+        )
+        raise HTTPException(
+            status_code=403, 
+            detail="EMAIL_NOT_VERIFIED"
+        )
+    
+    # Check MFA
+    if user.mfa_enabled:
+        if not credentials.totp_token:
+            raise HTTPException(status_code=401, detail="MFA token required")
+        
+        if not await auth_service.verify_totp(user, credentials.totp_token):
+            # Audit: Failed MFA
+            await create_audit_log(
+                db=db,
+                action="USER_MFA_FAILED",
+                entity_type="auth",
+                entity_id=user.id,
+                description=f"Failed MFA verification for {user.email}",
+                performed_by=user.id,
+                performed_by_email=user.email,
+                metadata={
+                    "ip_address": client_ip,
+                    "user_agent": request.headers.get("user-agent", "unknown"),
+                    "source": "web"
+                }
+            )
+            raise HTTPException(status_code=401, detail="Invalid MFA token")
+    
+    # Create session
+    access_token, refresh_token = await auth_service.create_session(
+        user,
+        ip_address=request.client.host if request.client else None,
+        user_agent=request.headers.get("user-agent")
+    )
+    
+    # Determine login action type based on user role
+    login_action = "ADMIN_LOGIN_SUCCESS" if user.role in ["ADMIN", "SUPER_ADMIN"] else "USER_LOGIN_SUCCESS"
+    
+    # Audit: Successful login (differentiate CUSTOMER vs ADMIN)
+    await create_audit_log(
+        db=db,
+        action=login_action,
+        entity_type="auth",
+        entity_id=user.id,
+        description=f"Successful login for {user.email}",
+        performed_by=user.id,
+        performed_by_role=user.role,
+        performed_by_email=user.email,
+        metadata={
+            "ip_address": client_ip, 
+            "mfa_used": user.mfa_enabled,
+            "user_agent": request.headers.get("user-agent", "unknown"),
+            "source": "web"
+        }
+    )
+    
+    # Set refresh token cookie
+    response.set_cookie(
+        key="refresh_token",
+        value=refresh_token,
+        httponly=True,
+        secure=not settings.DEBUG,
+        samesite="lax",
+        max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 86400
+    )
+    
+    return TokenResponse(
+        access_token=access_token,
+        user=UserResponse(
+            id=user.id,
+            email=user.email,
+            first_name=user.first_name,
+            last_name=user.last_name,
+            role=user.role,
+            status=user.status,
+            email_verified=user.email_verified,
+            mfa_enabled=user.mfa_enabled,
+            created_at=user.created_at,
+            last_login_at=user.last_login_at
+        )
+    )
