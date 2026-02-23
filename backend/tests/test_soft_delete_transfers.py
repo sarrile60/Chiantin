@@ -234,7 +234,12 @@ class TestSoftDeleteTransfers:
         assert response.status_code == 200, f"Audit logs failed: {response.text}"
         data = response.json()
         
-        logs = data.get("logs", data.get("data", []))
+        # Handle both list and dict response formats
+        if isinstance(data, list):
+            logs = data
+        else:
+            logs = data.get("logs", data.get("data", []))
+        
         print(f"PASS: Audit logs loaded. Found {len(logs)} transfer-related entries")
 
 
@@ -256,61 +261,45 @@ class TestSoftDeleteEndToEnd:
         return response.json()["access_token"]
     
     @pytest.fixture(scope="class")
-    def test_user_token(self):
-        """Get test user authentication token."""
-        response = requests.post(
-            f"{BASE_URL}/api/v1/auth/login",
-            json={"email": REGULAR_ADMIN_EMAIL, "password": REGULAR_ADMIN_PASSWORD}
-        )
-        assert response.status_code == 200, f"Test user login failed: {response.text}"
-        return response.json()["access_token"]
-    
-    def test_10_find_test_transfer_for_soft_delete(self, super_admin_token):
+    def soft_delete_test_transfer_id(self, super_admin_token):
         """Find a test transfer that can be soft-deleted."""
         headers = {"Authorization": f"Bearer {super_admin_token}"}
         
         # Search for test transfers from the test user
         response = requests.get(
             f"{BASE_URL}/api/v1/admin/transfers",
-            params={"search": "ashleyalt005", "status": "SUBMITTED", "page": 1, "limit": 50},
+            params={"search": "ashleyalt005", "page": 1, "limit": 50},
             headers=headers
         )
         assert response.status_code == 200
         data = response.json()
         transfers = data.get("data", data.get("transfers", []))
         
-        # Find a test transfer (ones with "Test" in the name)
-        test_transfers = [t for t in transfers if "Test" in t.get("beneficiary_name", "")]
+        # Find a SUBMITTED test transfer (ones with "Test" in the name)
+        test_transfers = [t for t in transfers if "Test" in t.get("beneficiary_name", "") and t.get("status") == "SUBMITTED"]
         
         if test_transfers:
-            print(f"PASS: Found {len(test_transfers)} test transfers available for soft delete testing")
-            print(f"  First test transfer: {test_transfers[0].get('id')[:8]}... - {test_transfers[0].get('beneficiary_name')}")
+            print(f"INFO: Found {len(test_transfers)} test transfers available for soft delete testing")
             return test_transfers[0].get("id")
-        else:
-            print("INFO: No specific test transfers found, will use any available SUBMITTED transfer")
-            if transfers:
-                return transfers[0].get("id")
-            pytest.skip("No SUBMITTED transfers available for testing")
+        
+        # Fallback: any SUBMITTED transfer from test user
+        submitted = [t for t in transfers if t.get("status") == "SUBMITTED"]
+        if submitted:
+            print("INFO: Using a SUBMITTED transfer from test user for testing")
+            return submitted[0].get("id")
+        
+        pytest.skip("No SUBMITTED transfers available for testing")
     
-    def test_11_soft_delete_transfer(self, super_admin_token, test_10_find_test_transfer_for_soft_delete):
+    def test_10_soft_delete_transfer(self, super_admin_token, soft_delete_test_transfer_id):
         """SOFT DELETE: Admin can delete a transfer via endpoint."""
-        transfer_id = test_10_find_test_transfer_for_soft_delete
-        if not transfer_id:
+        if not soft_delete_test_transfer_id:
             pytest.skip("No transfer available for soft delete test")
         
         headers = {"Authorization": f"Bearer {super_admin_token}"}
         
-        # Get transfer count before delete
-        before_response = requests.get(
-            f"{BASE_URL}/api/v1/admin/transfers",
-            params={"status": "SUBMITTED", "page": 1, "limit": 100},
-            headers=headers
-        )
-        before_count = before_response.json().get("pagination", {}).get("total", 0)
-        
         # Perform soft delete
         delete_response = requests.delete(
-            f"{BASE_URL}/api/v1/admin/transfers/{transfer_id}",
+            f"{BASE_URL}/api/v1/admin/transfers/{soft_delete_test_transfer_id}",
             headers=headers
         )
         assert delete_response.status_code == 200, f"Soft delete failed: {delete_response.text}"
@@ -318,18 +307,17 @@ class TestSoftDeleteEndToEnd:
         delete_data = delete_response.json()
         assert delete_data.get("ok") == True, f"Delete response not ok: {delete_data}"
         
-        print(f"PASS: Transfer {transfer_id[:8]}... soft-deleted successfully")
+        print(f"PASS: Transfer {soft_delete_test_transfer_id[:8]}... soft-deleted successfully")
         print(f"  Response: {delete_data}")
     
-    def test_12_soft_deleted_transfer_not_in_list(self, super_admin_token, test_10_find_test_transfer_for_soft_delete):
+    def test_11_soft_deleted_transfer_not_in_list(self, super_admin_token, soft_delete_test_transfer_id):
         """SOFT DELETE: Deleted transfer disappears from Transfers Queue list."""
-        transfer_id = test_10_find_test_transfer_for_soft_delete
-        if not transfer_id:
+        if not soft_delete_test_transfer_id:
             pytest.skip("No transfer available")
         
         headers = {"Authorization": f"Bearer {super_admin_token}"}
         
-        # Get all transfers and check if soft-deleted one is present
+        # Get all SUBMITTED transfers and check if soft-deleted one is present
         response = requests.get(
             f"{BASE_URL}/api/v1/admin/transfers",
             params={"status": "SUBMITTED", "page": 1, "limit": 200},
@@ -340,21 +328,20 @@ class TestSoftDeleteEndToEnd:
         transfers = data.get("data", data.get("transfers", []))
         
         transfer_ids = [t.get("id") for t in transfers]
-        assert transfer_id not in transfer_ids, f"Soft-deleted transfer {transfer_id} still appears in list!"
+        assert soft_delete_test_transfer_id not in transfer_ids, f"Soft-deleted transfer {soft_delete_test_transfer_id} still appears in list!"
         
-        print(f"PASS: Soft-deleted transfer {transfer_id[:8]}... not in transfers list")
+        print(f"PASS: Soft-deleted transfer {soft_delete_test_transfer_id[:8]}... not in transfers list")
     
-    def test_13_soft_delete_idempotent(self, super_admin_token, test_10_find_test_transfer_for_soft_delete):
+    def test_12_soft_delete_idempotent(self, super_admin_token, soft_delete_test_transfer_id):
         """SOFT DELETE: Repeat delete on same transfer returns success (idempotent)."""
-        transfer_id = test_10_find_test_transfer_for_soft_delete
-        if not transfer_id:
+        if not soft_delete_test_transfer_id:
             pytest.skip("No transfer available")
         
         headers = {"Authorization": f"Bearer {super_admin_token}"}
         
         # Try to delete again
         response = requests.delete(
-            f"{BASE_URL}/api/v1/admin/transfers/{transfer_id}",
+            f"{BASE_URL}/api/v1/admin/transfers/{soft_delete_test_transfer_id}",
             headers=headers
         )
         assert response.status_code == 200, f"Idempotent delete failed: {response.text}"
@@ -365,10 +352,9 @@ class TestSoftDeleteEndToEnd:
         
         print(f"PASS: Idempotent delete works. Response: {data}")
     
-    def test_14_audit_log_shows_soft_delete_event(self, super_admin_token, test_10_find_test_transfer_for_soft_delete):
+    def test_13_audit_log_shows_soft_delete_event(self, super_admin_token, soft_delete_test_transfer_id):
         """SOFT DELETE: Audit log shows TRANSFER_SOFT_DELETED event."""
-        transfer_id = test_10_find_test_transfer_for_soft_delete
-        if not transfer_id:
+        if not soft_delete_test_transfer_id:
             pytest.skip("No transfer available")
         
         headers = {"Authorization": f"Bearer {super_admin_token}"}
@@ -382,15 +368,19 @@ class TestSoftDeleteEndToEnd:
         assert response.status_code == 200, f"Audit logs failed: {response.text}"
         data = response.json()
         
-        logs = data.get("logs", data.get("data", []))
+        # Handle both list and dict response formats
+        if isinstance(data, list):
+            logs = data
+        else:
+            logs = data.get("logs", data.get("data", []))
         
         # Find the soft delete audit log entry
         soft_delete_logs = [
             log for log in logs 
-            if log.get("action") == "TRANSFER_SOFT_DELETED" and log.get("entity_id") == transfer_id
+            if log.get("action") == "TRANSFER_SOFT_DELETED" and log.get("entity_id") == soft_delete_test_transfer_id
         ]
         
-        assert len(soft_delete_logs) > 0, f"No TRANSFER_SOFT_DELETED audit log found for {transfer_id}"
+        assert len(soft_delete_logs) > 0, f"No TRANSFER_SOFT_DELETED audit log found for {soft_delete_test_transfer_id}"
         
         log_entry = soft_delete_logs[0]
         print(f"PASS: Found TRANSFER_SOFT_DELETED audit log:")
@@ -398,10 +388,9 @@ class TestSoftDeleteEndToEnd:
         print(f"  Description: {log_entry.get('description')}")
         print(f"  Performed by: {log_entry.get('performed_by_email')}")
     
-    def test_15_search_excludes_soft_deleted(self, super_admin_token, test_10_find_test_transfer_for_soft_delete):
+    def test_14_search_excludes_soft_deleted(self, super_admin_token, soft_delete_test_transfer_id):
         """SOFT DELETE: Transfer search excludes soft-deleted transfers."""
-        transfer_id = test_10_find_test_transfer_for_soft_delete
-        if not transfer_id:
+        if not soft_delete_test_transfer_id:
             pytest.skip("No transfer available")
         
         headers = {"Authorization": f"Bearer {super_admin_token}"}
@@ -417,9 +406,9 @@ class TestSoftDeleteEndToEnd:
         transfers = data.get("data", data.get("transfers", []))
         
         transfer_ids = [t.get("id") for t in transfers]
-        assert transfer_id not in transfer_ids, f"Soft-deleted transfer {transfer_id} found in search results!"
+        assert soft_delete_test_transfer_id not in transfer_ids, f"Soft-deleted transfer {soft_delete_test_transfer_id} found in search results!"
         
-        print(f"PASS: Soft-deleted transfer {transfer_id[:8]}... excluded from search results")
+        print(f"PASS: Soft-deleted transfer {soft_delete_test_transfer_id[:8]}... excluded from search results")
 
 
 class TestRegressionTransferFeatures:
@@ -435,7 +424,7 @@ class TestRegressionTransferFeatures:
         assert response.status_code == 200
         return response.json()["access_token"]
     
-    def test_16_transfer_detail_panel_opens(self, super_admin_token):
+    def test_15_transfer_detail_panel_opens(self, super_admin_token):
         """REGRESSION: Transfer detail panel can fetch individual transfer."""
         headers = {"Authorization": f"Bearer {super_admin_token}"}
         
@@ -454,7 +443,7 @@ class TestRegressionTransferFeatures:
         transfer_id = transfers[0].get("id")
         print(f"PASS: Transfer detail available. Transfer ID: {transfer_id[:8]}... Beneficiary: {transfers[0].get('beneficiary_name')}")
     
-    def test_17_notification_counts_exclude_soft_deleted(self, super_admin_token):
+    def test_16_notification_counts_exclude_soft_deleted(self, super_admin_token):
         """SOFT DELETE: Notification counts exclude soft-deleted transfers."""
         headers = {"Authorization": f"Bearer {super_admin_token}"}
         
@@ -478,7 +467,7 @@ class TestRegressionTransferFeatures:
         print(f"PASS: Notification counts endpoint working. Transfers badge logic active.")
         print(f"  Total SUBMITTED transfers visible: {transfers_count}")
     
-    def test_18_delete_nonexistent_transfer_returns_404(self, super_admin_token):
+    def test_17_delete_nonexistent_transfer_returns_404(self, super_admin_token):
         """Verify deleting a non-existent transfer returns 404."""
         headers = {"Authorization": f"Bearer {super_admin_token}"}
         
