@@ -1567,6 +1567,47 @@ const SECTION_LABELS = {
 - ~~Audit Logs timestamps 1 hour behind (timezone issue)~~ **FIXED Feb 23, 2025**
 - Domain SSL issue: `ecommbx.group` SSL certificate not provisioning
 
+### Copy Email Button in Admin Panel (Feb 23, 2025)
+**Feature:** Added "Copy email" button next to emails in admin Users UI (matches Copy Phone UX).
+
+**Problem:** Admins had to manually select and copy email addresses.
+
+**Solution:** Created `CopyEmailButton` component matching `CopyPhoneButton` pattern.
+
+**Component (App.js:89-127):**
+```jsx
+<CopyEmailButton email={email} toast={toast} size="sm|md" />
+```
+- Returns `null` if no email (button hidden - though emails always exist)
+- Uses `navigator.clipboard.writeText()` for copy
+- `e.stopPropagation()` prevents row click in table
+- Toast "Email address copied" on success
+- Two sizes: `sm` (table), `md` (details)
+
+**Integration Points:**
+1. Users table email cell (line 1935)
+2. User Details email field (line 2696)
+
+**Testing:** All passed (iteration_119.json) - 13/13 features verified
+
+### App.js Refactor - Partial Extraction (Feb 23, 2025)
+**Status:** Components extracted to separate file, ready for future import
+
+**Created:** `/app/frontend/src/components/AdminUsersSection.js`
+- Contains: `AdminUsersTable`, `StatusBadge`, `KycBadge`, `CopyPhoneButton`, `CopyEmailButton`
+- **Not yet imported in App.js** to minimize risk during this session
+- Can be imported in future iteration to reduce App.js size
+
+**Current App.js State:**
+- 4,030+ lines total
+- AdminDashboard still contains ~575 lines of Users section inline
+- Most other sections (KYC, Accounts, Transfers, etc.) already extracted
+
+**Staged Plan for Future:**
+- Stage 2a: Import `AdminUsersTable` from `AdminUsersSection.js`
+- Stage 2b: Import badge/copy components
+- Stage 2c: Extract User Details rendering
+
 ### Copy Phone Button in Admin Panel (Feb 23, 2025)
 **Feature:** Added "Copy phone" button next to phone numbers in admin Users UI.
 
