@@ -1417,6 +1417,37 @@ Unique index: (admin_id, section_key)
 - Stability: Rapid switching (12 sections in 2008ms), F5 preservation, no random reloads
 - Regression: Delete modal bug fix verified working
 
+### EMERGENCY FIX: Users Section Loading Deadlock (Feb 23, 2025)
+
+**Bug:** Users section stuck on "Loading users..." indefinitely (regression from performance optimization)
+
+**Root Cause:** The performance optimization added condition `&& !loading` which created a deadlock:
+```javascript
+// BROKEN CODE:
+if (activeSection === 'users' && users.length === 0 && !loading) {
+  fetchUsers(0, 1, usersPerPage, '');
+}
+```
+When `loading` was `true` from initial state, `!loading` was `false`, so `fetchUsers` never ran. But `loading` stayed `true` forever because nothing was fetching. **Deadlock!**
+
+**Fix Applied:**
+```javascript
+// FIXED CODE:
+if (activeSection === 'users') {
+  if (users.length === 0) {
+    fetchUsers(0, 1, usersPerPage, '');
+  }
+}
+```
+Removed the `&& !loading` condition - now correctly fetches when switching to Users section.
+
+**Verification:** Testing agent verified (iteration_109.json) - 100% pass:
+- Users section: PASS (no longer stuck on loading)
+- All 8 admin sections: PASS (load correctly)
+- Rapid section switching: PASS (10 switches in 2920ms)
+- F5 refresh: PASS (URL and section preserved)
+- Tab functionality: PASS (Card Requests and Transfers Queue tabs work)
+
 ### Admin Pagination Layout Refinement (Feb 20, 2025)
 
 **Change:** Moved pagination row ABOVE the tabs row for both Admin Transfers Queue and Admin Card Requests pages.
