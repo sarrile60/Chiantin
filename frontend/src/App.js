@@ -2028,14 +2028,23 @@ function AdminDashboard() {
   const applyFilters = useCallback(() => {
     let filtered = [...users];
 
-    // Search filter
+    // Search filter (for client-side filtering after server returns results)
+    // Note: Server already filters by search, but this handles edge cases and ensures phone matching
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
+      // Extract digits for phone number matching
+      const queryDigits = query.replace(/\D/g, '');
+      
       filtered = filtered.filter(u => 
         u.first_name.toLowerCase().includes(query) ||
         u.last_name.toLowerCase().includes(query) ||
         u.email.toLowerCase().includes(query) ||
-        (u.id && u.id.toLowerCase().includes(query))
+        (u.id && u.id.toLowerCase().includes(query)) ||
+        // Phone number matching - check both formatted and digits-only
+        (u.phone && (
+          u.phone.toLowerCase().includes(query) ||
+          (queryDigits.length >= 4 && u.phone.replace(/\D/g, '').includes(queryDigits))
+        ))
       );
     }
 
