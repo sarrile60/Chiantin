@@ -198,6 +198,7 @@ from routers import health as health_router
 from routers import audit as audit_router
 from routers import tickets as tickets_router
 from routers import kyc as kyc_router
+from routers import admin_users as admin_users_router
 
 app.include_router(health_router.router)
 app.include_router(audit_router.router)
@@ -205,6 +206,7 @@ app.include_router(tickets_router.router)
 app.include_router(tickets_router.admin_router)
 app.include_router(kyc_router.router)
 app.include_router(kyc_router.admin_router)
+app.include_router(admin_users_router.router)
 
 
 # Dependencies
