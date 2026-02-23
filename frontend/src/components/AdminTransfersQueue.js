@@ -40,6 +40,9 @@ export function AdminTransfersQueue() {
   const [debouncedSearch, setDebouncedSearch] = useState(getInitialSearch);
   const [isSearchMode, setIsSearchMode] = useState(!!getInitialSearch());
   
+  // Track previous search to prevent unnecessary URL updates
+  const prevSearchRef = useRef(getInitialSearch());
+  
   // Pagination state
   const [currentPage, setCurrentPageInternal] = useState(getInitialPage);
   const [pageSize, setPageSizeInternal] = useState(getInitialPageSize);
