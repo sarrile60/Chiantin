@@ -210,13 +210,16 @@ class TestAdminPanelRegressions:
         
         data = response.json()
         assert "users" in data
-        assert "total" in data
-        assert "page" in data
-        assert "total_pages" in data
+        assert "pagination" in data
+        
+        pagination = data["pagination"]
+        assert "total" in pagination
+        assert "page" in pagination
+        assert "total_pages" in pagination
         
         # Verify limit is respected
         assert len(data["users"]) <= 20
-        print(f"Pagination working: page {data['page']}/{data['total_pages']}, {len(data['users'])} users")
+        print(f"Pagination working: page {pagination['page']}/{pagination['total_pages']}, {len(data['users'])} users")
     
     def test_admin_access_required(self):
         """Verify non-admin cannot access users endpoint"""
