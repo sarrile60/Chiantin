@@ -1930,7 +1930,10 @@ function AdminUsersTable({ users, loading, onSelectUser, selectedUser, toast }) 
                 </div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-600">{user.email}</div>
+                <div className="text-sm text-gray-600 flex items-center gap-1" data-testid={`user-email-${user.id}`}>
+                  <span>{user.email}</span>
+                  <CopyEmailButton email={user.email} toast={toast} size="sm" />
+                </div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="text-sm text-gray-600 flex items-center gap-1" data-testid={`user-phone-${user.id}`}>
