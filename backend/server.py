@@ -193,6 +193,13 @@ app.add_middleware(
     expose_headers=["*"]
 )
 
+# Include extracted routers
+from routers import health as health_router
+from routers import audit as audit_router
+
+app.include_router(health_router.router)
+app.include_router(audit_router.router)
+
 
 # Dependencies
 def get_storage() -> CloudinaryStorage:
