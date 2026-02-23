@@ -2593,7 +2593,12 @@ function AdminDashboard() {
                         {selectedUser.user.phone || <span className="text-gray-400 italic">Not provided</span>}
                       </dd>
                     </div>
-                    <div><dt className="text-sm text-gray-700 font-medium">Status</dt><dd className="font-semibold mt-1">{selectedUser.user.status}</dd></div>
+                    <div>
+                      <dt className="text-sm text-gray-700 font-medium">Status</dt>
+                      <dd className="mt-1" data-testid="user-detail-status">
+                        <StatusBadge status={selectedUser.user.status} />
+                      </dd>
+                    </div>
                     <div>
                       <dt className="text-sm text-gray-700 font-medium">Email Verified</dt>
                       <dd className="font-semibold mt-1">
