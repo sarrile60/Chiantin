@@ -41,4 +41,32 @@ logger = logging.getLogger(__name__)
 # Router definition - NO prefix here, we'll add it when including
 router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
 
-# NOTE: Endpoints will be moved here incrementally in subsequent phases
+
+# ==================== /auth/me ====================
+
+@router.get("/me", response_model=UserResponse)
+async def get_me(
+    current_user: dict = Depends(get_current_user),
+    db: AsyncIOMotorDatabase = Depends(get_database)
+):
+    """Get current user info."""
+    auth_service = AuthService(db)
+    user = await auth_service.get_user(current_user["id"])
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return UserResponse(
+        id=user.id,
+        email=user.email,
+        first_name=user.first_name,
+        last_name=user.last_name,
+        role=user.role,
+        status=user.status,
+        email_verified=user.email_verified,
+        mfa_enabled=user.mfa_enabled,
+        created_at=user.created_at,
+        last_login_at=user.last_login_at
+    )
+
+
+# NOTE: More endpoints will be moved here incrementally in subsequent phases
