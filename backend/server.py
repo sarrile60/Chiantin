@@ -1000,15 +1000,6 @@ async def admin_withdraw_account(
     return {"ok": True, "message": "Debit successful", "new_balance": new_balance}
 
 
-
-# ==================== ADMIN NOTIFICATION MANAGEMENT ====================
-# NOTE: All admin notification endpoints moved to routers/notifications.py
-# @app.post("/api/v1/admin/notifications/clear")
-# @app.get("/api/v1/admin/notifications/cleared-at")
-# @app.get("/api/v1/admin/notifications/counts-since-clear")
-# ... (see routers/notifications.py)
-
-
 # Health check endpoint at root path for deployment health checks
 @app.get("/health")
 async def root_health_check():
@@ -1019,4 +1010,3 @@ async def root_health_check():
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("server:app", host="0.0.0.0", port=8001, reload=True)
-
