@@ -152,18 +152,33 @@ async def get_admin_notification_counts(
     async def get_tickets_new():
         """Count tickets with new client activity since last seen.
         
-        PERFORMANCE OPTIMIZED: Uses simple count on tickets collection
-        instead of expensive aggregation with $lookup.
+        PERFORMANCE OPTIMIZED: Uses simple count on tickets collection.
         Counts tickets where:
         - Status is OPEN/IN_PROGRESS
-        - Updated after last_seen (indicates new activity)
+        - Has client message after last_seen (last_client_message_at)
+        
+        NOTE: Uses last_client_message_at to only count CLIENT-originated activity.
+        Admin messages do NOT trigger admin notifications (admin shouldn't be notified
+        for their own actions).
         """
         last_seen = last_seen_map.get('tickets', default_last_seen)
         
-        # Simple and fast: count open/in-progress tickets updated after last_seen
+        # Count open/in-progress tickets with CLIENT messages after last_seen
+        # Uses last_client_message_at to exclude admin-originated activity
         return await db.tickets.count_documents({
             "status": {"$in": ["OPEN", "IN_PROGRESS", "open", "in_progress"]},
-            "updated_at": {"$gt": last_seen}
+            "$or": [
+                # Tickets with client messages after last_seen
+                {"last_client_message_at": {"$gt": last_seen}},
+                # New tickets (created_at > last_seen, not created by admin)
+                {"$and": [
+                    {"created_at": {"$gt": last_seen}},
+                    {"$or": [
+                        {"created_by_admin": {"$exists": False}},
+                        {"created_by_admin": False}
+                    ]}
+                ]}
+            ]
         })
     
     # Execute all queries in parallel for performance
