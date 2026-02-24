@@ -544,6 +544,134 @@ class BankingWorkflowsService:
             }
         }
     
+    async def get_deleted_transfers(self, page: int = 1, limit: int = 20, search: Optional[str] = None) -> dict:
+        """Admin: Get soft-deleted transfers with pagination.
+        
+        This returns ONLY transfers that have been soft-deleted (is_deleted=True).
+        Used by the admin DELETED tab to view and potentially restore deleted transfers.
+        
+        PERFORMANCE OPTIMIZED: Uses bulk lookups (same as get_admin_transfers).
+        
+        Args:
+            page: Page number (1-indexed)
+            limit: Items per page (20, 50, or 100)
+            search: Optional search term
+            
+        Returns:
+            Dictionary with 'transfers' list and 'pagination' info
+        """
+        # Build query - ONLY soft-deleted transfers
+        query = {"is_deleted": True}
+        
+        # Add search filter if provided
+        if search and search.strip():
+            search_regex = {"$regex": search.strip(), "$options": "i"}
+            query["$or"] = [
+                {"beneficiary_name": search_regex},
+                {"beneficiary_iban": search_regex},
+                {"reference_number": search_regex},
+                {"details": search_regex}
+            ]
+        
+        # Get total count for pagination
+        total_count = await self.db.transfers.count_documents(query)
+        
+        # Calculate pagination
+        total_pages = max(1, (total_count + limit - 1) // limit)
+        if page > total_pages:
+            page = total_pages
+        if page < 1:
+            page = 1
+        skip = (page - 1) * limit
+        
+        # Fetch transfers with pagination - sort by deleted_at (most recent first)
+        cursor = self.db.transfers.find(query).sort("deleted_at", -1).skip(skip).limit(limit)
+        transfer_docs = await cursor.to_list(length=limit)
+        
+        if not transfer_docs:
+            return {
+                "transfers": [],
+                "pagination": {
+                    "page": page,
+                    "page_size": limit,
+                    "total": total_count,
+                    "total_pages": total_pages,
+                    "has_next": False,
+                    "has_prev": page > 1
+                }
+            }
+        
+        # Collect all unique user_ids and account_ids for bulk lookup
+        user_ids = set()
+        account_ids = set()
+        
+        for doc in transfer_docs:
+            user_id = doc.get("user_id")
+            if user_id:
+                try:
+                    user_ids.add(ObjectId(user_id))
+                except:
+                    user_ids.add(user_id)
+            
+            from_account_id = doc.get("from_account_id")
+            if from_account_id:
+                account_ids.add(from_account_id)
+        
+        # BULK LOOKUP: Fetch all users in ONE query
+        users_map = {}
+        if user_ids:
+            users_cursor = self.db.users.find({"_id": {"$in": list(user_ids)}})
+            async for user in users_cursor:
+                users_map[str(user["_id"])] = user
+        
+        # BULK LOOKUP: Fetch all accounts in ONE query
+        accounts_map = {}
+        if account_ids:
+            accounts_cursor = self.db.bank_accounts.find({"_id": {"$in": list(account_ids)}})
+            async for account in accounts_cursor:
+                accounts_map[account["_id"]] = account
+        
+        # Enrich transfer documents with sender info (using bulk lookup results)
+        transfers = []
+        for doc in transfer_docs:
+            user = users_map.get(doc.get("user_id"))
+            account = accounts_map.get(doc.get("from_account_id"))
+            
+            transfer_dict = {
+                "id": str(doc["_id"]),
+                "user_id": doc.get("user_id"),
+                "amount": doc.get("amount"),
+                "beneficiary_name": doc.get("beneficiary_name"),
+                "beneficiary_iban": doc.get("beneficiary_iban"),
+                "details": doc.get("details"),
+                "status": doc.get("previous_status", doc.get("status", "UNKNOWN")),  # Show previous status
+                "created_at": doc.get("created_at").isoformat() if doc.get("created_at") else None,
+                "reference_number": doc.get("reference_number"),
+                "sender_name": f"{user.get('first_name', '')} {user.get('last_name', '')}".strip() if user else "Unknown",
+                "sender_email": user.get("email") if user else None,
+                "sender_iban": account.get("iban") if account else doc.get("sender_iban"),
+                "reject_reason": doc.get("reject_reason"),
+                # Deletion metadata
+                "is_deleted": True,
+                "deleted_at": doc.get("deleted_at").isoformat() if doc.get("deleted_at") else None,
+                "deleted_by": doc.get("deleted_by"),
+                "deleted_by_email": doc.get("deleted_by_email"),
+                "previous_status": doc.get("previous_status")
+            }
+            transfers.append(transfer_dict)
+        
+        return {
+            "transfers": transfers,
+            "pagination": {
+                "page": page,
+                "page_size": limit,
+                "total": total_count,
+                "total_pages": total_pages,
+                "has_next": page < total_pages,
+                "has_prev": page > 1
+            }
+        }
+    
     async def _search_transfers(self, search_term: str, page: int = 1, limit: int = 20) -> dict:
         """Search transfers across the ENTIRE database (all statuses) with pagination.
         
