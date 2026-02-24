@@ -2189,3 +2189,25 @@ Per user requirement - deferred
 - `/app/test_reports/iteration_126.json`: 100% success (19/19 backend, all frontend)
 - All sidebar sections verified working
 - No regressions detected
+
+---
+
+## HOTFIX: Accounts Section Crash (Dec 2025)
+
+**Issue:** `accounts.map is not a function` error in AdminAccountsControl
+
+**Root Cause:**
+- Backend router returned: `{data: [...], pagination: {...}}`
+- Frontend expected: `{accounts: [...], pagination: {...}}`
+
+**Fix Applied:**
+1. Changed response key from `data` to `accounts`
+2. Added `limit` query param alias for `page_size`
+3. Used camelCase field names (`userName`, `userEmail`, `userId`)
+
+**Test Results:** 100% pass (iteration_127.json)
+- 74 accounts rendered correctly
+- Pagination working (Page 1 of 2)
+- All cross-section smoke tests passed
+
+**Status:** ✅ RESOLVED
