@@ -433,13 +433,13 @@ function AdminUsersPage({ user }) {
     <>
       {/* Search and Filters */}
       <div className="mb-6 card p-4">
-        <div className="grid grid-cols-5 gap-4 mb-4">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
           <input 
             type="text" 
             value={searchQuery} 
             onChange={(e) => handleSearch(e.target.value)} 
             placeholder="Search by name, email, or phone..." 
-            className="input-field" 
+            className="input-field col-span-2 lg:col-span-1" 
             data-testid="user-search" 
           />
           <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="input-field" data-testid="status-filter">
