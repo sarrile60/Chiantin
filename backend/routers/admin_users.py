@@ -747,7 +747,7 @@ async def set_user_tax_hold(
             "_id": str(uuid.uuid4()),
             "user_id": actual_user_id,
             "is_active": True,
-            "tax_amount_due": int(data.tax_amount * 100),
+            "tax_amount_cents": int(data.tax_amount * 100),
             "reason": data.reason,
             "payment_details": {
                 "beneficiary_name": data.beneficiary_name,
