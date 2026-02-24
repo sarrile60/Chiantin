@@ -262,8 +262,8 @@ function AdminUsersTable({ users, loading, onSelectUser, selectedUser, toast }) 
   }
 
   return (
-    <div className="card">
-      <table className="w-full">
+    <div className="card overflow-x-auto">
+      <table className="w-full min-w-[900px]">
         <thead className="bg-gray-50 border-b">
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
