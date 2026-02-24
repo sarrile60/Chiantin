@@ -617,7 +617,7 @@ async def admin_account_withdraw(
         user_account_id=account["ledger_account_id"],
         amount=data.amount_cents,
         external_id=f"admin_withdraw_{uuid.uuid4()}",
-        reason=data.description,
+        reason=data.description or "Admin debit",
         performed_by=current_user["id"]
     )
     
