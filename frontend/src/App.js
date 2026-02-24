@@ -1754,7 +1754,7 @@ function AdminDashboard() {
   };
 
   return (
-    <div className="flex min-h-screen">
+    <div className="min-h-screen">
       <AdminSidebar activeSection={activeSection} onSectionChange={setActiveSection} user={user} logout={logout} />
       <div className="admin-content">
         <div className="border-b border-gray-200 bg-white">
