@@ -29,6 +29,23 @@ ecommbx is a full-stack EU-licensed digital banking platform built with React fr
 
 ## Recent Changes (February 2026)
 
+### P0 HOTFIX - KYC Queue + Tax Hold Amount Bugs (Feb 24, 2026)
+**Status:** ✅ FIXED AND VERIFIED
+
+**Bug 1: KYC Queue Panel Blank After Selection**
+- **Root Cause:** `/admin/kyc/pending` endpoint missing personal info fields
+- **Fix:** Added `full_name`, `date_of_birth`, `nationality`, `country`, `street_address`, `city`, `postal_code`, `tax_residency`, `tax_id` to response
+- **File:** `backend/routers/kyc.py` lines 187-206
+
+**Bug 2: Tax Hold Amount Showing €0,00**
+- **Root Cause:** Code reading `tax_amount_due` but database stores `tax_amount_cents`
+- **Fix:** Changed to read `tax_amount_cents` field
+- **File:** `backend/routers/admin_users.py` line 869
+
+**Regression Testing:** 17/17 backend tests PASS, all admin UI features verified
+
+---
+
 ### P0 FINAL REDEPLOY VALIDATION COMPLETE (Feb 24, 2026)
 **Validation Result:** ✅ **GO FOR PRODUCTION REDEPLOY**
 
