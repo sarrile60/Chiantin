@@ -26,6 +26,7 @@ Transfer Restore Feature: EXPLICITLY DEFERRED - DO NOT IMPLEMENT
 from fastapi import APIRouter, Depends, HTTPException
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from pydantic import BaseModel, Field
+from typing import Optional
 from datetime import datetime, timezone
 from bson import ObjectId
 from bson.errors import InvalidId
