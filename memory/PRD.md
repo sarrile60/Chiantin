@@ -29,6 +29,20 @@ ecommbx is a full-stack EU-licensed digital banking platform built with React fr
 
 ## Recent Changes (February 2026)
 
+### P0 UI HOTFIX - Admin Panel Horizontal Overflow Regression (Feb 24, 2026)
+**Status:** ✅ FIXED AND VERIFIED
+
+**Bug:** Admin panel content clipped on smaller monitors (1280x720) - 303px horizontal overflow
+**Root Cause:** `.admin-content` had no width constraint, causing flex container to exceed viewport
+**Fix Applied:**
+1. `App.css`: Added `width: calc(100vw - 240px)` and `overflow-x: auto` to `.admin-content`
+2. `AdminUsersPage.js`: Changed filter grid to responsive `grid-cols-2 lg:grid-cols-5`
+3. `AdminUsersSection.js`: Added `overflow-x-auto` to table card
+
+**Validation:** All viewports (1280, 1366, 1440, 1920) pass with no page-level overflow
+
+---
+
 ### P0 HOTFIX - KYC Queue + Tax Hold Amount Bugs (Feb 24, 2026)
 **Status:** ✅ FIXED AND VERIFIED
 
