@@ -74,11 +74,24 @@ class InternalTransferRequest(BaseModel):
 class AdminTopUpRequest(BaseModel):
     amount_cents: int
     description: str
+    # Optional banking details for professional credit
+    display_type: Optional[str] = None
+    sender_name: Optional[str] = None
+    sender_iban: Optional[str] = None
+    sender_bic: Optional[str] = None
+    reference: Optional[str] = None
+    admin_note: Optional[str] = None
 
 
 class AdminWithdrawRequest(BaseModel):
     amount_cents: int
     description: str
+    # Optional banking details for professional debit
+    display_type: Optional[str] = None
+    recipient_name: Optional[str] = None
+    recipient_iban: Optional[str] = None
+    reference: Optional[str] = None
+    admin_note: Optional[str] = None
 
 
 # User accounts router
