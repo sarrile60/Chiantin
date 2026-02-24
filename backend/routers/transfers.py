@@ -366,6 +366,124 @@ async def admin_delete_transfer(
     return {"ok": True, "message": "Transfer deleted successfully"}
 
 
+class RestoreTransferRequest(BaseModel):
+    reason: str = Field(None, description="Optional reason for restoring the transfer")
+
+
+@admin_router.post("/transfers/{transfer_id}/restore")
+async def admin_restore_transfer(
+    transfer_id: str,
+    data: RestoreTransferRequest = None,
+    current_user: dict = Depends(require_admin),
+    db: AsyncIOMotorDatabase = Depends(get_database)
+):
+    """Admin restores a soft-deleted transfer.
+    
+    RESTORE BEHAVIOR (IMPORTANT):
+    - This ONLY restores the transfer RECORD visibility in admin lists
+    - This does NOT re-execute any financial transaction
+    - This does NOT trigger any payment processor / settlement / ledger movement
+    - The transfer returns to its previous status before deletion
+    
+    Eligibility:
+    - Only transfers with is_deleted=True can be restored
+    - Non-deleted transfers return a safe error (idempotent-safe)
+    - Non-existent transfers return 404
+    
+    RBAC: Only SUPER_ADMIN can restore transfers (same as delete)
+    """
+    # Only SUPER_ADMIN can restore transfers (same permission as delete)
+    if current_user["role"] != "SUPER_ADMIN":
+        raise HTTPException(status_code=403, detail="Only Super Admin can restore transfers")
+    
+    # Find transfer (including soft-deleted ones)
+    transfer = await db.transfers.find_one({"_id": transfer_id})
+    if not transfer:
+        try:
+            transfer = await db.transfers.find_one({"_id": ObjectId(transfer_id)})
+        except InvalidId:
+            pass
+    
+    if not transfer:
+        raise HTTPException(status_code=404, detail="Transfer not found")
+    
+    # Check if transfer is soft-deleted
+    if not transfer.get("is_deleted", False):
+        # Idempotent-safe: Transfer is not deleted, nothing to restore
+        return {
+            "ok": True,
+            "message": "Transfer is not deleted, no restore needed",
+            "already_active": True
+        }
+    
+    # Get deletion metadata for audit trail
+    deleted_at = transfer.get("deleted_at")
+    deleted_by = transfer.get("deleted_by")
+    deleted_by_email = transfer.get("deleted_by_email")
+    previous_status = transfer.get("previous_status", transfer.get("status", "UNKNOWN"))
+    
+    transfer_amount = transfer.get("amount", 0)
+    beneficiary = transfer.get("beneficiary_name", "Unknown")
+    restore_reason = data.reason if data else None
+    
+    # RESTORE: Remove soft-delete flags and restore previous status
+    restore_result = await db.transfers.update_one(
+        {"_id": transfer["_id"]},
+        {
+            "$set": {
+                "is_deleted": False,
+                "restored_at": datetime.now(timezone.utc),
+                "restored_by": current_user["id"],
+                "restored_by_email": current_user["email"],
+                "restore_reason": restore_reason,
+                # Restore to previous status if available, otherwise keep current
+                "status": previous_status
+            },
+            "$unset": {
+                # Clear deletion fields but keep them in audit via the audit log
+                "deleted_at": "",
+                "deleted_by": "",
+                "deleted_by_email": ""
+                # Keep previous_status for reference
+            }
+        }
+    )
+    
+    if restore_result.modified_count == 0:
+        raise HTTPException(status_code=500, detail="Failed to restore transfer")
+    
+    # Audit log - MANDATORY for traceability
+    await create_audit_log(
+        db=db,
+        action="TRANSFER_RESTORED",
+        entity_type="transfer",
+        entity_id=str(transfer["_id"]),
+        description=f"Transfer to {beneficiary} (€{transfer_amount/100:.2f}) restored. Status: {previous_status}",
+        performed_by=current_user["id"],
+        performed_by_role=current_user["role"],
+        performed_by_email=current_user["email"],
+        metadata={
+            "restored_status": previous_status,
+            "amount": transfer_amount,
+            "beneficiary": beneficiary,
+            "restore_reason": restore_reason,
+            "was_deleted_at": deleted_at.isoformat() if deleted_at else None,
+            "was_deleted_by": deleted_by,
+            "was_deleted_by_email": deleted_by_email,
+            "note": "Record visibility restored only - no financial re-execution"
+        }
+    )
+    
+    logger.info(f"Transfer {transfer_id} restored by admin {current_user['email']} (restored to status: {previous_status})")
+    
+    return {
+        "ok": True,
+        "message": "Transfer restored successfully",
+        "restored_status": previous_status,
+        "note": "Transfer record visibility restored. No financial transaction was re-executed."
+    }
+
+
 @admin_router.post("/transfers/{transfer_id}/resend-email")
 async def admin_resend_transfer_email(
     transfer_id: str,
