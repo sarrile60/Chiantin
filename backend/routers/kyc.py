@@ -313,84 +313,33 @@ async def review_kyc(
     application_id: str,
     data: ReviewKYC,
     current_user: dict = Depends(require_admin),
-    db: AsyncIOMotorDatabase = Depends(get_database)
+    db: AsyncIOMotorDatabase = Depends(get_database),
+    storage: CloudinaryStorage = Depends(get_storage)
 ):
     """Review KYC application (admin)."""
-    from bson import ObjectId
-    from bson.errors import InvalidId
+    from schemas.kyc import KYCReviewRequest
     
-    kyc_app = await db.kyc_applications.find_one({"_id": application_id})
-    if not kyc_app:
-        try:
-            kyc_app = await db.kyc_applications.find_one({"_id": ObjectId(application_id)})
-        except InvalidId:
-            pass
-    
-    if not kyc_app:
-        raise HTTPException(status_code=404, detail="KYC application not found")
-    
-    update_data = {
-        "status": data.status.value,
-        "reviewed_by": current_user["id"],
-        "reviewed_at": datetime.now(timezone.utc)
-    }
-    
-    if data.status == ApplicationStatus.REJECTED and data.rejection_reason:
-        update_data["rejection_reason"] = data.rejection_reason
-    
-    await db.kyc_applications.update_one(
-        {"_id": kyc_app["_id"]},
-        {"$set": update_data}
+    # Convert ReviewKYC to KYCReviewRequest for service
+    review_request = KYCReviewRequest(
+        status=data.status,
+        rejection_reason=data.rejection_reason,
+        review_notes=data.review_notes,
+        assigned_iban=data.assigned_iban,
+        assigned_bic=data.assigned_bic
     )
     
-    user_id = kyc_app.get("user_id")
+    kyc_service = KYCService(db, storage)
+    result = await kyc_service.review_application(
+        application_id=application_id,
+        review=review_request,
+        reviewer_id=current_user["id"]
+    )
     
-    # Update user KYC status if approved
-    if data.status == KYCStatus.APPROVED:
-        if user_id:
-            user_query = {"_id": user_id}
-            try:
-                user_query = {"$or": [{"_id": user_id}, {"_id": ObjectId(str(user_id))}]}
-            except (InvalidId, TypeError):
-                pass
-            await db.users.update_one(user_query, {"$set": {"kyc_verified": True}})
-            
-            # Create notification for user
-            notification_service = NotificationService(db)
-            await notification_service.create_notification(
-                user_id=str(user_id),
-                notification_type="KYC",
-                title="KYC Approved",
-                message="Your KYC verification has been approved. You can now use all banking features.",
-                action_url="/dashboard"
-            )
-    elif data.status == KYCStatus.REJECTED:
-        # Create notification for rejected KYC
-        if user_id:
-            notification_service = NotificationService(db)
-            await notification_service.create_notification(
-                user_id=str(user_id),
-                notification_type="KYC",
-                title="KYC Requires Attention",
-                message=f"Your KYC verification needs attention. {data.rejection_reason or 'Please review and resubmit your documents.'}",
-                action_url="/settings/kyc"
-            )
-    
-    # Get user email for logging
-    user_doc = await db.users.find_one({"_id": user_id}) if user_id else None
-    if not user_doc and user_id:
-        try:
-            user_doc = await db.users.find_one({"_id": ObjectId(str(user_id))})
-        except InvalidId:
-            pass
-    
-    user_email = user_doc.get("email", "unknown") if user_doc else "unknown"
     logger.warning(
-        f"KYC REVIEW: Application {application_id} for user {user_email} "
-        f"was {data.status.value} by admin {current_user['email']}"
+        f"KYC REVIEW: Application {application_id} was {data.status.value} by admin {current_user['email']}"
     )
     
-    return {"message": f"KYC application {data.status.value}"}
+    return {"message": f"KYC application {data.status.value}", "status": data.status.value}
 
 
 @admin_router.delete("/{application_id}")
