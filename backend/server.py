@@ -999,94 +999,10 @@ async def mark_admin_section_seen(
     return {"ok": True, "section_key": section_key, "last_seen_at": now.isoformat()}
 
 
-@app.get("/api/v1/admin/analytics/monthly")
-async def get_admin_analytics_monthly(
-    current_user: dict = Depends(require_admin),
-    db: AsyncIOMotorDatabase = Depends(get_database)
-):
-    """Get real monthly statistics for admin dashboard charts.
-    
-    PERFORMANCE OPTIMIZED: Uses aggregation pipelines instead of sequential count queries.
-    Returns actual data from the database grouped by month for the last 6 months.
-    """
-    import asyncio
-    from datetime import datetime, timezone, timedelta
-    from calendar import month_abbr
-    
-    # Calculate date range - last 6 months including current
-    now = datetime.now(timezone.utc)
-    six_months_ago = now - timedelta(days=180)
-    
-    # Use aggregation to get all user counts by month in ONE query
-    async def get_users_by_month():
-        pipeline = [
-            {"$match": {"created_at": {"$gte": six_months_ago}}},
-            {
-                "$group": {
-                    "_id": {
-                        "year": {"$year": "$created_at"},
-                        "month": {"$month": "$created_at"}
-                    },
-                    "count": {"$sum": 1}
-                }
-            }
-        ]
-        results = await db.users.aggregate(pipeline).to_list(12)
-        return {(r["_id"]["year"], r["_id"]["month"]): r["count"] for r in results}
-    
-    # Use aggregation to get all transfer counts by month in ONE query
-    async def get_transfers_by_month():
-        pipeline = [
-            {"$match": {"created_at": {"$gte": six_months_ago}}},
-            {
-                "$group": {
-                    "_id": {
-                        "year": {"$year": "$created_at"},
-                        "month": {"$month": "$created_at"}
-                    },
-                    "count": {"$sum": 1}
-                }
-            }
-        ]
-        results = await db.transfers.aggregate(pipeline).to_list(12)
-        return {(r["_id"]["year"], r["_id"]["month"]): r["count"] for r in results}
-    
-    async def get_users_before_period():
-        return await db.users.count_documents({"created_at": {"$lt": six_months_ago}})
-    
-    # Execute all queries in parallel
-    users_by_month, transfers_by_month, users_before_period = await asyncio.gather(
-        get_users_by_month(),
-        get_transfers_by_month(),
-        get_users_before_period()
-    )
-    
-    # Generate list of last 6 months
-    months_data = []
-    running_total = users_before_period
-    
-    for i in range(5, -1, -1):  # 5 months ago to current month
-        target_date = now - timedelta(days=i*30)
-        year = target_date.year
-        month = target_date.month
-        
-        users_count = users_by_month.get((year, month), 0)
-        transfers_count = transfers_by_month.get((year, month), 0)
-        
-        running_total += users_count
-        
-        months_data.append({
-            "month": month_abbr[month],
-            "year": year,
-            "users": users_count,
-            "transactions": transfers_count,
-            "cumulative_users": running_total
-        })
-    
-    return {
-        "monthly_data": months_data,
-        "period": "last_6_months"
-    }
+# NOTE: /api/v1/admin/analytics/monthly moved to routers/analytics.py
+# @app.get("/api/v1/admin/analytics/monthly")
+# async def get_admin_analytics_monthly(...):
+#     ... (see routers/analytics.py)
 
 
 # ==================== NOTIFICATIONS ====================
