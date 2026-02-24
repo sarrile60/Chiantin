@@ -92,20 +92,14 @@ function useBadgeManager(apiUrl, token) {
 
   // Initialize counts on mount
   const initialize = useCallback(async () => {
-    if (!apiUrl || !token) {
-      console.log('[BadgeManager] Missing apiUrl or token:', { apiUrl: !!apiUrl, token: !!token });
-      return;
-    }
+    if (!apiUrl || !token) return;
     
-    console.log('[BadgeManager] Initializing badge fetch...');
     setIsLoading(true);
     const newCounts = await fetchCounts();
     
-    console.log('[BadgeManager] Fetch result:', newCounts);
     if (isMountedRef.current && newCounts) {
       setCounts(newCounts);
       setIsInitialized(true);
-      console.log('[BadgeManager] Counts set:', newCounts);
     }
     setIsLoading(false);
   }, [apiUrl, token, fetchCounts]);
