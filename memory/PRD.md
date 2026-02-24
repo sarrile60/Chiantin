@@ -2114,3 +2114,44 @@ Extraction done in phased commits. Each endpoint can be individually reverted if
 
 ### Test Report
 `/app/test_reports/iteration_124.json` - Full test results
+
+---
+
+## P0 Backend Router Extraction - PARTIAL COMPLETION (Dec 2025)
+
+### Routers Extracted (COMPLETED)
+
+| Router | File | Lines | Endpoints | Status |
+|--------|------|-------|-----------|--------|
+| auth | routers/auth.py | 710 | 12 | ✅ DONE |
+| analytics | routers/analytics.py | 220 | 2 | ✅ DONE |
+| notifications | routers/notifications.py | 360 | 8 | ✅ DONE |
+| cards | routers/cards.py | 350 | 7 | ✅ DONE |
+
+### Routers Remaining (NOT STARTED)
+
+| Router | Approx Lines | Endpoints | Priority |
+|--------|--------------|-----------|----------|
+| accounts | ~300 | 7 | Next |
+| transfers | ~400 | 10 | Last (highest risk) |
+| recipients | ~50 | 3 | Can combine with transfers |
+| ledger | ~200 | 5 | Can combine with accounts |
+
+### Progress
+
+- **server.py**: 3227 → 1715 lines (~47% reduction)
+- **Test Results**: 100% pass rate (18/18 backend, all frontend)
+- **Behavior Parity**: Verified ✅
+
+### Test Report
+`/app/test_reports/iteration_125.json` - Full verification
+
+### P1 Bug Assessment (SEPARATE)
+See `/app/P1_BUG_ASSESSMENT.md` for:
+- Root cause: auth_service.get_user() ObjectId handling
+- Affected endpoints: /auth/me, /auth/mfa/*
+- Recommended fix documented
+- NOT mixed into router extraction commits
+
+### Transfer Restore: EXPLICITLY SKIPPED
+Per user requirement - deferred to future session
