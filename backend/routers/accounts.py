@@ -505,11 +505,14 @@ async def admin_get_accounts_with_users(
         user = users_map.get(str(user_id)) if user_id else None
         
         if user:
-            account_dict["user_name"] = f"{user.get('first_name', '')} {user.get('last_name', '')}".strip()
-            account_dict["user_email"] = user.get("email", "")
+            # Use camelCase for frontend compatibility
+            account_dict["userName"] = f"{user.get('first_name', '')} {user.get('last_name', '')}".strip()
+            account_dict["userEmail"] = user.get("email", "")
+            account_dict["userId"] = str(user_id)  # Frontend needs this for IBAN edit
         else:
-            account_dict["user_name"] = "Unknown"
-            account_dict["user_email"] = ""
+            account_dict["userName"] = "Unknown"
+            account_dict["userEmail"] = ""
+            account_dict["userId"] = str(user_id) if user_id else ""
         
         ledger_id = doc.get("ledger_account_id")
         account_dict["balance"] = balances.get(ledger_id, 0)
