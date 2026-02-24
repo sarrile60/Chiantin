@@ -969,22 +969,6 @@ async def admin_reverse_transaction(
 # ... (see routers/recipients.py)
 
 
-# NOTE: /api/v1/admin/accounts-with-users moved to routers/accounts.py
-    return {"ok": True, "data": [r.model_dump() for r in recipients]}
-
-
-@app.delete("/api/v1/recipients/{recipient_id}")
-async def delete_recipient(
-    recipient_id: str,
-    current_user: dict = Depends(get_current_user),
-    db: AsyncIOMotorDatabase = Depends(get_database)
-):
-    """Delete saved recipient."""
-    workflows = BankingWorkflowsService(db)
-    success = await workflows.delete_recipient(recipient_id, current_user["id"])
-    return {"ok": success}
-
-
 # ==================== BANKING WORKFLOWS - TRANSFERS ====================
 # NOTE: All transfer endpoints moved to routers/transfers.py
 
