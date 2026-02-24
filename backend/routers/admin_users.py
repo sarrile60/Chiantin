@@ -866,7 +866,7 @@ async def get_user_tax_hold(
     
     return {
         "is_blocked": True,
-        "tax_amount_due": (tax_hold.get("tax_amount_due", 0) or 0) / 100,
+        "tax_amount_due": (tax_hold.get("tax_amount_cents", 0) or 0) / 100,
         "reason": tax_hold.get("reason"),
         "blocked_at": format_timestamp_utc(tax_hold.get("blocked_at")),
         "payment_details": tax_hold.get("payment_details", {})
