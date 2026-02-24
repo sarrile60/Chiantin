@@ -881,41 +881,41 @@ async def admin_reverse_transaction(
 
 
 # ==================== P2P TRANSFERS ====================
-
-@app.post("/api/v1/transfers/p2p")
-async def create_p2p_transfer(
-    data: P2PTransferRequest,
-    current_user: dict = Depends(get_current_user),
-    db: AsyncIOMotorDatabase = Depends(get_database)
-):
-    """Create P2P transfer between customers using IBAN."""
-    # Check for tax hold
-    tax_hold = await check_tax_hold(current_user["id"], db)
-    if tax_hold:
-        tax_amount = tax_hold["tax_amount_cents"] / 100
-        raise HTTPException(
-            status_code=403,
-            detail={
-                "code": "TAX_HOLD",
-                "message": "Your account is currently restricted due to outstanding tax obligations.",
-                "tax_amount_due": tax_amount,
-                "formatted_message": f"Account Restricted: Your account has been temporarily suspended due to outstanding tax obligations of €{tax_amount:,.2f}. To restore full access to your banking services, please settle the required amount. For assistance, contact our support team at support@projectatlas.eu"
-            }
-        )
-    
-    ledger_engine = LedgerEngine(db)
-    transfer_service = TransferService(db, ledger_engine)
-    
-    result = await transfer_service.p2p_transfer(
-        from_user_id=current_user["id"],
-        to_iban=data.to_iban,
-        amount=data.amount,
-        reason=data.reason,
-        recipient_name=data.recipient_name,
-        instant_requested=data.instant_requested  # Store for future instant transfer support
-    )
-    
-    return result
+# NOTE: /api/v1/transfers/p2p moved to routers/transfers.py
+# @app.post("/api/v1/transfers/p2p")
+# async def create_p2p_transfer(
+#     data: P2PTransferRequest,
+#     current_user: dict = Depends(get_current_user),
+#     db: AsyncIOMotorDatabase = Depends(get_database)
+# ):
+#     """Create P2P transfer between customers using IBAN."""
+#     # Check for tax hold
+#     tax_hold = await check_tax_hold(current_user["id"], db)
+#     if tax_hold:
+#         tax_amount = tax_hold["tax_amount_cents"] / 100
+#         raise HTTPException(
+#             status_code=403,
+#             detail={
+#                 "code": "TAX_HOLD",
+#                 "message": "Your account is currently restricted due to outstanding tax obligations.",
+#                 "tax_amount_due": tax_amount,
+#                 "formatted_message": f"Account Restricted: Your account has been temporarily suspended due to outstanding tax obligations of €{tax_amount:,.2f}. To restore full access to your banking services, please settle the required amount. For assistance, contact our support team at support@projectatlas.eu"
+#             }
+#         )
+#     
+#     ledger_engine = LedgerEngine(db)
+#     transfer_service = TransferService(db, ledger_engine)
+#     
+#     result = await transfer_service.p2p_transfer(
+#         from_user_id=current_user["id"],
+#         to_iban=data.to_iban,
+#         amount=data.amount,
+#         reason=data.reason,
+#         recipient_name=data.recipient_name,
+#         instant_requested=data.instant_requested  # Store for future instant transfer support
+#     )
+#     
+#     return result
 
 
 # ==================== BENEFICIARIES ====================
