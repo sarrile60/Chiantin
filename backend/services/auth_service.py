@@ -171,8 +171,20 @@ class AuthService:
         return True
     
     async def get_user(self, user_id: str) -> Optional[User]:
-        """Get user by ID."""
+        """Get user by ID. Handles both string and ObjectId formats."""
+        from bson import ObjectId
+        from bson.errors import InvalidId
+        
+        # First try as string (for seed data)
         user_doc = await self.db.users.find_one({"_id": user_id})
+        
+        # If not found, try as ObjectId
+        if not user_doc:
+            try:
+                user_doc = await self.db.users.find_one({"_id": ObjectId(user_id)})
+            except InvalidId:
+                pass
+        
         if not user_doc:
             return None
         return User(**serialize_doc(user_doc))
