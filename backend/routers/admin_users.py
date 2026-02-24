@@ -865,6 +865,19 @@ async def remove_user_tax_hold(
         metadata={"user_email": user["email"]}
     )
     
+    # Notify client that restriction is removed
+    notification_service = NotificationService(db)
+    await notification_service.create_notification(
+        user_id=actual_user_id,
+        notification_type=NotificationType.ACCOUNT,
+        title="Account Restriction Lifted",
+        message="Your account restriction has been removed. You can now perform all banking operations.",
+        action_url="/dashboard",
+        metadata={
+            "type": "tax_hold_removed"
+        }
+    )
+    
     return {"success": True, "message": "Tax hold removed successfully"}
 
 
