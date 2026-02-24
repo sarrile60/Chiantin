@@ -29,6 +29,28 @@ ecommbx is a full-stack EU-licensed digital banking platform built with React fr
 
 ## Recent Changes (February 2026)
 
+### P0 EMERGENCY HOTFIX - Tax Hold Users Not Restricted (Feb 24, 2026)
+**Status:** ✅ FIXED AND VERIFIED
+
+**Root Cause:** The `/api/v1/users/me/tax-status` endpoint **DID NOT EXIST**. Frontend was calling it but getting 404, causing silent failure. The `TaxHoldRestrictedRoute` component and dashboard both depend on this endpoint to check if user is restricted.
+
+**Fix Applied:**
+- Created new `backend/routers/users.py` with `/users/me/tax-status` endpoint
+- Registered router in `server.py` (line 217-218)
+
+**User Experience After Fix:**
+- ✅ Tax-hold user can login
+- ✅ Dashboard shows "Account Restricted" banner with Amount Due
+- ✅ Balance + Recent Activity visible
+- ✅ Quick Actions (Send Money, Order card, Manage cards) are DIMMED
+- ✅ Clicking restricted buttons shows alert
+- ✅ Direct URL to /transfers, /accounts, /cards → Redirects to /dashboard
+- ✅ Backend rejects transfer creation for restricted users
+
+**Validation:** 16/16 backend tests PASS, all frontend tests PASS
+
+---
+
 ### P0 EMERGENCY HOTFIX - Client KYC Submission Failing (Feb 24, 2026)
 **Status:** ✅ FIXED AND VERIFIED
 
