@@ -27,7 +27,6 @@ function useBadgeManager(apiUrl, token) {
 
   // Fetch counts from API (uses database-stored last_seen_at per section)
   const fetchCounts = useCallback(async () => {
-    console.log('[BadgeManager] fetchCounts called', { apiUrl: !!apiUrl, token: !!token });
     if (!apiUrl || !token) return null;
     
     try {
@@ -40,7 +39,6 @@ function useBadgeManager(apiUrl, token) {
       
       if (response.ok) {
         const data = await response.json();
-        console.log('[BadgeManager] Counts received:', data);
         return data;
       } else if (response.status === 401) {
         // Token expired - don't retry
