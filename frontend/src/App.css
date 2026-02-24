@@ -202,10 +202,12 @@ body {
   flex: 1;
   background: white;
   min-height: 100vh;
-  /* Fix: Constrain width to prevent horizontal overflow on smaller monitors */
+  /* Fix: Use box-sizing and explicit width to prevent overflow */
+  box-sizing: border-box;
   width: calc(100vw - 240px);
   max-width: calc(100vw - 240px);
-  overflow-x: auto;
+  min-width: 0; /* Critical: Allow flex child to shrink below content size */
+  overflow-x: hidden; /* Contain any internal overflow - table has its own scroll */
 }
 
 /* Smooth section content transitions - prevents layout shift during section switch */
