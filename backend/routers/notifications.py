@@ -123,10 +123,12 @@ async def get_admin_notification_counts(
         })
     
     async def get_kyc_new():
-        """Count KYC applications submitted since last seen, with status PENDING."""
+        """Count KYC applications submitted since last seen, with status SUBMITTED.
+        NOTE: KYC applications use 'SUBMITTED' status (not 'PENDING') when awaiting review.
+        """
         last_seen = last_seen_map.get('kyc', default_last_seen)
         return await db.kyc_applications.count_documents({
-            "status": "PENDING",
+            "status": "SUBMITTED",
             "created_at": {"$gt": last_seen}
         })
     
