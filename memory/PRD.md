@@ -2155,3 +2155,37 @@ See `/app/P1_BUG_ASSESSMENT.md` for:
 
 ### Transfer Restore: EXPLICITLY SKIPPED
 Per user requirement - deferred to future session
+
+---
+
+## P0 Backend Router Extraction - FINAL STATUS (Dec 2025)
+
+### Routers Extracted (ALL VERIFIED ✅)
+
+| Router | File | Lines | Endpoints | Status |
+|--------|------|-------|-----------|--------|
+| auth | routers/auth.py | 710 | 12 | ✅ DONE |
+| analytics | routers/analytics.py | 249 | 2 | ✅ DONE |
+| notifications | routers/notifications.py | 392 | 8 | ✅ DONE |
+| cards | routers/cards.py | 401 | 7 | ✅ DONE |
+| accounts | routers/accounts.py | 619 | 10 | ✅ DONE |
+
+### Remaining in server.py (NOT EXTRACTED)
+- **transfers** routes (10 endpoints) - Highest risk, deferred
+- **recipients** routes (3 endpoints) - Can be combined with transfers
+- **beneficiaries** routes (3 endpoints)
+- **scheduled-payments** routes (3 endpoints)
+- **insights** routes (2 endpoints)
+
+### P1 ObjectId Bug: ✅ FIXED
+- Testing agent applied the documented fix to auth_service.get_user()
+- Now handles both string and ObjectId user IDs
+- /auth/me and /auth/mfa/* now working correctly
+
+### Transfer Restore: ❌ EXPLICITLY SKIPPED
+Per user requirement - deferred
+
+### Test Results
+- `/app/test_reports/iteration_126.json`: 100% success (19/19 backend, all frontend)
+- All sidebar sections verified working
+- No regressions detected
