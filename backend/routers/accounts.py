@@ -29,7 +29,7 @@ import uuid
 import logging
 
 from database import get_database
-from services.ledger_engine import LedgerEngine
+from services.ledger_service import LedgerEngine
 from services.banking_service import BankingService
 from services.statement_service import StatementService
 from schemas.banking import AccountResponse
