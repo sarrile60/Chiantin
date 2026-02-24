@@ -27,6 +27,8 @@ import uuid
 from database import get_database
 from services.email_service import EmailService
 from services.auth_service import AuthService
+from services.notification_service import NotificationService
+from schemas.notifications import NotificationType
 
 from .dependencies import get_current_user, require_admin, create_audit_log, format_timestamp_utc
 
