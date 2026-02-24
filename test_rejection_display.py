@@ -8,7 +8,7 @@ import sys
 from datetime import datetime
 
 # Backend URL
-BASE_URL = "https://extract-transfers.preview.emergentagent.com/api/v1"
+BASE_URL = "https://redeploy-validation.preview.emergentagent.com/api/v1"
 
 # Test credentials
 TEST_USER_EMAIL = "ashleyalt004@gmail.com"

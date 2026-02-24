@@ -85,5 +85,5 @@
     "completed_transfers": 5,
     "pending_card_requests": 9
   },
-  "test_environment": "https://extract-transfers.preview.emergentagent.com"
+  "test_environment": "https://redeploy-validation.preview.emergentagent.com"
 }

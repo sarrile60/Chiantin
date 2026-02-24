@@ -94,6 +94,6 @@
     "admin": "admin@ecommbx.io / Admin@123456",
     "customer": "ashleyalt005@gmail.com / 123456789"
   },
-  "test_environment": "https://extract-transfers.preview.emergentagent.com",
+  "test_environment": "https://redeploy-validation.preview.emergentagent.com",
   "test_date": "2026-02-20"
 }

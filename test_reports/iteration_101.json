@@ -53,5 +53,5 @@
       "Delete modal: Opens and closes correctly - WORKING"
     ]
   },
-  "test_environment": "https://extract-transfers.preview.emergentagent.com"
+  "test_environment": "https://redeploy-validation.preview.emergentagent.com"
 }

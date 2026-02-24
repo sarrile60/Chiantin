@@ -1,6 +1,6 @@
 import requests
 
-BASE_URL = "https://extract-transfers.preview.emergentagent.com/api/v1"
+BASE_URL = "https://redeploy-validation.preview.emergentagent.com/api/v1"
 ADMIN_EMAIL = "admin@ecommbx.io"
 ADMIN_PASSWORD = "Admin@123456"
 
