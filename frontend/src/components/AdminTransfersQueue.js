@@ -612,7 +612,7 @@ export function AdminTransfersQueue() {
                     Cancel
                   </button>
                   <button
-                    onClick={handleRestore}
+                    onClick={() => handleRestore(selectedTransfer)}
                     disabled={restoringTransfer}
                     className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
                     data-testid="confirm-restore-btn"
