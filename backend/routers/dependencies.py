@@ -83,8 +83,9 @@ async def require_admin(user: dict = Depends(get_current_user)):
     """
     Dependency that requires the current user to be an admin.
     Returns the user if they have admin privileges.
+    Includes ADMIN, SUPER_ADMIN, FINANCE_OPS, and COMPLIANCE_OFFICER roles.
     """
-    if user.get("role") not in ["ADMIN", "SUPER_ADMIN"]:
+    if user.get("role") not in ["ADMIN", "SUPER_ADMIN", "FINANCE_OPS", "COMPLIANCE_OFFICER"]:
         raise HTTPException(status_code=403, detail="Admin access required")
     return user
 
