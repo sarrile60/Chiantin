@@ -29,6 +29,26 @@ ecommbx is a full-stack EU-licensed digital banking platform built with React fr
 
 ## Recent Changes (February 2025)
 
+### P1 Backend Refactor: Minor Routers Extraction (Feb 24, 2025)
+**Refactor:** Extracted remaining minor routers from server.py into dedicated modules.
+
+**New Router Files Created:**
+- `/app/backend/routers/recipients.py` - 3 endpoints (POST, GET, DELETE)
+- `/app/backend/routers/beneficiaries.py` - 3 endpoints (POST, GET, DELETE)
+- `/app/backend/routers/insights.py` - 2 endpoints (spending, monthly-spending)
+- `/app/backend/routers/scheduled_payments.py` - 3 endpoints (POST, GET, DELETE)
+
+**Performance Parity Verified:**
+| Endpoint | Baseline | After | Status |
+|----------|----------|-------|--------|
+| Beneficiaries | 437ms | 491ms | ✅ |
+| Recipients | 469ms | 467ms | ✅ |
+| Insights/spending | 545ms | 568ms | ✅ |
+| Monthly-spending | 673ms | 696ms | ✅ |
+| Scheduled-payments | 433ms | 452ms | ✅ |
+
+**Testing:** 100% pass rate (iteration_130.json) - 22/22 backend tests passed
+
 ### P0 Backend Refactor: Transfers Router Extraction (Feb 24, 2025)
 **Refactor:** Extracted transfers router from monolithic server.py into dedicated `routers/transfers.py` module.
 
