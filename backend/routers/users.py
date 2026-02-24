@@ -15,8 +15,7 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 from datetime import datetime, timezone
 
 from database import get_database
-from .dependencies import get_current_user
-from utils.timestamps import format_timestamp_utc
+from .dependencies import get_current_user, format_timestamp_utc
 
 router = APIRouter(prefix="/api/v1/users", tags=["users"])
 
