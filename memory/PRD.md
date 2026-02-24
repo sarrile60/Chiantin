@@ -29,6 +29,15 @@ ecommbx is a full-stack EU-licensed digital banking platform built with React fr
 
 ## Recent Changes (February 2025)
 
+### P1 UX Bugfix: Support Tickets Auto-Scroll (Feb 24, 2025)
+**Symptom:** Chat scroll position stayed where it was after admin sent a message - had to manually scroll to see new message
+**Root Cause:** No auto-scroll logic implemented after message send or ticket open
+**Fix:** Added `messagesContainerRef`, `scrollToBottom()` function with setTimeout(100ms), and useEffect hooks
+- Scroll triggers when `ticket.id` changes (opening new ticket)
+- Scroll triggers when `ticket.messages.length` changes (new message sent)
+**File:** `frontend/src/components/Support.js`
+**Testing:** 100% pass rate (iteration_135.json) - All auto-scroll scenarios verified
+
 ### P1 BUGFIX: Support Tickets Thread Disappear + Admin Self-Notification (Feb 24, 2025)
 **Bug A Fixed: Thread Disappears After Admin Sends Message**
 - **Symptom:** Chat panel went blank after admin sent a message
