@@ -294,11 +294,19 @@ class TicketService:
             attachments=attachments or []
         )
         
+        # Build update operation
+        update_fields = {"updated_at": datetime.utcnow()}
+        
+        # Track last client message timestamp separately for admin notifications
+        # Only client messages should trigger admin notification badges
+        if not is_staff:
+            update_fields["last_client_message_at"] = datetime.utcnow()
+        
         await self.db.tickets.update_one(
             {"_id": ticket_id},
             {
                 "$push": {"messages": message.model_dump()},
-                "$set": {"updated_at": datetime.utcnow()}
+                "$set": update_fields
             }
         )
         
