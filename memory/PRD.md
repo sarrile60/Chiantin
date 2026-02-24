@@ -29,6 +29,21 @@ ecommbx is a full-stack EU-licensed digital banking platform built with React fr
 
 ## Recent Changes (February 2025)
 
+### P1 BUGFIX: Support Tickets Thread Disappear + Admin Self-Notification (Feb 24, 2025)
+**Bug A Fixed: Thread Disappears After Admin Sends Message**
+- **Symptom:** Chat panel went blank after admin sent a message
+- **Root Cause:** `refreshSelectedTicket()` fetched list view (no messages), replacing full ticket data
+- **Fix:** Now fetches `/admin/tickets/{id}` first to get full ticket details with messages
+- **File:** `frontend/src/components/Support.js`
+
+**Bug B Fixed: Admin Receives Notification for Own Message**
+- **Symptom:** Support badge incremented when admin sent message (shouldn't happen)
+- **Root Cause:** Notification count used `updated_at` timestamp (any activity)
+- **Fix:** Added `last_client_message_at` field that only updates for client messages (is_staff=False)
+- **Files:** `backend/services/ticket_service.py`, `backend/routers/notifications.py`
+
+**Testing:** 100% pass rate (iteration_134.json) - Both bugs fixed, all regression tests pass
+
 ### P1/P2 Admin UX Enhancement Session (Feb 24, 2025)
 **Scope:** UI/UX polish only - no business logic changes.
 
