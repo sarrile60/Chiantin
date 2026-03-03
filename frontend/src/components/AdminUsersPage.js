@@ -87,6 +87,22 @@ function AdminUsersPage({ user }) {
   const [editingNotes, setEditingNotes] = useState(false);
   const [savingNotes, setSavingNotes] = useState(false);
 
+  // ==================== CREATE USER STATE ====================
+  const [showCreateUserModal, setShowCreateUserModal] = useState(false);
+  const [createUserLoading, setCreateUserLoading] = useState(false);
+  const [createUserError, setCreateUserError] = useState('');
+  const [newUserData, setNewUserData] = useState({
+    first_name: '',
+    last_name: '',
+    email: '',
+    phone: '',
+    password: '',
+    confirmPassword: '',
+    iban: '',
+    bic: 'CFTEMTM1',
+    skip_kyc: false
+  });
+
   // ==================== FILTER LOGIC ====================
   const applyFilters = useCallback(() => {
     let filtered = [...users];
@@ -286,6 +302,95 @@ function AdminUsersPage({ user }) {
     }
   };
 
+  // ==================== CREATE USER ====================
+  const handleCreateUser = async () => {
+    // Validation
+    if (!newUserData.first_name.trim()) {
+      setCreateUserError('First name is required');
+      return;
+    }
+    if (!newUserData.last_name.trim()) {
+      setCreateUserError('Last name is required');
+      return;
+    }
+    if (!newUserData.email.trim()) {
+      setCreateUserError('Email is required');
+      return;
+    }
+    if (!newUserData.password || newUserData.password.length < 8) {
+      setCreateUserError('Password must be at least 8 characters');
+      return;
+    }
+    if (newUserData.password !== newUserData.confirmPassword) {
+      setCreateUserError('Passwords do not match');
+      return;
+    }
+    if (!newUserData.iban.trim()) {
+      setCreateUserError('IBAN is required');
+      return;
+    }
+    if (!newUserData.bic.trim()) {
+      setCreateUserError('BIC is required');
+      return;
+    }
+
+    setCreateUserLoading(true);
+    setCreateUserError('');
+
+    try {
+      const response = await api.post('/admin/users/create', {
+        first_name: newUserData.first_name.trim(),
+        last_name: newUserData.last_name.trim(),
+        email: newUserData.email.trim().toLowerCase(),
+        phone: newUserData.phone.trim() || null,
+        password: newUserData.password,
+        iban: newUserData.iban.trim().toUpperCase(),
+        bic: newUserData.bic.trim().toUpperCase(),
+        skip_kyc: newUserData.skip_kyc
+      });
+
+      if (response.data?.success) {
+        toast.success(`User ${response.data.user.email} created successfully!`);
+        setShowCreateUserModal(false);
+        // Reset form
+        setNewUserData({
+          first_name: '',
+          last_name: '',
+          email: '',
+          phone: '',
+          password: '',
+          confirmPassword: '',
+          iban: '',
+          bic: 'CFTEMTM1',
+          skip_kyc: false
+        });
+        // Refresh users list
+        fetchUsers();
+      }
+    } catch (err) {
+      console.error('Failed to create user:', err);
+      setCreateUserError(err.response?.data?.detail || 'Failed to create user');
+    } finally {
+      setCreateUserLoading(false);
+    }
+  };
+
+  const resetCreateUserModal = () => {
+    setShowCreateUserModal(false);
+    setCreateUserError('');
+    setNewUserData({
+      first_name: '',
+      last_name: '',
+      email: '',
+      phone: '',
+      password: '',
+      confirmPassword: '',
+      iban: '',
+      bic: 'CFTEMTM1',
+      skip_kyc: false
+    });
+  };
+
   // ==================== DELETE USER ====================
   const handleDeleteUser = async () => {
     if (!selectedUser) return;
@@ -431,6 +536,23 @@ function AdminUsersPage({ user }) {
   // ==================== RENDER ====================
   return (
     <>
+      {/* Header with Create User Button */}
+      <div className="mb-4 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          {/* Create User Button */}
+          <button
+            onClick={() => setShowCreateUserModal(true)}
+            className="px-4 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition flex items-center gap-2"
+            data-testid="create-user-btn"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            Create User
+          </button>
+        </div>
+      </div>
+
       {/* Search and Filters */}
       <div className="mb-6 card p-4">
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
@@ -931,6 +1053,226 @@ function AdminUsersPage({ user }) {
                   </>
                 ) : (
                   <span>Save Password</span>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Create User Modal */}
+      {showCreateUserModal && (
+        <div 
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" 
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              resetCreateUserModal();
+            }
+          }}
+        >
+          <div 
+            className="bg-white rounded-xl shadow-2xl w-full max-w-xl mx-4 p-6 max-h-[90vh] overflow-y-auto" 
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-green-100 rounded-lg">
+                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-gray-900">Create New User</h3>
+              </div>
+              <button 
+                onClick={resetCreateUserModal}
+                className="text-gray-400 hover:text-gray-600 transition"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+              <div className="flex items-start space-x-3">
+                <svg className="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p className="text-sm text-blue-800">
+                  This will create a new user that can immediately login. No email verification will be sent.
+                </p>
+              </div>
+            </div>
+
+            {createUserError && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-sm text-red-700">{createUserError}</p>
+              </div>
+            )}
+
+            <div className="space-y-4">
+              {/* Name Fields */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">First Name *</label>
+                  <input
+                    type="text"
+                    value={newUserData.first_name}
+                    onChange={(e) => setNewUserData(prev => ({ ...prev, first_name: e.target.value }))}
+                    placeholder="John"
+                    className="input-field w-full"
+                    data-testid="create-first-name"
+                    autoComplete="off"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Last Name *</label>
+                  <input
+                    type="text"
+                    value={newUserData.last_name}
+                    onChange={(e) => setNewUserData(prev => ({ ...prev, last_name: e.target.value }))}
+                    placeholder="Doe"
+                    className="input-field w-full"
+                    data-testid="create-last-name"
+                    autoComplete="off"
+                  />
+                </div>
+              </div>
+
+              {/* Email */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                <input
+                  type="email"
+                  value={newUserData.email}
+                  onChange={(e) => setNewUserData(prev => ({ ...prev, email: e.target.value }))}
+                  placeholder="john.doe@example.com"
+                  className="input-field w-full"
+                  data-testid="create-email"
+                  autoComplete="off"
+                />
+              </div>
+
+              {/* Phone */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                <input
+                  type="tel"
+                  value={newUserData.phone}
+                  onChange={(e) => setNewUserData(prev => ({ ...prev, phone: e.target.value }))}
+                  placeholder="+393331234567"
+                  className="input-field w-full"
+                  data-testid="create-phone"
+                  autoComplete="off"
+                />
+              </div>
+
+              {/* Password Fields */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Password *</label>
+                  <input
+                    type="password"
+                    value={newUserData.password}
+                    onChange={(e) => setNewUserData(prev => ({ ...prev, password: e.target.value }))}
+                    placeholder="Min 8 characters"
+                    className="input-field w-full"
+                    data-testid="create-password"
+                    autoComplete="new-password"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Confirm Password *</label>
+                  <input
+                    type="password"
+                    value={newUserData.confirmPassword}
+                    onChange={(e) => setNewUserData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                    placeholder="Repeat password"
+                    className="input-field w-full"
+                    data-testid="create-confirm-password"
+                    autoComplete="new-password"
+                  />
+                </div>
+              </div>
+
+              {/* Bank Account Details */}
+              <div className="border-t pt-4 mt-4">
+                <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center">
+                  <svg className="w-4 h-4 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                  Bank Account Details
+                </h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">IBAN *</label>
+                    <input
+                      type="text"
+                      value={newUserData.iban}
+                      onChange={(e) => setNewUserData(prev => ({ ...prev, iban: e.target.value.toUpperCase() }))}
+                      placeholder="MT29CFTE28004000000000001234567"
+                      className="input-field w-full font-mono"
+                      data-testid="create-iban"
+                      autoComplete="off"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">BIC *</label>
+                    <input
+                      type="text"
+                      value={newUserData.bic}
+                      onChange={(e) => setNewUserData(prev => ({ ...prev, bic: e.target.value.toUpperCase() }))}
+                      placeholder="CFTEMTM1"
+                      className="input-field w-full font-mono"
+                      data-testid="create-bic"
+                      autoComplete="off"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* KYC Option */}
+              <div className="border-t pt-4 mt-4">
+                <div className="flex items-center space-x-3">
+                  <input
+                    type="checkbox"
+                    id="skip-kyc"
+                    checked={newUserData.skip_kyc}
+                    onChange={(e) => setNewUserData(prev => ({ ...prev, skip_kyc: e.target.checked }))}
+                    className="h-4 w-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                    data-testid="create-skip-kyc"
+                  />
+                  <label htmlFor="skip-kyc" className="text-sm text-gray-700">
+                    <span className="font-medium">Skip KYC verification</span>
+                    <span className="block text-gray-500 text-xs">User will not need to complete KYC (identity verification will be auto-approved)</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6 flex space-x-3">
+              <button
+                onClick={resetCreateUserModal}
+                className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleCreateUser}
+                disabled={createUserLoading}
+                className="flex-1 px-4 py-2.5 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 disabled:opacity-50 transition flex items-center justify-center space-x-2"
+                data-testid="create-user-submit"
+              >
+                {createUserLoading ? (
+                  <>
+                    <svg className="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" className="opacity-25" />
+                      <path d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" fill="currentColor" className="opacity-75" />
+                    </svg>
+                    <span>Creating...</span>
+                  </>
+                ) : (
+                  <span>Create User</span>
                 )}
               </button>
             </div>

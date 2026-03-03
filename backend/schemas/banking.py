@@ -83,6 +83,7 @@ class AccountResponse(BaseModel):
     id: str
     account_number: str
     iban: Optional[str] = None
+    bic: Optional[str] = None
     currency: str
     status: AccountStatus
     balance: int  # Derived from ledger

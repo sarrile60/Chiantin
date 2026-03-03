@@ -139,6 +139,7 @@ async def create_account(
         id=account.id,
         account_number=account.account_number,
         iban=account.iban,
+        bic=account.bic,
         currency=account.currency,
         status=account.status,
         balance=balance,

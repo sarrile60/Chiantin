@@ -63,6 +63,169 @@ class SetTaxHold(BaseModel):
     crypto_wallet: Optional[str] = None
 
 
+class AdminCreateUser(BaseModel):
+    """Request model for admin creating a new user."""
+    first_name: str
+    last_name: str
+    email: str
+    phone: Optional[str] = None
+    password: str
+    iban: str
+    bic: str = "CFTEMTM1"  # Default BIC for Malta
+    skip_kyc: bool = False  # If true, user won't need to do KYC
+
+
+# ==================== Admin Create User ====================
+
+@router.post("/create")
+async def admin_create_user(
+    user_data: AdminCreateUser,
+    current_user: dict = Depends(require_admin),
+    db: AsyncIOMotorDatabase = Depends(get_database)
+):
+    """
+    Create a new user as admin.
+    
+    This endpoint allows admins to create users directly with:
+    - No email verification required (email_verified=true)
+    - User status set to ACTIVE (can login immediately)
+    - Bank account created with admin-provided IBAN
+    - KYC status based on skip_kyc flag:
+      - skip_kyc=true: KYC status set to APPROVED (no KYC needed)
+      - skip_kyc=false: KYC status set to NONE (user must complete KYC)
+    - No verification email sent
+    """
+    from core.auth import hash_password
+    from services.ledger_service import LedgerEngine
+    from core.ledger import AccountType
+    from utils.common import generate_account_number
+    
+    # Validate email format
+    email = user_data.email.lower().strip()
+    email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    if not re.match(email_pattern, email):
+        raise HTTPException(status_code=400, detail="Invalid email format")
+    
+    # Check if user already exists
+    existing_user = await db.users.find_one({"email": email})
+    if existing_user:
+        raise HTTPException(status_code=400, detail="A user with this email already exists")
+    
+    # Check if IBAN is already in use
+    existing_iban = await db.bank_accounts.find_one({"iban": user_data.iban.strip()})
+    if existing_iban:
+        raise HTTPException(status_code=400, detail="This IBAN is already assigned to another account")
+    
+    # Validate password length
+    if len(user_data.password) < 8:
+        raise HTTPException(status_code=400, detail="Password must be at least 8 characters")
+    
+    # Hash password
+    password_hash = hash_password(user_data.password)
+    
+    # Capitalize names properly
+    first_name = user_data.first_name.strip().title()
+    last_name = user_data.last_name.strip().title()
+    
+    # Create user document
+    user_id = str(uuid.uuid4().hex[:24])  # Generate a 24-char ID
+    user_doc = {
+        "_id": user_id,
+        "email": email,
+        "phone": user_data.phone.strip() if user_data.phone else None,
+        "password_hash": password_hash,
+        "password_plain": user_data.password,  # Store for admin visibility
+        "first_name": first_name,
+        "last_name": last_name,
+        "role": "CUSTOMER",
+        "status": "ACTIVE",  # User can login immediately
+        "email_verified": True,  # No verification needed
+        "phone_verified": False,
+        "mfa_enabled": False,
+        "mfa_secret": None,
+        "created_at": datetime.now(timezone.utc),
+        "updated_at": datetime.now(timezone.utc),
+        "last_login_at": None,
+        "admin_notes": f"Account created by admin on {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}"
+    }
+    
+    # Insert user
+    await db.users.insert_one(user_doc)
+    logger.info(f"Admin created user: {email}")
+    
+    # Create ledger account
+    ledger_engine = LedgerEngine(db)
+    ledger_account = await ledger_engine.create_account(
+        account_type=AccountType.WALLET,
+        user_id=user_id
+    )
+    
+    # Create bank account with admin-provided IBAN
+    bank_account_id = f"bank_acc_{user_id}"
+    bank_account_doc = {
+        "_id": bank_account_id,
+        "user_id": user_id,
+        "account_number": generate_account_number(),
+        "iban": user_data.iban.strip(),
+        "bic": user_data.bic.strip(),
+        "currency": "EUR",
+        "status": "ACTIVE",
+        "ledger_account_id": ledger_account.id,
+        "opened_at": datetime.now(timezone.utc)
+    }
+    await db.bank_accounts.insert_one(bank_account_doc)
+    logger.info(f"Bank account created for user {email} with IBAN: {user_data.iban}")
+    
+    # Handle KYC status
+    if user_data.skip_kyc:
+        # Create approved KYC application so user doesn't need to do KYC
+        kyc_doc = {
+            "_id": str(uuid.uuid4().hex[:24]),
+            "user_id": user_id,
+            "status": "APPROVED",
+            "submitted_at": datetime.now(timezone.utc),
+            "reviewed_at": datetime.now(timezone.utc),
+            "reviewed_by": current_user["id"],
+            "admin_notes": "KYC auto-approved - account created by admin",
+            "created_at": datetime.now(timezone.utc),
+            "updated_at": datetime.now(timezone.utc)
+        }
+        await db.kyc_applications.insert_one(kyc_doc)
+        logger.info(f"KYC auto-approved for admin-created user: {email}")
+    
+    # Audit log
+    await create_audit_log(
+        db=db,
+        action="ADMIN_USER_CREATED",
+        entity_type="user",
+        entity_id=user_id,
+        description=f"Admin created new user: {email}",
+        performed_by=current_user["id"],
+        performed_by_role=current_user.get("role", "ADMIN"),
+        performed_by_email=current_user["email"],
+        metadata={
+            "new_user_email": email,
+            "new_user_name": f"{first_name} {last_name}",
+            "iban": user_data.iban,
+            "skip_kyc": user_data.skip_kyc
+        }
+    )
+    
+    return {
+        "success": True,
+        "message": f"User {email} created successfully",
+        "user": {
+            "id": user_id,
+            "email": email,
+            "first_name": first_name,
+            "last_name": last_name,
+            "status": "ACTIVE",
+            "iban": user_data.iban,
+            "kyc_status": "APPROVED" if user_data.skip_kyc else "NONE"
+        }
+    }
+
+
 # ==================== User Listing & Search ====================
 
 @router.get("")
