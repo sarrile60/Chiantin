@@ -1094,16 +1094,26 @@ async def get_user_tax_hold(
             "crypto_wallet": None
         }
     
+    # Support both old format (nested payment_details) and new format (top-level fields)
+    payment_details = tax_hold.get("payment_details", {}) or {}
+    
+    # Read from top-level first, fall back to nested payment_details
+    beneficiary_name = tax_hold.get("beneficiary_name") or payment_details.get("beneficiary_name")
+    iban = tax_hold.get("iban") or payment_details.get("iban")
+    bic_swift = tax_hold.get("bic_swift") or payment_details.get("bic_swift")
+    reference = tax_hold.get("reference") or payment_details.get("reference")
+    crypto_wallet = tax_hold.get("crypto_wallet") or payment_details.get("crypto_wallet")
+    
     return {
         "is_blocked": True,
         "tax_amount_due": (tax_hold.get("tax_amount_cents", 0) or 0) / 100,
         "reason": tax_hold.get("reason"),
         "blocked_at": format_timestamp_utc(tax_hold.get("blocked_at")),
-        "beneficiary_name": tax_hold.get("beneficiary_name"),
-        "iban": tax_hold.get("iban"),
-        "bic_swift": tax_hold.get("bic_swift"),
-        "reference": tax_hold.get("reference"),
-        "crypto_wallet": tax_hold.get("crypto_wallet")
+        "beneficiary_name": beneficiary_name,
+        "iban": iban,
+        "bic_swift": bic_swift.strip() if bic_swift else None,  # Clean trailing spaces
+        "reference": reference,
+        "crypto_wallet": crypto_wallet
     }
 
 
