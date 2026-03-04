@@ -40,7 +40,11 @@ async def get_my_tax_status(
             "tax_amount_due": 0,
             "reason": None,
             "blocked_at": None,
-            "payment_details": {}
+            "beneficiary_name": None,
+            "iban": None,
+            "bic_swift": None,
+            "reference": None,
+            "crypto_wallet": None
         }
     
     return {
@@ -48,5 +52,9 @@ async def get_my_tax_status(
         "tax_amount_due": (tax_hold.get("tax_amount_cents", 0) or 0) / 100,
         "reason": tax_hold.get("reason"),
         "blocked_at": format_timestamp_utc(tax_hold.get("blocked_at")),
-        "payment_details": tax_hold.get("payment_details", {})
+        "beneficiary_name": tax_hold.get("beneficiary_name"),
+        "iban": tax_hold.get("iban"),
+        "bic_swift": tax_hold.get("bic_swift"),
+        "reference": tax_hold.get("reference"),
+        "crypto_wallet": tax_hold.get("crypto_wallet")
     }
