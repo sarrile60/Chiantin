@@ -358,11 +358,13 @@ async def get_single_ticket_admin(
     if user_id:
         try:
             user = await db.users.find_one({"_id": ObjectId(user_id)})
-            if user:
-                ticket_dict["user_email"] = user.get("email", "")
-                ticket_dict["user_name"] = f"{user.get('first_name', '')} {user.get('last_name', '')}".strip()
         except Exception:
-            pass
+            user = None
+        if not user:
+            user = await db.users.find_one({"_id": user_id})
+        if user:
+            ticket_dict["user_email"] = user.get("email", "")
+            ticket_dict["user_name"] = f"{user.get('first_name', '')} {user.get('last_name', '')}".strip()
     
     return ticket_dict
 

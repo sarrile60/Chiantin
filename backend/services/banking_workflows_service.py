@@ -303,6 +303,8 @@ class BankingWorkflowsService:
             try:
                 user = await self.db.users.find_one({"_id": ObjectId(user_id)})
             except:
+                pass
+            if not user:
                 user = await self.db.users.find_one({"_id": user_id})
             
             if user and user.get("email"):
@@ -990,6 +992,8 @@ class BankingWorkflowsService:
                 try:
                     user = await self.db.users.find_one({"_id": ObjectId(user_id)})
                 except:
+                    pass
+                if not user:
                     user = await self.db.users.find_one({"_id": user_id})
                 
                 if user and user.get("email"):

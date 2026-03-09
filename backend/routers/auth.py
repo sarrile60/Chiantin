@@ -292,7 +292,10 @@ async def verify_user_password(
         # First try as ObjectId
         user_doc = await db.users.find_one({"_id": ObjectId(user_id)})
     except (InvalidId, TypeError):
-        # If not a valid ObjectId, try as string
+        pass
+    
+    # If ObjectId lookup failed (admin-created users have string IDs), try as string
+    if not user_doc:
         user_doc = await db.users.find_one({"_id": user_id})
     
     if not user_doc:

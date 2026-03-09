@@ -525,6 +525,8 @@ async def admin_resend_transfer_email(
     try:
         user = await db.users.find_one({"_id": ObjectId(user_id)})
     except:
+        pass
+    if not user:
         user = await db.users.find_one({"_id": user_id})
     
     if not user:
