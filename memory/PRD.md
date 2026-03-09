@@ -136,8 +136,18 @@ Full-stack banking application with KYC, transfers, admin panel, and notificatio
 ## Backlog / Future Tasks
 - Mobile KYC ghost text issue (could not reproduce - needs user screenshots)
 - Performance optimization for large user lists
+- Cloudinary raw file handling: Consider migrating old raw files to include proper Content-Disposition headers
 
-## Latest Changes (Feb 25, 2026)
+## Latest Changes (March 9, 2026)
+### P0 Fix: PDF/Document Download from Support Tickets
+- **Problem:** Non-image files (PDFs, docs) downloaded from support tickets were corrupted/saved without file extension
+- **Root Cause:** Previous fix added file extensions to Cloudinary raw file public_ids, but this Cloudinary account has strict delivery settings that block raw files with extensions in URL (401 ACL failure). Old files without extensions in URL worked fine.
+- **Fix (Backend):** Reverted `cloudinary_storage.py` to always strip extension from public_id for all file types. Cloudinary URL returned from upload is used as-is (without appending extension).
+- **Fix (Frontend):** Blob-based download handler in `Support.js` fetches the raw URL, creates a Blob, and triggers download with `att.file_name` (which has the correct extension). This ensures the saved file has the proper extension regardless of what Cloudinary's Content-Disposition says.
+- **Files Modified:** `backend/providers/cloudinary_storage.py`, `frontend/src/components/Support.js`
+- **Testing:** Verified via testing agent (iteration_158) — all tests passed
+
+## Previous Changes (Feb 25, 2026)
 - Fixed client transaction history rendering for admin-created credits/debits
 - Root cause: Admin topup/withdraw not passing professional banking fields as metadata
 - Now properly displays From/To names, IBANs, BIC, references in transaction detail modals
