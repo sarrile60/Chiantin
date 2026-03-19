@@ -1407,13 +1407,13 @@ function AdminUsersPage({ user }) {
                   type="text"
                   value={domainChangeNewDomain}
                   onChange={(e) => setDomainChangeNewDomain(e.target.value)}
-                  placeholder="e.g., online-ecommbx.com"
+                  placeholder="e.g., chiantin.im"
                   className="input-field w-full"
                   data-testid="domain-change-new-domain-input"
                   autoComplete="off"
                   autoFocus
                 />
-                <p className="text-xs text-gray-500 mt-1">Enter the domain without https:// (e.g., online-ecommbx.com)</p>
+                <p className="text-xs text-gray-500 mt-1">Enter the domain without https:// (e.g., chiantin.im)</p>
               </div>
             </div>
 

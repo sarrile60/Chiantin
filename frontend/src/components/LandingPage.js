@@ -1,4 +1,4 @@
-// ecommbx - Professional Landing Page (Inspired by ECOMMBANX)
+// Chiantin - Professional Landing Page (Inspired by ECOMMBANX)
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage, useTheme } from '../contexts/AppContext';
@@ -654,7 +654,7 @@ export function LandingPage() {
             </div>
           </div>
           <div className={`border-t mt-12 pt-8 text-sm text-center ${isDark ? 'border-gray-800' : 'border-gray-800'}`}>
-            <p>© 2026 ecommbx. {t('allRightsReserved')} {t('licensedBy')}</p>
+            <p>© 2026 Chiantin. {t('allRightsReserved')} {t('licensedBy')}</p>
           </div>
         </div>
       </footer>

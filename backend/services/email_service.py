@@ -60,9 +60,9 @@ EMAIL_TRANSLATIONS = {
         
         # Email Verification
         'email_verify_subject': f'Verify Your Email - {APP_NAME}',
-        'email_verify_title': 'Welcome to ecommbx',
+        'email_verify_title': 'Welcome to Chiantin',
         'email_verify_greeting': 'Hello',
-        'email_verify_body': 'Thank you for registering with ecommbx. To complete your registration and access your account, please verify your email address by clicking the button below:',
+        'email_verify_body': 'Thank you for registering with Chiantin. To complete your registration and access your account, please verify your email address by clicking the button below:',
         'email_verify_button': 'Verify Email Address',
         'email_verify_link_instruction': 'Or copy and paste this link into your browser:',
         'email_verify_expiry': '⏰ This verification link expires in 24 hours.',
@@ -88,7 +88,7 @@ EMAIL_TRANSLATIONS = {
         'transfer_note_2': 'You can track the status in your Transaction History.',
         'transfer_button': 'View Transfer Details',
         'transfer_security_warning': 'If you did not authorize this transfer, please contact our support team immediately.',
-        'transfer_disclaimer': 'Please do not reply to this email. For assistance, contact support@ecommbx.io',
+        'transfer_disclaimer': 'Please do not reply to this email. For assistance, contact support@chiantin.im',
         
         # Transfer Rejected Email
         'transfer_rejected_subject': 'Transfer rejected – action may be required',
@@ -129,9 +129,9 @@ EMAIL_TRANSLATIONS = {
         
         # Email Verification
         'email_verify_subject': f'Verifica la Tua Email - {APP_NAME}',
-        'email_verify_title': 'Benvenuto in ecommbx',
+        'email_verify_title': 'Benvenuto in Chiantin',
         'email_verify_greeting': 'Ciao',
-        'email_verify_body': 'Grazie per esserti registrato con ecommbx. Per completare la registrazione e accedere al tuo account, verifica il tuo indirizzo email cliccando il pulsante qui sotto:',
+        'email_verify_body': 'Grazie per esserti registrato con Chiantin. Per completare la registrazione e accedere al tuo account, verifica il tuo indirizzo email cliccando il pulsante qui sotto:',
         'email_verify_button': 'Verifica Indirizzo Email',
         'email_verify_link_instruction': 'Oppure copia e incolla questo link nel tuo browser:',
         'email_verify_expiry': '⏰ Questo link di verifica scade tra 24 ore.',
@@ -157,7 +157,7 @@ EMAIL_TRANSLATIONS = {
         'transfer_note_2': 'Puoi monitorare lo stato nella tua Cronologia Transazioni.',
         'transfer_button': 'Visualizza Dettagli Bonifico',
         'transfer_security_warning': 'Se non hai autorizzato questo bonifico, contatta immediatamente il nostro servizio clienti.',
-        'transfer_disclaimer': 'Si prega di non rispondere a questa email. Per assistenza, contattare support@ecommbx.io',
+        'transfer_disclaimer': 'Si prega di non rispondere a questa email. Per assistenza, contattare support@chiantin.im',
         
         # Transfer Rejected Email
         'transfer_rejected_subject': 'Bonifico rifiutato – potrebbe essere necessaria un\'azione',
@@ -241,7 +241,7 @@ class EmailService:
             </head>
             <body style="background-color: #f4f4f4;">
                 <div class="header" style="background-color: #1a1a2e; color: #FFFFFF; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-                    <h1 style="margin: 0; color: #FFFFFF;">&#128272; <span class="brand" style="color: #FFFFFF;">ecomm</span><span class="brand-accent" style="color: #dc3545;">bx</span></h1>
+                    <h1 style="margin: 0; color: #FFFFFF;">&#128272; <span class="brand" style="color: #FFFFFF;">Chian</span><span class="brand-accent" style="color: #dc3545;">tin</span></h1>
                     <p style="color: #FFFFFF; margin: 10px 0 0 0;">{t('admin_reset_title')}</p>
                 </div>
                 <div class="content" style="background-color: #f8f9fa; padding: 30px; border-radius: 0 0 10px 10px;">
@@ -282,7 +282,7 @@ class EmailService:
             </head>
             <body style="font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #333333; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f4f4f4;">
                 <div class="email-header" style="background-color: #1a1a2e; color: #FFFFFF; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-                    <h1 style="margin: 0; color: #FFFFFF;">&#128272; <span style="color: #FFFFFF;">ecomm</span><span class="brand-red" style="color: #dc3545;">bx</span></h1>
+                    <h1 style="margin: 0; color: #FFFFFF;">&#128272; <span style="color: #FFFFFF;">Chian</span><span class="brand-red" style="color: #dc3545;">tin</span></h1>
                     <p style="margin: 10px 0 0 0; color: #FFFFFF;">{t('password_reset_title')}</p>
                 </div>
                 <div class="email-content" style="background-color: #f8f9fa; padding: 30px; border-radius: 0 0 10px 10px;">
@@ -378,7 +378,7 @@ class EmailService:
         </head>
         <body style="background-color: #f4f4f4;">
             <div class="header" style="background-color: #1a1a2e; color: #FFFFFF; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-                <h1 style="margin: 0; color: #FFFFFF;">&#128274; <span style="color: #FFFFFF;">ecomm</span><span class="brand-accent" style="color: #dc3545;">bx</span></h1>
+                <h1 style="margin: 0; color: #FFFFFF;">&#128274; <span style="color: #FFFFFF;">Chian</span><span class="brand-accent" style="color: #dc3545;">tin</span></h1>
                 <p style="color: #FFFFFF; margin: 10px 0 0 0;">{t('otp_title')}</p>
             </div>
             <div class="content" style="background-color: #f8f9fa; padding: 30px; border-radius: 0 0 10px 10px;">
@@ -465,7 +465,7 @@ class EmailService:
         </head>
         <body style="font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #333333; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f4f4f4;">
             <div class="email-header" style="background-color: #1a1a2e; color: #FFFFFF; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-                <h1 style="margin: 0; color: #FFFFFF;">&#9993;&#65039; <span style="color: #FFFFFF;">ecomm</span><span class="brand-red" style="color: #dc3545;">bx</span></h1>
+                <h1 style="margin: 0; color: #FFFFFF;">&#9993;&#65039; <span style="color: #FFFFFF;">Chian</span><span class="brand-red" style="color: #dc3545;">tin</span></h1>
                 <p style="margin: 10px 0 0 0; color: #FFFFFF;">{t('email_verify_title')}</p>
             </div>
             <div class="email-content" style="background-color: #f8f9fa; padding: 30px; border-radius: 0 0 10px 10px;">
@@ -624,7 +624,7 @@ class EmailService:
             <div class="dark-mode-bg" style="background-color: #1a1a2e; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
                 <h1 style="margin: 0;">
                     <span style="font-size: 28px;">💸</span>
-                    <span class="white-text" style="color: #FFFFFF; font-size: 28px; font-weight: bold;">ecomm</span><span class="red-text" style="color: #dc3545; font-size: 28px; font-weight: bold;">bx</span>
+                    <span class="white-text" style="color: #FFFFFF; font-size: 28px; font-weight: bold;">Chian</span><span class="red-text" style="color: #dc3545; font-size: 28px; font-weight: bold;">tin</span>
                 </h1>
                 <p class="white-text" style="margin: 10px 0 0 0; font-size: 18px; color: #FFFFFF;">{t('transfer_title')}</p>
             </div>
@@ -823,7 +823,7 @@ class EmailService:
             <div class="dark-mode-bg" style="background-color: #1a1a2e; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
                 <h1 style="margin: 0;">
                     <span style="font-size: 28px;">⚠️</span>
-                    <span class="white-text" style="color: #FFFFFF; font-size: 28px; font-weight: bold;">ecomm</span><span class="red-text" style="color: #dc3545; font-size: 28px; font-weight: bold;">bx</span>
+                    <span class="white-text" style="color: #FFFFFF; font-size: 28px; font-weight: bold;">Chian</span><span class="red-text" style="color: #dc3545; font-size: 28px; font-weight: bold;">tin</span>
                 </h1>
                 <p class="white-text" style="margin: 10px 0 0 0; font-size: 18px; color: #FFFFFF;">{t('transfer_rejected_title')}</p>
             </div>
@@ -967,7 +967,7 @@ class EmailService:
         </head>
         <body style="font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #333333; max-width: 600px; margin: 0 auto; padding: 0; background-color: #f0f0f0;">
             <div class="email-header" style="background-color: #1a1a2e; color: #FFFFFF; padding: 40px 30px; text-align: center;">
-                <h1 style="margin: 0; font-size: 28px; color: #FFFFFF;"><span style="color: #FFFFFF;">ecomm</span><span class="brand-red" style="color: #dc3545;">bx</span></h1>
+                <h1 style="margin: 0; font-size: 28px; color: #FFFFFF;"><span style="color: #FFFFFF;">Chian</span><span class="brand-red" style="color: #dc3545;">tin</span></h1>
                 <p style="margin: 12px 0 0 0; color: #cbd5e1; font-size: 14px; letter-spacing: 1px; text-transform: uppercase;">Important Service Update</p>
             </div>
             <div class="email-body" style="background-color: #ffffff; padding: 35px 30px;">
@@ -998,15 +998,15 @@ class EmailService:
                 </div>
 
                 <div style="background-color: #d4edda; border-radius: 8px; padding: 15px 20px; margin: 25px 0;">
-                    <p style="margin: 0; font-size: 14px; color: #155724;"><strong>Security Reminder:</strong> ecommbx will never ask for your password via email. Always verify you are on <strong>{new_domain}</strong> before entering your credentials.</p>
+                    <p style="margin: 0; font-size: 14px; color: #155724;"><strong>Security Reminder:</strong> Chiantin will never ask for your password via email. Always verify you are on <strong>{new_domain}</strong> before entering your credentials.</p>
                 </div>
 
                 <p style="font-size: 15px; color: #444444;">If you have any questions or require assistance, please do not hesitate to contact our support team through the platform.</p>
-                <p style="font-size: 15px; color: #444444; margin-bottom: 0;">Kind regards,<br><strong>The ecommbx Team</strong></p>
+                <p style="font-size: 15px; color: #444444; margin-bottom: 0;">Kind regards,<br><strong>The Chiantin Team</strong></p>
             </div>
             <div class="email-footer" style="background-color: #1a1a2e; padding: 20px 30px; text-align: center;">
-                <p style="color: #94a3b8; font-size: 12px; margin: 0;">This is an official communication from ecommbx.</p>
-                <p style="color: #64748b; font-size: 11px; margin: 8px 0 0 0;">ecommbx | Secure Digital Banking</p>
+                <p style="color: #94a3b8; font-size: 12px; margin: 0;">This is an official communication from Chiantin.</p>
+                <p style="color: #64748b; font-size: 11px; margin: 8px 0 0 0;">Chiantin | Secure Digital Banking</p>
             </div>
         </body>
         </html>

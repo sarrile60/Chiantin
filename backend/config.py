@@ -1,4 +1,4 @@
-"""Configuration management for ecommbx Banking Platform."""
+"""Configuration management for Chiantin Banking Platform."""
 
 import os
 from functools import lru_cache
@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
     
     # App
-    APP_NAME: str = Field(default="ecommbx")
+    APP_NAME: str = Field(default="Chiantin")
     APP_ENV: str = Field(default="production")
     DEBUG: bool = Field(default=False)
     

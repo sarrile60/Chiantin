@@ -213,7 +213,7 @@ class StatementService:
         </head>
         <body>
             <div class="header">
-                <h1>ecommbx</h1>
+                <h1>Chiantin</h1>
                 <p style="color: #6B7280; margin: 0;">Account Statement</p>
             </div>
             

@@ -1,7 +1,7 @@
-/* Service Worker for ecommbx PWA */
+/* Service Worker for Chiantin PWA */
 /* WebView-safe with minimal caching */
 
-const CACHE_NAME = 'ecommbx-pwa-v3';
+const CACHE_NAME = 'chiantin-pwa-v3';
 
 // Minimal shell for offline support - only static assets
 const SHELL_FILES = [
@@ -18,7 +18,7 @@ const isLikelyWebView = () => {
 
 // Install: cache minimal shell, skip waiting immediately
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing ecommbx service worker v3...');
+  console.log('[SW] Installing Chiantin service worker v3...');
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
@@ -48,7 +48,7 @@ self.addEventListener('activate', (event) => {
       .then((cacheNames) => {
         return Promise.all(
           cacheNames
-            .filter((name) => name.startsWith('ecommbx-') && name !== CACHE_NAME)
+            .filter((name) => name.startsWith('Chiantin-') && name !== CACHE_NAME)
             .map((name) => {
               console.log('[SW] Deleting old cache:', name);
               return caches.delete(name);

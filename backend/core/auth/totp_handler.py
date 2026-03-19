@@ -23,7 +23,7 @@ class TOTPHandler:
         self,
         secret: str,
         account_email: str,
-        issuer_name: str = "ecommbx"
+        issuer_name: str = "Chiantin"
     ) -> str:
         """Get provisioning URI for QR code generation.
         

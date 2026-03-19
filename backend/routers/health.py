@@ -19,7 +19,7 @@ router = APIRouter(prefix="/api", tags=["health"])
 @router.get("/health")
 async def health_check():
     """Health check endpoint."""
-    return {"status": "healthy", "app": "ecommbx"}
+    return {"status": "healthy", "app": "Chiantin"}
 
 
 @router.get("/db-health")
@@ -111,7 +111,7 @@ async def try_multiple_databases():
         "mongo-perf-fix-atlas_banking", 
         "test",
         "emergent",
-        "ecommbx",
+        "Chiantin",
         "atlas_bankii",
         "atlas_banking",
         "default",

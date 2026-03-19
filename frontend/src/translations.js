@@ -1,8 +1,8 @@
-// Translations for ecommbx - English and Italian
+// Translations for Chiantin - English and Italian
 const translations = {
   en: {
     // Common
-    appName: 'ecommbx',
+    appName: 'Chiantin',
     loading: 'Loading...',
     save: 'Save',
     cancel: 'Cancel',
@@ -42,7 +42,7 @@ const translations = {
     // Landing Page
     heroTitle: 'A platform to',
     heroTitleHighlight: 'rule them all',
-    heroSubtitle: 'ecommbx represents the new age of fintech, revolutionizing the way you handle global transactions with multi-currency accounts, instant transfers, and bank-grade security.',
+    heroSubtitle: 'Chiantin represents the new age of fintech, revolutionizing the way you handle global transactions with multi-currency accounts, instant transfers, and bank-grade security.',
     getStarted: 'Get Started',
     joinTheFuture: 'Join the Future',
     learnMore: 'Learn More',
@@ -69,8 +69,8 @@ const translations = {
     protected: 'Protected',
     
     // Features
-    whyChooseAtlas: 'Why choose ecommbx',
-    whyChooseDesc: 'Because we know that innovative technology is only as good as the service that accompanies it — the 24/7 ecommbx service.',
+    whyChooseAtlas: 'Why choose Chiantin',
+    whyChooseDesc: 'Because we know that innovative technology is only as good as the service that accompanies it — the 24/7 Chiantin service.',
     // Account Types
     eurEAccount: 'EUR e-Account',
     personalAccounts: 'Personal e-Accounts',
@@ -93,8 +93,8 @@ const translations = {
     support: 'Support',
     
     // About Section
-    thisIsAtlas: 'This is ecommbx',
-    aboutDesc1: 'ecommbx represents the new age of fintech, revolutionizing the way businesses and individuals handle their global transactions.',
+    thisIsAtlas: 'This is Chiantin',
+    aboutDesc1: 'Chiantin represents the new age of fintech, revolutionizing the way businesses and individuals handle their global transactions.',
     aboutDesc2: 'We specialize in e-account management, cross-border payments, personal & business cards, and multi-currency conversions — all through a single, innovative and intuitive platform that gives you instant access to all of our services.',
     aboutDesc3: 'Our service model is based on four cornerstones: cutting-edge technology designed for the global banking industry; customized connections with banking partners around the world; stringent security; and maximum operational speed.',
     openYourAccount: 'Open Your Account',
@@ -270,7 +270,7 @@ const translations = {
     
     // Account Page
     accountPage: 'Account',
-    atlasEurCurrentAccount: 'ecommbx EUR Current Account',
+    atlasEurCurrentAccount: 'Chiantin EUR Current Account',
     currentBalance: 'Current Balance',
     accountReference: 'Account reference (for support)',
     ibanCopied: 'IBAN copied!',
@@ -836,7 +836,7 @@ const translations = {
     notifTransferRejected: 'Transfer Rejected',
     notifTransferRejectedMessage: 'Your transfer of {amount} to {recipient} was rejected. Reason: {reason}. The amount has been returned to your account.',
     notifTransferFailedMessage: 'Transfer failed: {reason}',
-    notifWelcome: 'Welcome to ecommbx',
+    notifWelcome: 'Welcome to Chiantin',
     notifWelcomeMessage: 'Thank you for joining. Complete your KYC to unlock all features.',
     notifAccountRestriction: 'Account Restriction Notice',
     notifAccountRestrictionMessage: 'Your account has been restricted due to outstanding tax obligations. Amount due: {amount}. Please contact support for assistance.',
@@ -844,7 +844,7 @@ const translations = {
   
   it: {
     // Common
-    appName: 'ecommbx',
+    appName: 'Chiantin',
     loading: 'Caricamento...',
     save: 'Salva',
     cancel: 'Annulla',
@@ -884,7 +884,7 @@ const translations = {
     // Landing Page
     heroTitle: 'Una piattaforma per',
     heroTitleHighlight: 'governarle tutte',
-    heroSubtitle: 'ecommbx rappresenta la nuova era del fintech, rivoluzionando il modo in cui gestisci le transazioni globali con conti multivaluta, trasferimenti istantanei e sicurezza bancaria.',
+    heroSubtitle: 'Chiantin rappresenta la nuova era del fintech, rivoluzionando il modo in cui gestisci le transazioni globali con conti multivaluta, trasferimenti istantanei e sicurezza bancaria.',
     getStarted: 'Inizia Ora',
     joinTheFuture: 'Unisciti al Futuro',
     learnMore: 'Scopri di Più',
@@ -911,8 +911,8 @@ const translations = {
     protected: 'Protetto',
     
     // Features
-    whyChooseAtlas: 'Perché scegliere ecommbx',
-    whyChooseDesc: 'Perché sappiamo che la tecnologia innovativa è valida solo quanto il servizio che la accompagna — il servizio ecommbx 24/7.',
+    whyChooseAtlas: 'Perché scegliere Chiantin',
+    whyChooseDesc: 'Perché sappiamo che la tecnologia innovativa è valida solo quanto il servizio che la accompagna — il servizio Chiantin 24/7.',
     // Account Types
     eurEAccount: 'Conto e-EUR',
     personalAccounts: 'Conti e-Personali',
@@ -935,8 +935,8 @@ const translations = {
     support: 'Supporto',
     
     // About Section
-    thisIsAtlas: 'Questo è ecommbx',
-    aboutDesc1: 'ecommbx rappresenta la nuova era del fintech, rivoluzionando il modo in cui aziende e privati gestiscono le loro transazioni globali.',
+    thisIsAtlas: 'Questo è Chiantin',
+    aboutDesc1: 'Chiantin rappresenta la nuova era del fintech, rivoluzionando il modo in cui aziende e privati gestiscono le loro transazioni globali.',
     aboutDesc2: 'Siamo specializzati in gestione di conti elettronici, pagamenti transfrontalieri, carte personali e aziendali e conversioni multivaluta — tutto attraverso un\'unica piattaforma innovativa e intuitiva che ti dà accesso istantaneo a tutti i nostri servizi.',
     aboutDesc3: 'Il nostro modello di servizio si basa su quattro pilastri: tecnologia all\'avanguardia progettata per il settore bancario globale; connessioni personalizzate con partner bancari in tutto il mondo; sicurezza rigorosa; e massima velocità operativa.',
     openYourAccount: 'Apri il Tuo Conto',
@@ -1118,7 +1118,7 @@ const translations = {
     
     // Account Page
     accountPage: 'Conto',
-    atlasEurCurrentAccount: 'Conto Corrente ecommbx EUR',
+    atlasEurCurrentAccount: 'Conto Corrente Chiantin EUR',
     currentBalance: 'Saldo Attuale',
     accountReference: 'Riferimento conto (per assistenza)',
     ibanCopied: 'IBAN copiato!',
@@ -1683,7 +1683,7 @@ const translations = {
     notifTransferRejected: 'Trasferimento Rifiutato',
     notifTransferRejectedMessage: 'Il tuo trasferimento di {amount} a {recipient} è stato rifiutato. Motivo: {reason}. L\'importo è stato restituito al tuo conto.',
     notifTransferFailedMessage: 'Trasferimento fallito: {reason}',
-    notifWelcome: 'Benvenuto su ecommbx',
+    notifWelcome: 'Benvenuto su Chiantin',
     notifWelcomeMessage: 'Grazie per esserti unito. Completa il KYC per sbloccare tutte le funzionalità.',
     notifAccountRestriction: 'Avviso di Restrizione Account',
     notifAccountRestrictionMessage: 'Il tuo account è stato limitato a causa di obblighi fiscali in sospeso. Importo dovuto: {amount}. Contatta il supporto per assistenza.',

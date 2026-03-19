@@ -72,7 +72,7 @@ export function CardOrderingModal({ onClose, onSuccess }) {
                     </svg>
                   </div>
                   <div className="text-white text-left">
-                    <p className="text-xs opacity-80 mb-1">ecommbx</p>
+                    <p className="text-xs opacity-80 mb-1">Chiantin</p>
                     <div className="flex justify-end">
                       <p className="text-lg font-bold">VISA</p>
                     </div>
@@ -98,7 +98,7 @@ export function CardOrderingModal({ onClose, onSuccess }) {
                     </svg>
                   </div>
                   <div className={`text-left ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                    <p className="text-xs opacity-60 mb-1">ecommbx</p>
+                    <p className="text-xs opacity-60 mb-1">Chiantin</p>
                     <div className="flex justify-end">
                       <p className="text-lg font-bold">VISA</p>
                     </div>
@@ -130,7 +130,7 @@ export function CardOrderingModal({ onClose, onSuccess }) {
               <div className={`w-48 h-48 rounded-full flex items-center justify-center ${isDark ? 'bg-teal-900/30' : 'bg-teal-100'}`}>
                 <div className="bg-gradient-to-br from-teal-400 to-teal-600 rounded-lg p-4 shadow-lg transform rotate-12" style={{width: '140px', height: '88px'}}>
                   <div className="w-8 h-6 bg-yellow-400 rounded opacity-80 mb-2"></div>
-                  <div className="text-white text-xs">ecommbx</div>
+                  <div className="text-white text-xs">Chiantin</div>
                 </div>
               </div>
             </div>
@@ -201,7 +201,7 @@ export function CardOrderingModal({ onClose, onSuccess }) {
                   </svg>
                   
                   <div className="relative">
-                    <p className={`text-sm mb-4 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>ecommbx</p>
+                    <p className={`text-sm mb-4 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Chiantin</p>
                     <p className={`text-right text-xl font-bold ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>VISA</p>
                   </div>
                 </div>
