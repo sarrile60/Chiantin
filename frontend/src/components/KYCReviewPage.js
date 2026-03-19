@@ -6,10 +6,10 @@ import { useToast } from './Toast';
 import api from '../api';
 import { useLanguage, useTheme } from '../contexts/AppContext';
 
-// Styled Logo Component - displays "ecomm" with "bx" in red
+// Styled Logo Component - displays "Chian" with "tin" in red
 const StyledLogo = ({ isDark = false }) => (
   <span className={isDark ? 'text-white' : 'text-gray-900'}>
-    ecomm<span className="text-red-500">bx</span>
+    Chian<span className="text-red-500">tin</span>
   </span>
 );
 

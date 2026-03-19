@@ -35,11 +35,11 @@ import BalanceToggle from './components/BalanceToggle';
 import { Sun, Moon, Mail, CheckCircle, XCircle, Loader2, Eye, EyeOff } from 'lucide-react';
 import { formatCurrency, formatCentsToNumber, formatEuroAmount } from './utils/currency';
 
-// Styled Logo Component - displays "ecomm" with "bx" in red
+// Styled Logo Component - displays "Chian" with "tin" in red
 const StyledLogo = ({ className = '', isDark = false }) => (
   <span className={className}>
-    <span className={isDark ? 'text-white' : ''}>ecomm</span>
-    <span className="text-red-500">bx</span>
+    <span className={isDark ? 'text-white' : ''}>Chian</span>
+    <span className="text-red-500">tin</span>
   </span>
 );
 
