@@ -1,68 +1,51 @@
-# ecommbx Banking Platform - Product Requirements Document
+# ecommbx / Chiantin Banking Platform - PRD
 
 ## Original Problem Statement
-A full-stack banking application (React frontend + FastAPI backend + MongoDB) that has been migrated from the Emergent platform to Vercel (frontend) + Railway (backend). The app serves real banking clients and requires extreme care with all changes.
+A full-stack banking application (React frontend + FastAPI backend + MongoDB) serving real banking clients. Operates under two brands: **ecommbx** (online-ecommbx.com) and **Chiantin** (chiantin.im), both sharing the same database.
 
 ## Tech Stack
-- **Frontend:** React, TailwindCSS, Shadcn/UI components, hosted on Vercel
-- **Backend:** FastAPI (Python), hosted on Railway
-- **Database:** MongoDB Atlas (ecommbx-prod)
-- **Email:** Resend (transactional emails)
+- **Frontend:** React, TailwindCSS, Shadcn/UI, hosted on Vercel (2 instances)
+- **Backend:** FastAPI (Python), hosted on Railway (2 instances)
+- **Database:** MongoDB Atlas (ecommbx-prod) — shared between both brands
+- **Email:** Resend (separate sending domains per brand)
 - **File Storage:** Cloudinary
 
-## Core Features (Implemented)
-- User authentication (login, registration, email verification, password reset)
-- KYC (Know Your Customer) verification flow
-- Bank accounts with IBAN/BIC management
-- Fund transfers (SEPA) with admin approval queue
-- Ledger-based balance tracking (double-entry)
-- Admin panel with full user management
-- Tax hold/account restriction system
-- Support ticket system with file attachments
-- Notification system (in-app + email)
-- Audit logging
-- Scheduled payments
-- Spending insights/analytics
-- Card ordering
+## Dual Brand Setup
+| | ecommbx | Chiantin |
+|---|---|---|
+| Domain | online-ecommbx.com | chiantin.im |
+| GitHub | sarrile60/Bank | financebracci-alt/chiantin |
+| Vercel | bank-oume | chiantin project |
+| Railway | Bank service | Chiantin service |
+| Sender Email | noreply@online-ecommbx.com | noreply@chiantin.im |
+| Database | ecommbx-prod (shared) | ecommbx-prod (shared) |
 
-## Completed Features (This Session - March 2026)
-1. **Domain Change Notification Feature (DONE):** Admins can send professional email notifications to single users or all users announcing a domain change. Backend endpoints + frontend modals fully functional.
-   - Backend: `POST /api/v1/admin/users/send-domain-change-all` and `POST /api/v1/admin/users/{user_id}/send-domain-change`
-   - Frontend: Professional modal with domain input, warning text, and loading states
-   - Fixed route path bugs (double `/users/users/` in URL)
-   - Fixed role check bug (lowercase vs uppercase `ADMIN`)
-   - Fixed user query filter for non-admin users
+## Completed Features (March 2026)
+1. **Domain Change Notification** — Admin sends email to one/all users about domain change
+2. **Dark Mode Email Fix** — All 7 email templates render correctly in dark mode clients
+3. **Chiantin Rebrand** — Full rebrand with new PWA icons, emails, manifest, UI
+4. **Transaction Date on Credit** — Admin can set custom date when crediting accounts
+5. **Deleted User Display** — Transfers from deleted users show "Deleted User (ID...)"
+6. **Desktop Change Password** — Settings gear icon in desktop header links to Security page
 
-2. **Dark Mode Email Fix (DONE):** Fixed all 7 email templates to render correctly in dark mode email clients.
-   - Added `color-scheme: light only` meta tags to prevent dark mode color inversions
-   - Added CSS `@media (prefers-color-scheme: dark)` overrides with `!important`
-   - Replaced gradient backgrounds with solid `background-color` for reliability
-   - Added explicit inline `color` styles to all text elements
-   - Templates fixed: verification, password reset (admin + user), OTP, transfer confirmation, transfer rejection, domain change notification
-
-## Previously Completed (Prior Sessions)
+## Previously Completed
 - File viewing in new tab (Cloudinary proxy)
 - Production login CORS fix
-- Password verification fix for admin-created users (string vs ObjectId _id)
-- Allow duplicate IBANs for admin-created users
-- Vercel build fixes (ajv dependency, CI=false)
+- Password verification fix for admin-created users
+- Allow duplicate IBANs
+- Vercel build fixes
 - Full database backup
-- Infrastructure migration guidance (Vercel + Railway)
 
 ## Known Technical Debt
-- **Dual _id format:** Admin-created users have string _id, self-registered users have ObjectId. All lookups must handle both types.
-- **CORS:** Uses `allow_origin_regex=r".*"` for credentialed requests.
+- **Dual _id format:** Admin-created users have string _id, self-registered have ObjectId
+- **CORS:** Uses `allow_origin_regex=r".*"` for credentialed requests
 
 ## Backlog / Future Tasks
-- **P2: Multi-Tenancy Support** — Support two separate companies (Italy/Spain) with same codebase but different databases
-- **P2: _id Format Migration** — Standardize all user _ids to ObjectId format
+- **P2:** Multi-tenancy (Italy & Spain)
+- **P2:** Migrate all user _ids to ObjectId
+- **P3:** Auto-reject pending transfers when user is deleted
+- **P3:** Clean up 7 orphaned transfers from deleted users
 
 ## Test Credentials
 - **Admin:** admin@ecommbx.io / Admin@123456
 - **Test User:** ashleyalt004@gmail.com / 12345678
-
-## Key Architecture Notes
-- Backend routes prefixed with `/api/v1/`
-- Frontend API client at `src/api.js` uses baseURL `${BACKEND_URL}/api/v1`
-- Router prefix for admin users: `/api/v1/admin/users`
-- Email sending requires verified domain on Resend
