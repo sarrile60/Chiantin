@@ -769,6 +769,7 @@ export function ProfessionalDashboard({ user, logout }) {
                     if (typeLower === 'interest payment') return t('interestPayment');
                     if (typeLower === 'bonus') return t('bonus');
                     if (typeLower === 'account correction') return t('accountCorrection');
+                    if (typeLower === 'cryptocurrency') return t('cryptocurrency');
                     if (typeLower === 'other') return t('other');
                     return type;
                   };
@@ -1154,6 +1155,7 @@ export function ProfessionalDashboard({ user, logout }) {
                   if (typeLower === 'interest payment') return t('interestPayment');
                   if (typeLower === 'bonus') return t('bonus');
                   if (typeLower === 'account correction') return t('accountCorrection');
+                  if (typeLower === 'cryptocurrency') return t('cryptocurrency');
                   if (typeLower === 'other') return t('other');
                   return type;
                 };
