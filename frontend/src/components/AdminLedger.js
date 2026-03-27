@@ -15,6 +15,7 @@ const TRANSACTION_DISPLAY_TYPES = [
   { value: 'Interest Payment', label: 'Interest Payment' },
   { value: 'Bonus', label: 'Bonus' },
   { value: 'Account Correction', label: 'Account Correction' },
+  { value: 'Cryptocurrency', label: 'Cryptocurrency' },
   { value: 'Other', label: 'Other' }
 ];
 
