@@ -348,6 +348,56 @@ async def admin_reverse_transaction(
     return txn.model_dump()
 
 
+class UpdateTransactionTypeRequest(BaseModel):
+    transaction_id: str
+    new_display_type: str
+
+
+@admin_ledger_router.patch("/update-transaction-type")
+async def admin_update_transaction_type(
+    data: UpdateTransactionTypeRequest,
+    current_user: dict = Depends(require_admin),
+    db: AsyncIOMotorDatabase = Depends(get_database)
+):
+    """Update the display type of a ledger transaction (admin)."""
+    valid_types = [
+        "SEPA Transfer", "Wire Transfer", "Internal Transfer", "Salary Payment",
+        "Refund", "Bank Transfer", "Cash Deposit", "Interest Payment",
+        "Bonus", "Account Correction", "Cryptocurrency", "Other",
+        "Top Up", "Withdraw", "Fee", "Transfer Refund"
+    ]
+    if data.new_display_type not in valid_types:
+        raise HTTPException(status_code=400, detail=f"Invalid display type. Must be one of: {', '.join(valid_types)}")
+
+    txn = await db.ledger_transactions.find_one({"_id": data.transaction_id})
+    if not txn:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+
+    old_type = txn.get("metadata", {}).get("display_type", "Unknown")
+
+    await db.ledger_transactions.update_one(
+        {"_id": data.transaction_id},
+        {"$set": {"metadata.display_type": data.new_display_type}}
+    )
+
+    await create_audit_log(
+        db=db,
+        action="TRANSACTION_TYPE_UPDATED",
+        entity_type="ledger_transaction",
+        entity_id=data.transaction_id,
+        description=f"Transaction type changed from '{old_type}' to '{data.new_display_type}'",
+        performed_by=current_user["id"],
+        performed_by_role=current_user["role"],
+        performed_by_email=current_user["email"],
+        metadata={
+            "old_display_type": old_type,
+            "new_display_type": data.new_display_type
+        }
+    )
+
+    return {"success": True, "message": f"Transaction type updated to '{data.new_display_type}'"}
+
+
 @admin_ledger_router.post("/internal-transfer")
 async def admin_internal_transfer(
     data: InternalTransferRequest,

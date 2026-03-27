@@ -56,6 +56,46 @@ export function EnhancedLedgerTools({ account, onSuccess }) {
     toAccountId: ''
   });
 
+  // Edit transaction type state
+  const [transactions, setTransactions] = useState([]);
+  const [txnLoading, setTxnLoading] = useState(false);
+  const [selectedTxn, setSelectedTxn] = useState(null);
+  const [newDisplayType, setNewDisplayType] = useState('');
+
+  const fetchTransactions = async () => {
+    setTxnLoading(true);
+    try {
+      const response = await api.get(`/accounts/${account.id}/transactions`);
+      setTransactions(response.data || []);
+    } catch (err) {
+      toast.error('Failed to load transactions');
+    } finally {
+      setTxnLoading(false);
+    }
+  };
+
+  const handleUpdateTransactionType = async () => {
+    if (!selectedTxn || !newDisplayType) return;
+    setLoading(true);
+    setError('');
+    try {
+      await api.patch('/admin/ledger/update-transaction-type', {
+        transaction_id: selectedTxn.id,
+        new_display_type: newDisplayType
+      });
+      toast.success(`Transaction type updated to "${newDisplayType}"`);
+      setSelectedTxn(null);
+      setNewDisplayType('');
+      fetchTransactions();
+      onSuccess && onSuccess();
+    } catch (err) {
+      const errorDetail = err.response?.data?.detail;
+      setError(typeof errorDetail === 'string' ? errorDetail : 'Update failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleProfessionalCredit = async () => {
     if (!creditForm.amount) {
       setError('Amount is required');
@@ -280,6 +320,13 @@ export function EnhancedLedgerTools({ account, onSuccess }) {
             data-testid="transfer-btn"
           >
             Internal Transfer
+          </button>
+          <button
+            onClick={() => { setActiveOperation('edit_type'); fetchTransactions(); }}
+            className="px-4 py-3 bg-purple-600 text-white rounded-md hover:bg-purple-700 text-sm font-medium col-span-2"
+            data-testid="edit-type-btn"
+          >
+            Edit Transaction Type
           </button>
         </div>
       ) : activeOperation === 'credit' ? (
@@ -511,6 +558,77 @@ export function EnhancedLedgerTools({ account, onSuccess }) {
           >
             {loading ? 'Processing...' : `Debit ${debitForm.amount ? formatAmountFromEuro(debitForm.amount) : '€0.00'}`}
           </button>
+        </div>
+      ) : activeOperation === 'edit_type' ? (
+        /* Edit Transaction Type */
+        <div className="border rounded-lg p-4 space-y-4 bg-purple-50">
+          <div className="flex justify-between items-center border-b pb-2">
+            <h5 className="font-semibold text-purple-800">Edit Transaction Type</h5>
+            <button onClick={resetAndClose} className="text-sm text-gray-600 hover:text-gray-900">Cancel</button>
+          </div>
+
+          {txnLoading ? (
+            <p className="text-sm text-gray-500">Loading transactions...</p>
+          ) : transactions.length === 0 ? (
+            <p className="text-sm text-gray-500">No transactions found</p>
+          ) : (
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-gray-700">Select Transaction</label>
+              <div className="max-h-48 overflow-y-auto border rounded-md bg-white">
+                {transactions.map((txn) => {
+                  const displayType = txn.metadata?.display_type || txn.transaction_type || 'Unknown';
+                  const amount = txn.entries?.[0]?.amount || 0;
+                  const direction = txn.entries?.[0]?.direction;
+                  const date = txn.created_at ? new Date(txn.created_at).toLocaleDateString() : '';
+                  const senderName = txn.metadata?.sender_name || '';
+                  const isSelected = selectedTxn?.id === txn.id;
+                  return (
+                    <div
+                      key={txn.id}
+                      onClick={() => { setSelectedTxn(txn); setNewDisplayType(displayType); }}
+                      className={`px-3 py-2 cursor-pointer border-b last:border-b-0 text-sm flex justify-between items-center ${isSelected ? 'bg-purple-100 border-purple-300' : 'hover:bg-gray-50'}`}
+                      data-testid={`txn-select-${txn.id}`}
+                    >
+                      <div>
+                        <span className="font-medium">{displayType}</span>
+                        {senderName && <span className="text-gray-500 ml-1">- {senderName}</span>}
+                        <span className="text-gray-400 ml-2 text-xs">{date}</span>
+                      </div>
+                      <span className={direction === 'CREDIT' ? 'text-green-600 font-medium' : 'text-red-600 font-medium'}>
+                        {direction === 'CREDIT' ? '+' : '-'}€{(amount / 100).toFixed(2)}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {selectedTxn && (
+                <div className="space-y-3 pt-2 border-t">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">New Transaction Type</label>
+                    <select
+                      value={newDisplayType}
+                      onChange={(e) => setNewDisplayType(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                      data-testid="new-type-select"
+                    >
+                      {TRANSACTION_DISPLAY_TYPES.map(t => (
+                        <option key={t.value} value={t.value}>{t.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <button
+                    onClick={handleUpdateTransactionType}
+                    disabled={loading || !newDisplayType}
+                    className="w-full py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:opacity-50 font-medium"
+                    data-testid="submit-type-change"
+                  >
+                    {loading ? 'Updating...' : 'Update Transaction Type'}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       ) : (
         /* Simple Form for Fee and Transfer */
