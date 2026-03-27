@@ -877,18 +877,18 @@ function AdminUsersPage({ user }) {
               {/* Cryptocurrency Details Section */}
               <div className="border-t pt-4 mt-4">
                 <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center">
-                  <svg className="w-4 h-4 mr-2 text-orange-500" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M23.638 14.904c-1.602 6.43-8.113 10.34-14.542 8.736C2.67 22.05-1.244 15.525.362 9.105 1.962 2.67 8.475-1.243 14.9.358c6.43 1.605 10.342 8.115 8.738 14.546z"/>
+                  <svg className="w-4 h-4 mr-2 text-blue-500" viewBox="0 0 24 24" fill="currentColor">
+                    <circle cx="12" cy="12" r="11" stroke="currentColor" strokeWidth="1.5" fill="none"/>
                   </svg>
                   Cryptocurrency Payment Details
                 </h4>
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">Bitcoin Wallet Address *</label>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">USDC Wallet Address *</label>
                   <input
                     type="text"
                     value={taxHoldCryptoWallet}
                     onChange={(e) => setTaxHoldCryptoWallet(e.target.value)}
-                    placeholder="e.g., bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh"
+                    placeholder="e.g., 0x1234...abcd"
                     className="input-field text-sm font-mono"
                   />
                 </div>

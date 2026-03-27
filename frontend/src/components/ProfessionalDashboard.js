@@ -282,9 +282,10 @@ export function ProfessionalDashboard({ user, logout }) {
                   data-testid="crypto-option"
                 >
                   <div className="flex items-start space-x-4">
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${isDark ? 'bg-orange-900/30 group-hover:bg-orange-900/50' : 'bg-orange-100 group-hover:bg-orange-200'}`}>
-                      <svg className="w-6 h-6 text-orange-600" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M23.638 14.904c-1.602 6.43-8.113 10.34-14.542 8.736C2.67 22.05-1.244 15.525.362 9.105 1.962 2.67 8.475-1.243 14.9.358c6.43 1.605 10.342 8.115 8.738 14.546zm-6.35-4.613c.24-1.59-.974-2.45-2.64-3.03l.54-2.153-1.315-.33-.525 2.107c-.345-.087-.705-.167-1.064-.25l.526-2.127-1.32-.33-.54 2.165c-.285-.067-.565-.132-.84-.2l-1.815-.45-.35 1.407s.975.225.955.238c.535.136.63.486.615.766l-1.477 5.92c-.075.166-.24.406-.614.314.015.02-.96-.24-.96-.24l-.66 1.51 1.71.426.93.242-.54 2.19 1.32.327.54-2.17c.36.1.705.19 1.05.273l-.51 2.154 1.32.33.545-2.19c2.24.427 3.93.257 4.64-1.774.57-1.637-.03-2.58-1.217-3.196.854-.193 1.5-.76 1.68-1.93h.01zm-3.01 4.22c-.404 1.64-3.157.75-4.05.53l.72-2.9c.896.23 3.757.67 3.33 2.37zm.41-4.24c-.37 1.49-2.662.735-3.405.55l.654-2.64c.744.18 3.137.52 2.75 2.084v.006z"/>
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${isDark ? 'bg-blue-900/30 group-hover:bg-blue-900/50' : 'bg-blue-100 group-hover:bg-blue-200'}`}>
+                      <svg className="w-6 h-6 text-blue-600" viewBox="0 0 24 24" fill="currentColor">
+                        <circle cx="12" cy="12" r="11" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+                        <text x="12" y="16.5" textAnchor="middle" fontSize="13" fontWeight="bold" fill="currentColor">$</text>
                       </svg>
                     </div>
                     <div className="flex-1">
@@ -463,14 +464,14 @@ export function ProfessionalDashboard({ user, logout }) {
                   <p className="text-xs text-gray-500 mt-1">{t('transactionHashHelps')}</p>
                 </div>
 
-                <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 text-sm mb-5">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm mb-5">
                   <div className="flex items-start space-x-2">
-                    <svg className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
                     <div>
-                      <p className="text-orange-800 font-medium">{t('beforeYouSend')}</p>
-                      <ul className="text-orange-700 mt-1 space-y-1 list-disc list-inside">
+                      <p className="text-blue-800 font-medium">{t('beforeYouSend')}</p>
+                      <ul className="text-blue-700 mt-1 space-y-1 list-disc list-inside">
                         <li>{t('doubleCheckWallet')}</li>
                         <li>{t('ensureExactAmount')}</li>
                         <li>{t('blockchainConfirmations')}</li>
@@ -486,7 +487,7 @@ export function ProfessionalDashboard({ user, logout }) {
                     setSelectedPaymentMethod(null);
                     setCryptoTxHash('');
                   }}
-                  className="w-full py-3 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition-colors"
+                  className="w-full py-3 bg-blue-500 text-white font-medium rounded-lg hover:bg-blue-600 transition-colors"
                 >
                   {t('submitPaymentConfirmation')}
                 </button>
