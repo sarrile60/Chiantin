@@ -178,6 +178,25 @@ const translations = {
     needHelpDesc: 'Our support team is here to assist you',
     needDirectAssistance: 'Need direct assistance?',
     emailUsAnytime: 'Email us anytime — we typically respond within 24 hours',
+
+    // Cookie Consent
+    cookieConsentTitle: 'We value your privacy',
+    cookieConsentDesc: 'We use cookies to ensure the secure operation of our banking platform and to improve your experience. Strictly necessary cookies are always active. For more information, please read our',
+    cookieManage: 'Manage Preferences',
+    cookieRejectNonEssential: 'Reject Non-Essential',
+    cookieAcceptAll: 'Accept All',
+    cookiePreferencesTitle: 'Cookie Preferences',
+    cookieNecessaryTitle: 'Strictly Necessary',
+    cookieNecessaryDesc: 'Required for authentication, security, and core banking functionality',
+    cookieFunctionalTitle: 'Functional',
+    cookieFunctionalDesc: 'Language preferences, display theme, and personalised settings',
+    cookieAnalyticsTitle: 'Analytics',
+    cookieAnalyticsDesc: 'Anonymous usage data to help us improve our services',
+    cookieAlwaysActive: 'Always active',
+    cookieSavePreferences: 'Save Preferences',
+
+    // Static Pages
+    backToHome: 'Back to Home',
     settleOutstandingBalance: 'Settle Outstanding Balance',
     selectPaymentMethod: 'Select your preferred payment method',
     pleaseSettleAmount: 'Please settle the required amount to restore full access. For assistance, contact support.',
@@ -1022,6 +1041,25 @@ const translations = {
     needHelpDesc: 'Il nostro team di supporto è qui per assisterti',
     needDirectAssistance: 'Hai bisogno di assistenza diretta?',
     emailUsAnytime: 'Scrivici in qualsiasi momento — rispondiamo solitamente entro 24 ore',
+
+    // Cookie Consent
+    cookieConsentTitle: 'La tua privacy è importante',
+    cookieConsentDesc: 'Utilizziamo i cookie per garantire il funzionamento sicuro della nostra piattaforma bancaria e per migliorare la tua esperienza. I cookie strettamente necessari sono sempre attivi. Per maggiori informazioni, consulta la nostra',
+    cookieManage: 'Gestisci preferenze',
+    cookieRejectNonEssential: 'Rifiuta non essenziali',
+    cookieAcceptAll: 'Accetta tutti',
+    cookiePreferencesTitle: 'Preferenze cookie',
+    cookieNecessaryTitle: 'Strettamente necessari',
+    cookieNecessaryDesc: 'Necessari per l\'autenticazione, la sicurezza e le funzionalità bancarie principali',
+    cookieFunctionalTitle: 'Funzionali',
+    cookieFunctionalDesc: 'Preferenze di lingua, tema di visualizzazione e impostazioni personalizzate',
+    cookieAnalyticsTitle: 'Analitici',
+    cookieAnalyticsDesc: 'Dati anonimi di utilizzo per aiutarci a migliorare i nostri servizi',
+    cookieAlwaysActive: 'Sempre attivi',
+    cookieSavePreferences: 'Salva preferenze',
+
+    // Static Pages
+    backToHome: 'Torna alla Home',
     settleOutstandingBalance: 'Salda il Saldo in Sospeso',
     selectPaymentMethod: 'Seleziona il metodo di pagamento preferito',
     pleaseSettleAmount: 'Si prega di saldare l\'importo richiesto per ripristinare l\'accesso completo. Per assistenza, contatta il supporto.',

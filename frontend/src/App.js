@@ -32,6 +32,7 @@ import PrivacyPolicyPage from './components/PrivacyPolicyPage';
 import TermsOfServicePage from './components/TermsOfServicePage';
 import CookiePolicyPage from './components/CookiePolicyPage';
 import CompliancePage from './components/CompliancePage';
+import CookieConsent from './components/CookieConsent';
 import { AdminTransfersQueue } from './components/AdminTransfersQueue';
 import { AdminAccountsControl } from './components/AdminAccountsControl';
 import { AdminNotificationBell } from './components/AdminNotificationBell';
@@ -2265,6 +2266,7 @@ function App() {
           <Route path="/compliance" element={<CompliancePage />} />
           <Route path="/" element={<LandingPage />} />
         </Routes>
+        <CookieConsent />
       </AuthProvider>
       </ToastProvider>
     </Router>
