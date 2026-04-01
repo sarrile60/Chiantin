@@ -42,6 +42,10 @@ A full-stack banking application (React frontend + FastAPI backend + MongoDB) se
 
 ## Completed (April 2026)
 7. **Support Email on Landing Page** — Added `support@chiantin.eu` to footer of LandingPage.js with mail icon and mailto link
+8. **Backend Support Emails Updated** — Replaced all `support@projectatlas.eu` and `support@chiantin.im` with `support@chiantin.eu` in email_service.py, transfers.py, cards.py (did NOT touch Resend email templates)
+9. **Support Email in Customer Dashboard** — Added `support@chiantin.eu` to the "Need Help?" section at the bottom of the customer dashboard
+10. **Support Email on Support Page** — Added professional contact bar at top of Support page with "Need direct assistance?" text and email button
+11. **i18n Translations** — Added Italian translations for new support email text strings
 
 ## Pending Tasks
 - **P1:** Update old support emails in backend (`support@projectatlas.eu`, `support@chiantin.im`) to `support@chiantin.eu` in:
