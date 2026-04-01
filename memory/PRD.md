@@ -46,6 +46,11 @@ A full-stack banking application (React frontend + FastAPI backend + MongoDB) se
 9. **Support Email in Customer Dashboard** — Added `support@chiantin.eu` to the "Need Help?" section at the bottom of the customer dashboard
 10. **Support Email on Support Page** — Added professional contact bar at top of Support page with "Need direct assistance?" text and email button
 11. **i18n Translations** — Added Italian translations for new support email text strings
+12. **Professional Static Pages** — Created 8 new branded pages with real banking language:
+    - **Company:** About Us, Careers, Press, Contact (with email support cards)
+    - **Legal:** Privacy Policy (GDPR-compliant), Terms of Service, Cookie Policy, Compliance (AML/KYC/CTF/PSD2)
+13. **Footer Links Updated** — All footer links now clickable: Products → #features anchor, Company → /about /careers /press /contact, Legal → /privacy /terms /cookies /compliance
+14. **Anti-spam & Google Protection** — Proper semantic HTML, real `href` attributes, GDPR/AML references, structured legal content
 
 ## Pending Tasks
 - **P1:** Update old support emails in backend (`support@projectatlas.eu`, `support@chiantin.im`) to `support@chiantin.eu` in:
