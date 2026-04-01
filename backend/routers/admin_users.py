@@ -295,7 +295,7 @@ async def get_all_users(
             "phone": doc.get("phone"),
             "role": doc["role"],
             "status": doc["status"],
-            "created_at": format_timestamp_utc(doc["created_at"]),
+            "created_at": format_timestamp_utc(doc.get("created_at")) if doc.get("created_at") else None,
             "has_tax_hold": user_id in tax_hold_user_ids,
             "admin_notes": doc.get("admin_notes", "")
         })
