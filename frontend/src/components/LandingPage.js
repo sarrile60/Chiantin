@@ -639,28 +639,28 @@ export function LandingPage() {
             <div>
               <h4 className="text-white font-semibold mb-4">{t('products')}</h4>
               <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white transition">{t('personalAccounts')}</a></li>
-                <li><a href="#" className="hover:text-white transition">{t('businessAccounts')}</a></li>
-                <li><a href="#" className="hover:text-white transition">{t('cards')}</a></li>
-                <li><a href="#" className="hover:text-white transition">{t('transfers')}</a></li>
+                <li><a href="#features" className="hover:text-white transition">{t('personalAccounts')}</a></li>
+                <li><a href="#features" className="hover:text-white transition">{t('businessAccounts')}</a></li>
+                <li><a href="#features" className="hover:text-white transition">{t('cards')}</a></li>
+                <li><a href="#features" className="hover:text-white transition">{t('transfers')}</a></li>
               </ul>
             </div>
             <div>
               <h4 className="text-white font-semibold mb-4">{t('company')}</h4>
               <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white transition">{t('aboutUs')}</a></li>
-                <li><a href="#" className="hover:text-white transition">{t('careers')}</a></li>
-                <li><a href="#" className="hover:text-white transition">{t('press')}</a></li>
-                <li><a href="#" className="hover:text-white transition">{t('contact')}</a></li>
+                <li><a href="/about" className="hover:text-white transition">{t('aboutUs')}</a></li>
+                <li><a href="/careers" className="hover:text-white transition">{t('careers')}</a></li>
+                <li><a href="/press" className="hover:text-white transition">{t('press')}</a></li>
+                <li><a href="/contact" className="hover:text-white transition">{t('contact')}</a></li>
               </ul>
             </div>
             <div>
               <h4 className="text-white font-semibold mb-4">{t('legal')}</h4>
               <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white transition">{t('privacyPolicy')}</a></li>
-                <li><a href="#" className="hover:text-white transition">{t('termsOfService')}</a></li>
-                <li><a href="#" className="hover:text-white transition">{t('cookiePolicy')}</a></li>
-                <li><a href="#" className="hover:text-white transition">{t('compliance')}</a></li>
+                <li><a href="/privacy" className="hover:text-white transition">{t('privacyPolicy')}</a></li>
+                <li><a href="/terms" className="hover:text-white transition">{t('termsOfService')}</a></li>
+                <li><a href="/cookies" className="hover:text-white transition">{t('cookiePolicy')}</a></li>
+                <li><a href="/compliance" className="hover:text-white transition">{t('compliance')}</a></li>
               </ul>
             </div>
           </div>

@@ -24,6 +24,14 @@ import { SpendingInsights } from './components/SpendingInsights';
 import { CardsPage } from './components/CardsPage';
 import { AdminCardRequestsQueue } from './components/AdminCardRequestsQueue';
 import { KYCReviewPage } from './components/KYCReviewPage';
+import AboutPage from './components/AboutPage';
+import CareersPage from './components/CareersPage';
+import PressPage from './components/PressPage';
+import ContactPage from './components/ContactPage';
+import PrivacyPolicyPage from './components/PrivacyPolicyPage';
+import TermsOfServicePage from './components/TermsOfServicePage';
+import CookiePolicyPage from './components/CookiePolicyPage';
+import CompliancePage from './components/CompliancePage';
 import { AdminTransfersQueue } from './components/AdminTransfersQueue';
 import { AdminAccountsControl } from './components/AdminAccountsControl';
 import { AdminNotificationBell } from './components/AdminNotificationBell';
@@ -2247,6 +2255,14 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/careers" element={<CareersPage />} />
+          <Route path="/press" element={<PressPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/privacy" element={<PrivacyPolicyPage />} />
+          <Route path="/terms" element={<TermsOfServicePage />} />
+          <Route path="/cookies" element={<CookiePolicyPage />} />
+          <Route path="/compliance" element={<CompliancePage />} />
           <Route path="/" element={<LandingPage />} />
         </Routes>
       </AuthProvider>
