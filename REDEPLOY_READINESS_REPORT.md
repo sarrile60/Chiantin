@@ -3,7 +3,7 @@
 
 **Report Date:** February 24, 2026  
 **Validation Type:** Full Platform Redeploy Readiness  
-**Environment:** Preview (https://peaceful-mestorf-4.preview.emergentagent.com)  
+**Environment:** Preview (https://email-integration-6.preview.emergentagent.com)  
 **Production Target:** https://ecommbx.group
 
 ---

@@ -40,6 +40,16 @@ A full-stack banking application (React frontend + FastAPI backend + MongoDB) se
 - **Dual _id format:** Admin-created users have string _id, self-registered have ObjectId
 - **CORS:** Uses `allow_origin_regex=r".*"` for credentialed requests
 
+## Completed (April 2026)
+7. **Support Email on Landing Page** — Added `support@chiantin.eu` to footer of LandingPage.js with mail icon and mailto link
+
+## Pending Tasks
+- **P1:** Update old support emails in backend (`support@projectatlas.eu`, `support@chiantin.im`) to `support@chiantin.eu` in:
+  - `/app/backend/services/email_service.py` (lines 91, 160)
+  - `/app/backend/routers/transfers.py` (lines 107, 143)
+  - `/app/backend/routers/cards.py` (line 68)
+  - *Waiting for user's explicit go-ahead*
+
 ## Backlog / Future Tasks
 - **P2:** Multi-tenancy (Italy & Spain)
 - **P2:** Migrate all user _ids to ObjectId
