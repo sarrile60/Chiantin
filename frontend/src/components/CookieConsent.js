@@ -21,6 +21,12 @@ export default function CookieConsent() {
     }
   }, []);
 
+  useEffect(() => {
+    const handler = () => setVisible(true);
+    window.addEventListener('open-cookie-settings', handler);
+    return () => window.removeEventListener('open-cookie-settings', handler);
+  }, []);
+
   const saveConsent = (type) => {
     const consent = {
       type,

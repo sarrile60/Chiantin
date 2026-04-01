@@ -661,18 +661,12 @@ export function LandingPage() {
                 <li><a href="/terms" className="hover:text-white transition">{t('termsOfService')}</a></li>
                 <li><a href="/cookies" className="hover:text-white transition">{t('cookiePolicy')}</a></li>
                 <li><a href="/compliance" className="hover:text-white transition">{t('compliance')}</a></li>
+                <li><button onClick={() => window.dispatchEvent(new Event('open-cookie-settings'))} className="hover:text-white transition cursor-pointer" data-testid="landing-cookie-settings-link">{t('cookieSettings')}</button></li>
               </ul>
             </div>
           </div>
-          <div className={`border-t mt-12 pt-8 text-sm text-center flex flex-col sm:flex-row items-center justify-center gap-3 ${isDark ? 'border-gray-800' : 'border-gray-800'}`}>
+          <div className={`border-t mt-12 pt-8 text-sm text-center ${isDark ? 'border-gray-800' : 'border-gray-800'}`}>
             <p>© 2026 Chiantin. {t('allRightsReserved')} {t('licensedBy')}</p>
-            <button
-              onClick={() => { localStorage.removeItem('chiantin_cookie_consent'); window.location.reload(); }}
-              className="text-gray-400 hover:text-white transition cursor-pointer"
-              data-testid="landing-cookie-settings-link"
-            >
-              {t('cookieSettings')}
-            </button>
           </div>
         </div>
       </footer>

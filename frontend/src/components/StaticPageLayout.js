@@ -44,7 +44,7 @@ export default function StaticPageLayout({ title, subtitle, children }) {
               <Link to="/compliance" className="hover:text-gray-800 transition-colors">{t('compliance')}</Link>
               <a href="mailto:support@chiantin.eu" className="hover:text-gray-800 transition-colors">{t('contact')}</a>
               <button
-                onClick={() => { localStorage.removeItem('chiantin_cookie_consent'); window.location.reload(); }}
+                onClick={() => window.dispatchEvent(new Event('open-cookie-settings'))}
                 className="hover:text-gray-800 transition-colors cursor-pointer"
                 data-testid="cookie-settings-link"
               >
