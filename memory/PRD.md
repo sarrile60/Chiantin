@@ -51,6 +51,8 @@ A full-stack banking application (React frontend + FastAPI backend + MongoDB) se
     - **Legal:** Privacy Policy (GDPR-compliant), Terms of Service, Cookie Policy, Compliance (AML/KYC/CTF/PSD2)
 13. **Footer Links Updated** — All footer links now clickable: Products → #features anchor, Company → /about /careers /press /contact, Legal → /privacy /terms /cookies /compliance
 14. **Anti-spam & Google Protection** — Proper semantic HTML, real `href` attributes, GDPR/AML references, structured legal content
+15. **GDPR Cookie Consent Banner** — Professional cookie banner with Accept All, Reject Non-Essential, and Manage Preferences. Remembers choice in localStorage. Fully bilingual (EN/IT).
+16. **Full Italian Translations** — All 8 static pages (About, Careers, Press, Contact, Privacy, Terms, Cookies, Compliance) fully translated to Italian with professional banking/legal terminology. Cookie banner also translated. Grammar verified.
 
 ## Pending Tasks
 - **P1:** Update old support emails in backend (`support@projectatlas.eu`, `support@chiantin.im`) to `support@chiantin.eu` in:
