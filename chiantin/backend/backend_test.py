@@ -9,7 +9,7 @@ import sys
 from datetime import datetime
 
 class EcommbxAPITester:
-    def __init__(self, base_url="https://bank-staging.preview.emergentagent.com"):
+    def __init__(self, base_url="https://peaceful-mestorf-4.preview.emergentagent.com"):
         self.base_url = base_url
         self.admin_token = None
         self.user_token = None
