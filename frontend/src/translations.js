@@ -194,6 +194,7 @@ const translations = {
     cookieAnalyticsDesc: 'Anonymous usage data to help us improve our services',
     cookieAlwaysActive: 'Always active',
     cookieSavePreferences: 'Save Preferences',
+    cookieSettings: 'Cookie Settings',
 
     // Static Pages
     backToHome: 'Back to Home',
@@ -1057,6 +1058,7 @@ const translations = {
     cookieAnalyticsDesc: 'Dati anonimi di utilizzo per aiutarci a migliorare i nostri servizi',
     cookieAlwaysActive: 'Sempre attivi',
     cookieSavePreferences: 'Salva preferenze',
+    cookieSettings: 'Impostazioni cookie',
 
     // Static Pages
     backToHome: 'Torna alla Home',
