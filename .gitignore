@@ -87,3 +87,6 @@ android-sdk/
 .env.local
 .env.development
 .env.test
+
+# Sensitive test files
+memory/test_credentials.md
