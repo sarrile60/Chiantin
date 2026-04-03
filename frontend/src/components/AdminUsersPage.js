@@ -525,7 +525,9 @@ function AdminUsersPage({ user }) {
       setTaxHoldCryptoWallet('');
       fetchUserTaxHold(selectedUser.user.id);
     } catch (err) {
-      toast.error('Failed to set tax hold: ' + (err.response?.data?.detail || err.message));
+      const detail = err.response?.data?.detail;
+      const msg = typeof detail === 'string' ? detail : (Array.isArray(detail) ? detail.map(d => d.msg || d).join(', ') : err.message);
+      toast.error('Failed to set tax hold: ' + msg);
     } finally {
       setTaxHoldLoading(false);
     }
