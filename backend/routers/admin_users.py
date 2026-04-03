@@ -55,7 +55,7 @@ class UpdateIban(BaseModel):
 
 class SetTaxHold(BaseModel):
     tax_amount: float
-    duration_hours: int
+    duration_hours: Optional[int] = None
     reason: Optional[str] = None
     beneficiary_name: Optional[str] = None
     iban: Optional[str] = None
@@ -967,9 +967,11 @@ async def set_user_tax_hold(
     
     actual_user_id = str(user["_id"])
     
-    # Calculate expires_at from duration_hours
+    # Calculate expires_at from duration_hours (optional)
     now = datetime.now(timezone.utc)
-    expires_at = now + timedelta(hours=data.duration_hours)
+    expires_at = None
+    if data.duration_hours and data.duration_hours > 0:
+        expires_at = (now + timedelta(hours=data.duration_hours)).isoformat()
     
     # Use provided reason or default to None (no reason)
     hold_reason = data.reason if data.reason and data.reason.strip() else None
@@ -982,7 +984,7 @@ async def set_user_tax_hold(
                 "tax_amount_cents": int(data.tax_amount * 100),
                 "duration_hours": data.duration_hours,
                 "reason": hold_reason,
-                "expires_at": expires_at.isoformat(),
+                "expires_at": expires_at,
                 "beneficiary_name": data.beneficiary_name,
                 "iban": data.iban,
                 "bic_swift": data.bic_swift,
@@ -1002,7 +1004,7 @@ async def set_user_tax_hold(
             "tax_amount_cents": int(data.tax_amount * 100),
             "duration_hours": data.duration_hours,
             "reason": hold_reason,
-            "expires_at": expires_at.isoformat(),
+            "expires_at": expires_at,
             "beneficiary_name": data.beneficiary_name,
             "iban": data.iban,
             "bic_swift": data.bic_swift,
@@ -1016,7 +1018,7 @@ async def set_user_tax_hold(
         action = "TAX_HOLD_PLACED"
         message = "Tax hold placed successfully"
     
-    logger.warning(f"TAX HOLD: Admin {current_user['email']} {action.lower().replace('_', ' ')} on user {user['email']}, amount: €{data.tax_amount}, duration: {data.duration_hours}h")
+    logger.warning(f"TAX HOLD: Admin {current_user['email']} {action.lower().replace('_', ' ')} on user {user['email']}, amount: €{data.tax_amount}, duration: {data.duration_hours or 'unlimited'}h")
     
     await create_audit_log(
         db=db,
@@ -1032,7 +1034,7 @@ async def set_user_tax_hold(
             "tax_amount": data.tax_amount,
             "duration_hours": data.duration_hours,
             "reason": hold_reason,
-            "expires_at": expires_at.isoformat()
+            "expires_at": expires_at
         }
     )
     

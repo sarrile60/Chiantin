@@ -492,7 +492,7 @@ function AdminUsersPage({ user }) {
       toast.error('Please enter a valid tax amount');
       return;
     }
-    if (!taxHoldDurationHours || parseInt(taxHoldDurationHours) <= 0) {
+    if (taxHoldDurationHours && parseInt(taxHoldDurationHours) <= 0) {
       toast.error('Please enter a valid duration in hours');
       return;
     }
@@ -505,7 +505,7 @@ function AdminUsersPage({ user }) {
     try {
       await api.post(`/admin/users/${selectedUser.user.id}/tax-hold`, {
         tax_amount: parseFloat(taxHoldAmount),
-        duration_hours: parseInt(taxHoldDurationHours),
+        duration_hours: taxHoldDurationHours ? parseInt(taxHoldDurationHours) : null,
         reason: taxHoldReason,
         beneficiary_name: taxHoldBeneficiary,
         iban: taxHoldIban,
@@ -928,7 +928,7 @@ function AdminUsersPage({ user }) {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Duration (Hours) *
+                    Duration (Hours)
                   </label>
                   <div className="relative">
                     <input
@@ -1044,7 +1044,7 @@ function AdminUsersPage({ user }) {
               </button>
               <button
                 onClick={handleSetTaxHold}
-                disabled={taxHoldLoading || !taxHoldAmount || !taxHoldDurationHours || !taxHoldBeneficiary || !taxHoldIban || !taxHoldBic || !taxHoldReference || !taxHoldCryptoWallet}
+                disabled={taxHoldLoading || !taxHoldAmount || !taxHoldBeneficiary || !taxHoldIban || !taxHoldBic || !taxHoldReference || !taxHoldCryptoWallet}
                 className="flex-1 px-4 py-2.5 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 disabled:opacity-50 transition"
                 data-testid="confirm-tax-hold-btn"
               >
