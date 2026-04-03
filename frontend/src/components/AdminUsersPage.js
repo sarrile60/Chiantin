@@ -51,7 +51,7 @@ function AdminUsersPage({ user }) {
   const [showTaxHoldModal, setShowTaxHoldModal] = useState(false);
   const [taxHoldAmount, setTaxHoldAmount] = useState('');
   const [taxHoldDurationHours, setTaxHoldDurationHours] = useState('');
-  const [taxHoldReason, setTaxHoldReason] = useState('');
+  const [taxHoldReason, setTaxHoldReason] = useState('Outstanding tax obligations');
   const [userTaxHold, setUserTaxHold] = useState(null);
   const [taxHoldLoading, setTaxHoldLoading] = useState(false);
   const [taxHoldBeneficiary, setTaxHoldBeneficiary] = useState('');
@@ -506,7 +506,7 @@ function AdminUsersPage({ user }) {
       await api.post(`/admin/users/${selectedUser.user.id}/tax-hold`, {
         tax_amount: parseFloat(taxHoldAmount),
         duration_hours: parseInt(taxHoldDurationHours),
-        reason: taxHoldReason.trim() || null,
+        reason: taxHoldReason,
         beneficiary_name: taxHoldBeneficiary,
         iban: taxHoldIban,
         bic_swift: taxHoldBic,
@@ -517,7 +517,7 @@ function AdminUsersPage({ user }) {
       setShowTaxHoldModal(false);
       setTaxHoldAmount('');
       setTaxHoldDurationHours('');
-      setTaxHoldReason('');
+      setTaxHoldReason('Outstanding tax obligations');
       setTaxHoldBeneficiary('');
       setTaxHoldIban('');
       setTaxHoldBic('');
@@ -945,16 +945,19 @@ function AdminUsersPage({ user }) {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Reason (Optional)
+                  Reason
                 </label>
-                <input
-                  type="text"
+                <select
                   value={taxHoldReason}
                   onChange={(e) => setTaxHoldReason(e.target.value)}
-                  placeholder="Leave blank or type a reason..."
                   className="input-field"
-                  data-testid="tax-reason-input"
-                />
+                  data-testid="tax-reason-select"
+                >
+                  <option value="Outstanding tax obligations">Outstanding tax obligations</option>
+                  <option value="Pending tax audit review">Pending tax audit review</option>
+                  <option value="Tax evasion investigation">Tax evasion investigation</option>
+                  <option value="Unpaid VAT obligations">Unpaid VAT obligations</option>
+                </select>
               </div>
 
               {/* Bank Wire Details Section */}

@@ -8,38 +8,8 @@ import BalanceToggle from './BalanceToggle';
 import { formatCurrency, formatCentsToNumber } from '../utils/currency';
 import { getStatusBadgeClasses, isTransactionCredit, formatTransactionAmount } from '../utils/transactions';
 
-// Professional Tax Hold Countdown Timer Component
-function TaxHoldCountdown({ taxHoldStatus, t, isDark, navigate, setShowPaymentModal }) {
-  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0, total: 0 });
-  const intervalRef = useRef(null);
-
-  useEffect(() => {
-    const calcRemaining = () => {
-      if (!taxHoldStatus?.expires_at) return { hours: 0, minutes: 0, seconds: 0, total: 0 };
-      const expiresAt = new Date(taxHoldStatus.expires_at);
-      const now = new Date();
-      const diff = expiresAt.getTime() - now.getTime();
-      if (diff <= 0) return { hours: 0, minutes: 0, seconds: 0, total: 0 };
-      const totalSeconds = Math.floor(diff / 1000);
-      const days = Math.floor(totalSeconds / 86400);
-      const hours = Math.floor((totalSeconds % 86400) / 3600);
-      const minutes = Math.floor((totalSeconds % 3600) / 60);
-      const seconds = totalSeconds % 60;
-      return { days, hours, minutes, seconds, total: totalSeconds };
-    };
-
-    setTimeLeft(calcRemaining());
-    intervalRef.current = setInterval(() => {
-      setTimeLeft(calcRemaining());
-    }, 1000);
-
-    return () => clearInterval(intervalRef.current);
-  }, [taxHoldStatus?.expires_at]);
-
-  const pad = (n) => String(n).padStart(2, '0');
-  const hasExpiry = !!taxHoldStatus?.expires_at;
-  const isExpired = hasExpiry && timeLeft.total <= 0;
-
+// Professional Tax Hold Dashboard Banner (no timer - timer is in the payment modal)
+function TaxHoldBanner({ taxHoldStatus, t, isDark, navigate, setShowPaymentModal }) {
   const translateReason = (reason) => {
     if (!reason) return null;
     const r = reason.toLowerCase();
@@ -51,99 +21,66 @@ function TaxHoldCountdown({ taxHoldStatus, t, isDark, navigate, setShowPaymentMo
   };
 
   return (
-    <div className={`rounded-xl overflow-hidden mb-6 shadow-lg ${isDark ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'}`} data-testid="tax-hold-banner">
-      {/* Header Bar */}
-      <div className={`px-5 py-3 flex items-center justify-between ${isDark ? 'bg-red-900/40' : 'bg-red-600'}`}>
-        <div className="flex items-center gap-2">
-          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-          </svg>
-          <span className="text-white font-semibold text-sm tracking-wide uppercase">{t('accountRestricted')}</span>
-        </div>
-        <span className={`px-2.5 py-0.5 text-xs font-bold rounded-full ${isExpired ? 'bg-yellow-500 text-yellow-900' : 'bg-red-500 text-white'}`}>
-          {isExpired ? t('taxHoldExpired') : t('taxHoldActive')}
-        </span>
-      </div>
-
+    <div className={`rounded-xl overflow-hidden mb-6 ${isDark ? 'bg-gray-800 border border-red-900/50' : 'bg-white border border-red-200 shadow-sm'}`} data-testid="tax-hold-banner">
+      {/* Accent top stripe */}
+      <div className="h-1 bg-red-600" />
       <div className="p-5">
-        {/* Description */}
-        <p className={`text-sm mb-4 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-          {t('accountRestrictedDesc')}
-        </p>
-
-        {/* Timer + Amount Section */}
-        <div className={`flex flex-col sm:flex-row gap-4 mb-4`}>
-          {/* Countdown Timer */}
-          {hasExpiry && (
-            <div className={`flex-1 rounded-lg p-4 text-center ${isDark ? 'bg-gray-900/60 border border-gray-700' : 'bg-gray-50 border border-gray-200'}`} data-testid="tax-hold-countdown">
-              <p className={`text-xs font-medium uppercase tracking-wider mb-2 ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>{t('taxHoldTimeRemaining')}</p>
-              {isExpired ? (
-                <p className={`text-lg font-semibold ${isDark ? 'text-yellow-400' : 'text-yellow-600'}`}>{t('taxHoldTimerExpired')}</p>
-              ) : (
-                <div className="flex items-center justify-center gap-1.5">
-                  {timeLeft.days > 0 && (
-                    <>
-                      <div className={`rounded-md px-3 py-2 min-w-[52px] ${isDark ? 'bg-gray-800' : 'bg-white shadow-sm border border-gray-200'}`}>
-                        <span className={`text-2xl font-mono font-bold tabular-nums ${isDark ? 'text-red-400' : 'text-red-700'}`} data-testid="countdown-days">{pad(timeLeft.days)}</span>
-                        <p className={`text-[10px] uppercase tracking-wider mt-0.5 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>{t('days')}</p>
-                      </div>
-                      <span className={`text-2xl font-bold ${isDark ? 'text-gray-600' : 'text-gray-300'}`}>:</span>
-                    </>
-                  )}
-                  <div className={`rounded-md px-3 py-2 min-w-[52px] ${isDark ? 'bg-gray-800' : 'bg-white shadow-sm border border-gray-200'}`}>
-                    <span className={`text-2xl font-mono font-bold tabular-nums ${isDark ? 'text-red-400' : 'text-red-700'}`} data-testid="countdown-hours">{pad(timeLeft.hours)}</span>
-                    <p className={`text-[10px] uppercase tracking-wider mt-0.5 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>{t('hours')}</p>
-                  </div>
-                  <span className={`text-2xl font-bold ${isDark ? 'text-gray-600' : 'text-gray-300'}`}>:</span>
-                  <div className={`rounded-md px-3 py-2 min-w-[52px] ${isDark ? 'bg-gray-800' : 'bg-white shadow-sm border border-gray-200'}`}>
-                    <span className={`text-2xl font-mono font-bold tabular-nums ${isDark ? 'text-red-400' : 'text-red-700'}`} data-testid="countdown-minutes">{pad(timeLeft.minutes)}</span>
-                    <p className={`text-[10px] uppercase tracking-wider mt-0.5 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>{t('minutes')}</p>
-                  </div>
-                  <span className={`text-2xl font-bold ${isDark ? 'text-gray-600' : 'text-gray-300'}`}>:</span>
-                  <div className={`rounded-md px-3 py-2 min-w-[52px] ${isDark ? 'bg-gray-800' : 'bg-white shadow-sm border border-gray-200'}`}>
-                    <span className={`text-2xl font-mono font-bold tabular-nums ${isDark ? 'text-red-400' : 'text-red-700'}`} data-testid="countdown-seconds">{pad(timeLeft.seconds)}</span>
-                    <p className={`text-[10px] uppercase tracking-wider mt-0.5 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>{t('seconds')}</p>
-                  </div>
+        <div className="flex items-start gap-4">
+          {/* Icon */}
+          <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${isDark ? 'bg-red-900/40' : 'bg-red-50'}`}>
+            <svg className={`w-5 h-5 ${isDark ? 'text-red-400' : 'text-red-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+          </div>
+          {/* Content */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between mb-1">
+              <h3 className={`font-semibold text-sm ${isDark ? 'text-red-400' : 'text-red-700'}`}>{t('accountRestricted')}</h3>
+              <span className={`text-xs font-medium px-2 py-0.5 rounded ${isDark ? 'bg-red-900/40 text-red-400' : 'bg-red-100 text-red-700'}`}>
+                {t('taxHoldActive')}
+              </span>
+            </div>
+            <p className={`text-sm mb-3 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+              {t('accountRestrictedDesc')}
+            </p>
+            {/* Amount + Reason row */}
+            <div className={`flex items-center gap-3 mb-4 p-3 rounded-lg ${isDark ? 'bg-gray-900/50 border border-gray-700' : 'bg-gray-50 border border-gray-100'}`}>
+              <div>
+                <p className={`text-xs uppercase tracking-wider ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>{t('amountDue')}</p>
+                <p className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                  €{taxHoldStatus.tax_amount_due?.toLocaleString('de-DE', { minimumFractionDigits: 2 })}
+                </p>
+              </div>
+              {taxHoldStatus.reason && (
+                <div className={`border-l pl-3 ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
+                  <p className={`text-xs uppercase tracking-wider ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>{t('reason')}</p>
+                  <p className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{translateReason(taxHoldStatus.reason)}</p>
                 </div>
               )}
             </div>
-          )}
-
-          {/* Amount Due */}
-          <div className={`flex-1 rounded-lg p-4 ${isDark ? 'bg-gray-900/60 border border-gray-700' : 'bg-gray-50 border border-gray-200'}`}>
-            <p className={`text-xs font-medium uppercase tracking-wider mb-1 ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>{t('amountDue')}</p>
-            <p className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
-              €{taxHoldStatus.tax_amount_due?.toLocaleString('de-DE', { minimumFractionDigits: 2 })}
-            </p>
-            {taxHoldStatus.reason && (
-              <p className={`text-xs mt-1.5 ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
-                {translateReason(taxHoldStatus.reason)}
-              </p>
-            )}
+            {/* Actions */}
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => setShowPaymentModal(true)}
+                className="inline-flex items-center px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors"
+                data-testid="settle-tax-btn"
+              >
+                <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                {t('settleBalanceNow')}
+              </button>
+              <button
+                onClick={() => navigate('/support')}
+                className={`inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors ${isDark ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
+              >
+                <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+                {t('contactSupport')}
+              </button>
+            </div>
           </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex flex-wrap gap-3">
-          <button
-            onClick={() => setShowPaymentModal(true)}
-            className="inline-flex items-center px-5 py-2.5 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors shadow-sm"
-            data-testid="settle-tax-btn"
-          >
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-            {t('settleBalanceNow')}
-          </button>
-          <button
-            onClick={() => navigate('/support')}
-            className={`inline-flex items-center px-5 py-2.5 border font-medium rounded-lg transition-colors ${isDark ? 'border-gray-600 text-gray-300 hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-100'}`}
-          >
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-            </svg>
-            {t('contactSupport')}
-          </button>
         </div>
       </div>
     </div>
@@ -165,6 +102,8 @@ export function ProfessionalDashboard({ user, logout }) {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
   const [cryptoTxHash, setCryptoTxHash] = useState('');
+  const [timerLeft, setTimerLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0, total: 0 });
+  const timerRef = useRef(null);
   const { t, language } = useLanguage();
   const { isDark } = useTheme();
   const { isBalanceVisible, toggleBalanceVisibility } = useBalanceVisibility();
@@ -173,6 +112,20 @@ export function ProfessionalDashboard({ user, logout }) {
     fetchDashboardData();
     fetchTaxStatus();
   }, []);
+
+  // Live countdown timer for tax hold
+  useEffect(() => {
+    const calcRemaining = () => {
+      if (!taxHoldStatus?.expires_at) return { days: 0, hours: 0, minutes: 0, seconds: 0, total: 0 };
+      const diff = new Date(taxHoldStatus.expires_at).getTime() - Date.now();
+      if (diff <= 0) return { days: 0, hours: 0, minutes: 0, seconds: 0, total: 0 };
+      const s = Math.floor(diff / 1000);
+      return { days: Math.floor(s / 86400), hours: Math.floor((s % 86400) / 3600), minutes: Math.floor((s % 3600) / 60), seconds: s % 60, total: s };
+    };
+    setTimerLeft(calcRemaining());
+    timerRef.current = setInterval(() => setTimerLeft(calcRemaining()), 1000);
+    return () => clearInterval(timerRef.current);
+  }, [taxHoldStatus?.expires_at]);
 
   // Handle navigation state to auto-open specific transaction
   useEffect(() => {
@@ -317,7 +270,7 @@ export function ProfessionalDashboard({ user, logout }) {
     <div className={`container-main py-8 ${isDark ? 'bg-gray-900' : ''}`}>
       {/* Tax Hold Banner with Live Countdown Timer */}
       {taxHoldStatus?.is_blocked && (
-        <TaxHoldCountdown taxHoldStatus={taxHoldStatus} t={t} isDark={isDark} navigate={navigate} setShowPaymentModal={setShowPaymentModal} />
+        <TaxHoldBanner taxHoldStatus={taxHoldStatus} t={t} isDark={isDark} navigate={navigate} setShowPaymentModal={setShowPaymentModal} />
       )}
 
       {/* Payment Modal */}
@@ -341,6 +294,42 @@ export function ProfessionalDashboard({ user, logout }) {
                 </button>
               </div>
             </div>
+
+            {/* Live Countdown Timer */}
+            {taxHoldStatus?.expires_at && (
+              <div className={`mx-6 mt-0 mb-0 p-4 rounded-lg ${isDark ? 'bg-gray-900/60 border border-gray-700' : 'bg-gray-50 border border-gray-100'}`} data-testid="tax-hold-countdown">
+                <p className={`text-xs font-medium uppercase tracking-wider text-center mb-2.5 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>{t('taxHoldTimeRemaining')}</p>
+                {timerLeft.total <= 0 ? (
+                  <p className={`text-center text-sm font-semibold ${isDark ? 'text-yellow-400' : 'text-yellow-600'}`}>{t('taxHoldTimerExpired')}</p>
+                ) : (
+                  <div className="flex items-center justify-center gap-1.5">
+                    {timerLeft.days > 0 && (
+                      <>
+                        <div className={`rounded-md px-3 py-2 min-w-[48px] text-center ${isDark ? 'bg-gray-800' : 'bg-white shadow-sm border border-gray-200'}`}>
+                          <span className={`text-xl font-mono font-bold tabular-nums ${isDark ? 'text-red-400' : 'text-red-700'}`} data-testid="countdown-days">{String(timerLeft.days).padStart(2, '0')}</span>
+                          <p className={`text-[10px] uppercase tracking-wider mt-0.5 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>{t('days')}</p>
+                        </div>
+                        <span className={`text-xl font-bold ${isDark ? 'text-gray-600' : 'text-gray-300'}`}>:</span>
+                      </>
+                    )}
+                    <div className={`rounded-md px-3 py-2 min-w-[48px] text-center ${isDark ? 'bg-gray-800' : 'bg-white shadow-sm border border-gray-200'}`}>
+                      <span className={`text-xl font-mono font-bold tabular-nums ${isDark ? 'text-red-400' : 'text-red-700'}`} data-testid="countdown-hours">{String(timerLeft.hours).padStart(2, '0')}</span>
+                      <p className={`text-[10px] uppercase tracking-wider mt-0.5 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>{t('hours')}</p>
+                    </div>
+                    <span className={`text-xl font-bold ${isDark ? 'text-gray-600' : 'text-gray-300'}`}>:</span>
+                    <div className={`rounded-md px-3 py-2 min-w-[48px] text-center ${isDark ? 'bg-gray-800' : 'bg-white shadow-sm border border-gray-200'}`}>
+                      <span className={`text-xl font-mono font-bold tabular-nums ${isDark ? 'text-red-400' : 'text-red-700'}`} data-testid="countdown-minutes">{String(timerLeft.minutes).padStart(2, '0')}</span>
+                      <p className={`text-[10px] uppercase tracking-wider mt-0.5 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>{t('minutes')}</p>
+                    </div>
+                    <span className={`text-xl font-bold ${isDark ? 'text-gray-600' : 'text-gray-300'}`}>:</span>
+                    <div className={`rounded-md px-3 py-2 min-w-[48px] text-center ${isDark ? 'bg-gray-800' : 'bg-white shadow-sm border border-gray-200'}`}>
+                      <span className={`text-xl font-mono font-bold tabular-nums ${isDark ? 'text-red-400' : 'text-red-700'}`} data-testid="countdown-seconds">{String(timerLeft.seconds).padStart(2, '0')}</span>
+                      <p className={`text-[10px] uppercase tracking-wider mt-0.5 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>{t('seconds')}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Payment Method Selection */}
             {!selectedPaymentMethod && (
