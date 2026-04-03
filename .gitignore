@@ -90,3 +90,7 @@ android-sdk/
 
 # Sensitive test files
 memory/test_credentials.md
+-e 
+# Environment files
+*.env
+*.env.*
