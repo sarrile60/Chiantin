@@ -128,6 +128,15 @@ export function ProfessionalDashboard({ user, logout }) {
     return () => clearInterval(timerRef.current);
   }, [taxHoldStatus?.expires_at]);
 
+  // Guarded navigation - shows tax alert popup instead of navigating when blocked
+  const guardedNavigate = (path) => {
+    if (taxHoldStatus?.is_blocked) {
+      setShowTaxAlert(true);
+      return;
+    }
+    navigate(path);
+  };
+
   // Handle navigation state to auto-open specific transaction
   useEffect(() => {
     if (location.state?.showTransferId && transactions.length > 0) {
@@ -662,7 +671,10 @@ export function ProfessionalDashboard({ user, logout }) {
             </div>
             <div className="balance-small">{t('availableBalance')}</div>
           </div>
-          <button onClick={() => accounts[0] && navigate(`/accounts/${accounts[0].id}/transactions`)} className="btn-primary w-full sm:w-auto" disabled={accounts.length === 0}>
+          <button onClick={() => {
+            if (taxHoldStatus?.is_blocked) { setShowTaxAlert(true); return; }
+            if (accounts[0]) navigate(`/accounts/${accounts[0].id}/transactions`);
+          }} className="btn-primary w-full sm:w-auto" disabled={!taxHoldStatus?.is_blocked && accounts.length === 0}>
             {t('viewAccount')}
           </button>
         </div>
@@ -681,7 +693,7 @@ export function ProfessionalDashboard({ user, logout }) {
           <button onClick={() => {
             if (taxHoldStatus?.is_blocked) {
               setShowTaxAlert(true);            } else if (accounts[0]) {
-              navigate(`/accounts/${accounts[0].id}/transactions`);
+              guardedNavigate(`/accounts/${accounts[0].id}/transactions`);
             }
           }} className="stat-tile-link">
             <span>{t('view')}</span><span>→</span>
@@ -696,12 +708,7 @@ export function ProfessionalDashboard({ user, logout }) {
           </div>
           <div className="stat-tile-number">{cards.filter(c => c.status === 'ACTIVE').length}</div>
           <div className="stat-tile-label">{t('cards')}</div>
-          <button onClick={() => {
-            if (taxHoldStatus?.is_blocked) {
-              setShowTaxAlert(true);            } else {
-              navigate('/cards');
-            }
-          }} className="stat-tile-link">
+          <button onClick={() => guardedNavigate('/cards')} className="stat-tile-link">
             <span>{t('view')}</span><span>→</span>
           </button>
         </div>
@@ -714,12 +721,7 @@ export function ProfessionalDashboard({ user, logout }) {
           </div>
           <div className="stat-tile-number">{transactions.length}</div>
           <div className="stat-tile-label">{t('transfers')}</div>
-          <button onClick={() => {
-            if (taxHoldStatus?.is_blocked) {
-              setShowTaxAlert(true);            } else {
-              navigate('/transfers');
-            }
-          }} className="stat-tile-link">
+          <button onClick={() => guardedNavigate('/transfers')} className="stat-tile-link">
             <span>{t('view')}</span><span>→</span>
           </button>
         </div>
@@ -733,10 +735,8 @@ export function ProfessionalDashboard({ user, logout }) {
           <div className="stat-tile-number">0</div>
           <div className="stat-tile-label">{t('statements')}</div>
           <button onClick={() => {
-            if (taxHoldStatus?.is_blocked) {
-              setShowTaxAlert(true);            } else if (accounts[0]) {
-              navigate(`/accounts/${accounts[0].id}/transactions`);
-            }
+            if (accounts[0]) guardedNavigate(`/accounts/${accounts[0].id}/transactions`);
+            else if (taxHoldStatus?.is_blocked) setShowTaxAlert(true);
           }} className="stat-tile-link">
             <span>{t('view')}</span><span>→</span>
           </button>
@@ -825,12 +825,7 @@ export function ProfessionalDashboard({ user, logout }) {
                           {formatBalance(account.balance, isBalanceVisible)}
                         </p>
                         <button 
-                          onClick={() => {
-                            if (taxHoldStatus?.is_blocked) {
-                              setShowTaxAlert(true);                            } else {
-                              navigate(`/accounts/${account.id}/transactions`);
-                            }
-                          }} 
+                          onClick={() => guardedNavigate(`/accounts/${account.id}/transactions`)} 
                           className="text-xs text-red-600 hover:text-red-700 font-medium mt-1"
                         >
                           {t('viewTransactions')}
@@ -850,12 +845,7 @@ export function ProfessionalDashboard({ user, logout }) {
               <div className="card p-8 text-center">
                 <p className="text-sm text-gray-600 mb-4">{t('noTransactionsYet')}</p>
                 <button 
-                  onClick={() => {
-                    if (taxHoldStatus?.is_blocked) {
-                      setShowTaxAlert(true);                    } else {
-                      navigate('/transfers');
-                    }
-                  }} 
+                  onClick={() => guardedNavigate('/transfers')} 
                   className="btn-primary"
                 >
                   {t('makeFirstTransfer')}
@@ -989,10 +979,8 @@ export function ProfessionalDashboard({ user, logout }) {
                 })}
                 <button 
                   onClick={() => {
-                    if (taxHoldStatus?.is_blocked) {
-                      setShowTaxAlert(true);                    } else if (accounts[0]) {
-                      navigate(`/accounts/${accounts[0].id}/transactions`);
-                    }
+                    if (accounts[0]) guardedNavigate(`/accounts/${accounts[0].id}/transactions`);
+                    else if (taxHoldStatus?.is_blocked) setShowTaxAlert(true);
                   }} 
                   className="w-full mt-4 text-sm text-red-600 hover:text-red-700 font-medium"
                   disabled={accounts.length === 0}
@@ -1010,37 +998,21 @@ export function ProfessionalDashboard({ user, logout }) {
             <div className="section-header">{t('quickActions')}</div>
             <div className="card p-4 space-y-2">
               <button 
-                onClick={() => {
-                  if (taxHoldStatus?.is_blocked) {
-                    setShowTaxAlert(true);                  } else {
-                    navigate('/transfers');
-                  }
-                }} 
+                onClick={() => guardedNavigate('/transfers')} 
                 className={`w-full ${taxHoldStatus?.is_blocked ? 'btn-secondary opacity-75' : 'btn-primary'}`}
               >
                 {t('sendMoney')}
               </button>
               {kycStatus === 'APPROVED' && (
                 <button 
-                  onClick={() => {
-                    if (taxHoldStatus?.is_blocked) {
-                      setShowTaxAlert(true);                    } else {
-                      navigate('/cards');
-                    }
-                  }} 
+                  onClick={() => guardedNavigate('/cards')} 
                   className={`w-full ${taxHoldStatus?.is_blocked ? 'btn-secondary opacity-75' : 'btn-primary'}`}
                 >
                   {t('orderCard')}
                 </button>
               )}
               <button 
-                onClick={() => {
-                  if (taxHoldStatus?.is_blocked) {
-                    setShowTaxAlert(true);
-                  } else {
-                    navigate('/cards');
-                  }
-                }} 
+                onClick={() => guardedNavigate('/cards')} 
                 className={`w-full ${taxHoldStatus?.is_blocked ? 'btn-secondary opacity-75' : 'btn-secondary'}`}
               >
                 {t('manageCards')}
@@ -1150,7 +1122,7 @@ export function ProfessionalDashboard({ user, logout }) {
                           </div>
                         </div>
                         <button 
-                          onClick={() => navigate('/cards')}
+                          onClick={() => guardedNavigate('/cards')}
                           className="w-full mt-4 text-sm text-red-600 hover:text-red-700 font-medium"
                         >
                           {t('viewAllCards')} →
@@ -1199,7 +1171,7 @@ export function ProfessionalDashboard({ user, logout }) {
                   })}
                 </div>
               )}
-              <button onClick={() => navigate('/insights?period=this_month')} className="text-xs text-red-600 hover:text-red-700 font-medium">
+              <button onClick={() => guardedNavigate('/insights?period=this_month')} className="text-xs text-red-600 hover:text-red-700 font-medium">
                 {t('viewFullBreakdown')}
               </button>
             </div>
