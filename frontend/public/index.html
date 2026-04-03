@@ -1,10 +1,20 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" translate="no">
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
         <meta name="theme-color" content="#dc3545" />
         <meta name="description" content="Chiantin - Professional EU digital banking platform with multi-currency accounts, instant transfers, and bank-grade security" />
+        <meta name="google" content="notranslate" />
+        <meta http-equiv="Content-Language" content="it,en" />
+        
+        <!-- Set lang from localStorage before React renders to prevent browser auto-translate -->
+        <script>
+            try {
+                var savedLang = localStorage.getItem('atlas_language');
+                if (savedLang) document.documentElement.lang = savedLang;
+            } catch(e) {}
+        </script>
         
         <!-- PWA Manifest - Critical for standalone mode -->
         <link rel="manifest" href="/manifest.webmanifest" crossorigin="use-credentials" />

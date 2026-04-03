@@ -143,12 +143,14 @@ export function LandingPage() {
               <button
                 onClick={() => navigate('/login')}
                 className={`font-medium transition ${isDark ? 'text-gray-300 hover:text-white' : 'text-gray-700 hover:text-gray-900'}`}
+                translate="no"
               >
                 {t('signIn')}
               </button>
               <button
                 onClick={() => navigate('/signup')}
                 className="px-6 py-2.5 bg-gradient-to-r from-red-500 to-red-600 text-white font-semibold rounded-full hover:shadow-lg hover:shadow-red-500/30 transition-all duration-300"
+                translate="no"
               >
                 {t('getStarted')}
               </button>
@@ -227,12 +229,14 @@ export function LandingPage() {
                 <button
                   onClick={() => navigate('/login')}
                   className={`text-left font-medium ${isDark ? 'text-gray-300 hover:text-white' : 'text-gray-700 hover:text-gray-900'}`}
+                  translate="no"
                 >
                   {t('signIn')}
                 </button>
                 <button
                   onClick={() => navigate('/signup')}
                   className="w-full py-3 bg-gradient-to-r from-red-500 to-red-600 text-white font-semibold rounded-full"
+                  translate="no"
                 >
                   {t('getStarted')}
                 </button>
@@ -273,16 +277,18 @@ export function LandingPage() {
                 {t('heroSubtitle')}
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start" translate="no">
                 <button
                   onClick={() => navigate('/signup')}
                   className="px-8 py-4 bg-gradient-to-r from-red-500 to-red-600 text-white font-semibold rounded-full text-lg hover:shadow-xl hover:shadow-red-500/30 transition-all duration-300 transform hover:-translate-y-1"
+                  translate="no"
                 >
                   {t('joinTheFuture') || 'Join the Future'}
                 </button>
                 <button
                   onClick={() => navigate('/login')}
                   className={`px-8 py-4 font-semibold rounded-full text-lg transition-all duration-300 ${isDark ? 'bg-gray-800 text-gray-200 hover:bg-gray-700' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`}
+                  translate="no"
                 >
                   {t('signIn') || 'Sign In'}
                 </button>
@@ -593,16 +599,18 @@ export function LandingPage() {
           <p className="text-lg text-white/90 mb-8 max-w-2xl mx-auto">
             {t('ctaDesc')}
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center" translate="no">
             <button
               onClick={() => navigate('/signup')}
               className="px-8 py-4 bg-white text-red-600 font-semibold rounded-full text-lg hover:bg-gray-100 transition-all duration-300 transform hover:-translate-y-1"
+              translate="no"
             >
               {t('createFreeAccount')}
             </button>
             <button
               onClick={() => navigate('/login')}
               className="px-8 py-4 bg-transparent border-2 border-white text-white font-semibold rounded-full text-lg hover:bg-white/10 transition-all duration-300"
+              translate="no"
             >
               {t('signIn')}
             </button>

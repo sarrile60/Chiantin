@@ -48,7 +48,7 @@ self.addEventListener('activate', (event) => {
       .then((cacheNames) => {
         return Promise.all(
           cacheNames
-            .filter((name) => name.startsWith('Chiantin-') && name !== CACHE_NAME)
+            .filter((name) => (name.startsWith('Chiantin-') && name !== CACHE_NAME) || name.startsWith('atlas-'))
             .map((name) => {
               console.log('[SW] Deleting old cache:', name);
               return caches.delete(name);
