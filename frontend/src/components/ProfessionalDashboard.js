@@ -631,7 +631,7 @@ export function ProfessionalDashboard({ user, logout }) {
                 className={`px-4 py-2.5 text-sm font-medium rounded-lg transition-colors ${isDark ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
                 data-testid="tax-alert-dismiss-btn"
               >
-                {t('dismiss') || 'OK'}
+                {t('understood')}
               </button>
             </div>
           </div>
