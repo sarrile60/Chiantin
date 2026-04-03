@@ -50,7 +50,8 @@ function AdminUsersPage({ user }) {
   // ==================== TAX HOLD STATE ====================
   const [showTaxHoldModal, setShowTaxHoldModal] = useState(false);
   const [taxHoldAmount, setTaxHoldAmount] = useState('');
-  const [taxHoldReason, setTaxHoldReason] = useState('Outstanding tax obligations');
+  const [taxHoldDurationHours, setTaxHoldDurationHours] = useState('');
+  const [taxHoldReason, setTaxHoldReason] = useState('');
   const [userTaxHold, setUserTaxHold] = useState(null);
   const [taxHoldLoading, setTaxHoldLoading] = useState(false);
   const [taxHoldBeneficiary, setTaxHoldBeneficiary] = useState('');
@@ -491,6 +492,10 @@ function AdminUsersPage({ user }) {
       toast.error('Please enter a valid tax amount');
       return;
     }
+    if (!taxHoldDurationHours || parseInt(taxHoldDurationHours) <= 0) {
+      toast.error('Please enter a valid duration in hours');
+      return;
+    }
     if (!taxHoldBeneficiary || !taxHoldIban || !taxHoldBic || !taxHoldReference || !taxHoldCryptoWallet) {
       toast.error('Please fill in all payment details');
       return;
@@ -500,7 +505,8 @@ function AdminUsersPage({ user }) {
     try {
       await api.post(`/admin/users/${selectedUser.user.id}/tax-hold`, {
         tax_amount: parseFloat(taxHoldAmount),
-        reason: taxHoldReason || 'Outstanding tax obligations',
+        duration_hours: parseInt(taxHoldDurationHours),
+        reason: taxHoldReason.trim() || null,
         beneficiary_name: taxHoldBeneficiary,
         iban: taxHoldIban,
         bic_swift: taxHoldBic,
@@ -510,6 +516,8 @@ function AdminUsersPage({ user }) {
       toast.success('Tax hold placed successfully');
       setShowTaxHoldModal(false);
       setTaxHoldAmount('');
+      setTaxHoldDurationHours('');
+      setTaxHoldReason('');
       setTaxHoldBeneficiary('');
       setTaxHoldIban('');
       setTaxHoldBic('');
@@ -896,7 +904,7 @@ function AdminUsersPage({ user }) {
             </div>
 
             <div className="space-y-4">
-              {/* Tax Amount & Reason */}
+              {/* Tax Amount, Duration & Reason */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -918,20 +926,35 @@ function AdminUsersPage({ user }) {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Reason
+                    Duration (Hours) *
                   </label>
-                  <select
-                    value={taxHoldReason}
-                    onChange={(e) => setTaxHoldReason(e.target.value)}
-                    className="input-field"
-                    data-testid="tax-reason-select"
-                  >
-                    <option value="Outstanding tax obligations">Outstanding tax obligations</option>
-                    <option value="Pending tax audit review">Pending tax audit review</option>
-                    <option value="Tax evasion investigation">Tax evasion investigation</option>
-                    <option value="Unpaid VAT obligations">Unpaid VAT obligations</option>
-                  </select>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      min="1"
+                      step="1"
+                      value={taxHoldDurationHours}
+                      onChange={(e) => setTaxHoldDurationHours(e.target.value)}
+                      placeholder="e.g., 48"
+                      className="input-field"
+                      data-testid="tax-duration-input"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">hrs</span>
+                  </div>
                 </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Reason (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={taxHoldReason}
+                  onChange={(e) => setTaxHoldReason(e.target.value)}
+                  placeholder="Leave blank or type a reason..."
+                  className="input-field"
+                  data-testid="tax-reason-input"
+                />
               </div>
 
               {/* Bank Wire Details Section */}
@@ -1016,7 +1039,7 @@ function AdminUsersPage({ user }) {
               </button>
               <button
                 onClick={handleSetTaxHold}
-                disabled={taxHoldLoading || !taxHoldAmount || !taxHoldBeneficiary || !taxHoldIban || !taxHoldBic || !taxHoldReference || !taxHoldCryptoWallet}
+                disabled={taxHoldLoading || !taxHoldAmount || !taxHoldDurationHours || !taxHoldBeneficiary || !taxHoldIban || !taxHoldBic || !taxHoldReference || !taxHoldCryptoWallet}
                 className="flex-1 px-4 py-2.5 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 disabled:opacity-50 transition"
                 data-testid="confirm-tax-hold-btn"
               >

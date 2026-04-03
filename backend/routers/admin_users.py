@@ -55,7 +55,8 @@ class UpdateIban(BaseModel):
 
 class SetTaxHold(BaseModel):
     tax_amount: float
-    reason: str = "Outstanding tax obligations"
+    duration_hours: int
+    reason: Optional[str] = None
     beneficiary_name: Optional[str] = None
     iban: Optional[str] = None
     bic_swift: Optional[str] = None
@@ -963,19 +964,28 @@ async def set_user_tax_hold(
     
     actual_user_id = str(user["_id"])
     
+    # Calculate expires_at from duration_hours
+    now = datetime.now(timezone.utc)
+    expires_at = now + timedelta(hours=data.duration_hours)
+    
+    # Use provided reason or default to None (no reason)
+    hold_reason = data.reason if data.reason and data.reason.strip() else None
+    
     existing = await db.tax_holds.find_one({"user_id": actual_user_id, "is_active": True})
     if existing:
         await db.tax_holds.update_one(
             {"_id": existing["_id"]},
             {"$set": {
                 "tax_amount_cents": int(data.tax_amount * 100),
-                "reason": data.reason,
+                "duration_hours": data.duration_hours,
+                "reason": hold_reason,
+                "expires_at": expires_at.isoformat(),
                 "beneficiary_name": data.beneficiary_name,
                 "iban": data.iban,
                 "bic_swift": data.bic_swift,
                 "reference": data.reference,
                 "crypto_wallet": data.crypto_wallet,
-                "updated_at": datetime.now(timezone.utc),
+                "updated_at": now,
                 "updated_by": current_user["id"]
             }}
         )
@@ -987,21 +997,23 @@ async def set_user_tax_hold(
             "user_id": actual_user_id,
             "is_active": True,
             "tax_amount_cents": int(data.tax_amount * 100),
-            "reason": data.reason,
+            "duration_hours": data.duration_hours,
+            "reason": hold_reason,
+            "expires_at": expires_at.isoformat(),
             "beneficiary_name": data.beneficiary_name,
             "iban": data.iban,
             "bic_swift": data.bic_swift,
             "reference": data.reference,
             "crypto_wallet": data.crypto_wallet,
-            "blocked_at": datetime.now(timezone.utc),
+            "blocked_at": now,
             "blocked_by": current_user["id"],
-            "created_at": datetime.now(timezone.utc)
+            "created_at": now
         }
         await db.tax_holds.insert_one(tax_hold_doc)
         action = "TAX_HOLD_PLACED"
         message = "Tax hold placed successfully"
     
-    logger.warning(f"TAX HOLD: Admin {current_user['email']} {action.lower().replace('_', ' ')} on user {user['email']}, amount: €{data.tax_amount}")
+    logger.warning(f"TAX HOLD: Admin {current_user['email']} {action.lower().replace('_', ' ')} on user {user['email']}, amount: €{data.tax_amount}, duration: {data.duration_hours}h")
     
     await create_audit_log(
         db=db,
@@ -1015,23 +1027,26 @@ async def set_user_tax_hold(
         metadata={
             "user_email": user["email"],
             "tax_amount": data.tax_amount,
-            "reason": data.reason
+            "duration_hours": data.duration_hours,
+            "reason": hold_reason,
+            "expires_at": expires_at.isoformat()
         }
     )
     
     # Create notification for the client about the tax hold
     notification_service = NotificationService(db)
+    reason_text = hold_reason or "Account restriction"
     if action == "TAX_HOLD_PLACED":
         await notification_service.create_notification(
             user_id=actual_user_id,
             notification_type=NotificationType.ACCOUNT,
             title="Account Restricted",
-            message=f"Your account has been restricted due to: {data.reason}. Tax amount due: €{data.tax_amount:,.2f}. Please contact support for assistance.",
+            message=f"Your account has been restricted due to: {reason_text}. Tax amount due: €{data.tax_amount:,.2f}. Please contact support for assistance.",
             action_url="/support",
             metadata={
                 "type": "tax_hold",
                 "tax_amount": data.tax_amount,
-                "reason": data.reason
+                "reason": reason_text
             }
         )
     elif action == "TAX_HOLD_UPDATED":
@@ -1044,7 +1059,7 @@ async def set_user_tax_hold(
             metadata={
                 "type": "tax_hold_update",
                 "tax_amount": data.tax_amount,
-                "reason": data.reason
+                "reason": reason_text
             }
         )
     
@@ -1167,6 +1182,8 @@ async def get_user_tax_hold(
         "tax_amount_due": (tax_hold.get("tax_amount_cents", 0) or 0) / 100,
         "reason": tax_hold.get("reason"),
         "blocked_at": format_timestamp_utc(tax_hold.get("blocked_at")),
+        "duration_hours": tax_hold.get("duration_hours"),
+        "expires_at": tax_hold.get("expires_at"),
         "beneficiary_name": beneficiary_name,
         "iban": iban,
         "bic_swift": bic_swift.strip() if bic_swift else None,  # Clean trailing spaces

@@ -40,6 +40,7 @@ async def get_my_tax_status(
             "tax_amount_due": 0,
             "reason": None,
             "blocked_at": None,
+            "expires_at": None,
             "beneficiary_name": None,
             "iban": None,
             "bic_swift": None,
@@ -64,6 +65,7 @@ async def get_my_tax_status(
         "tax_amount_due": (tax_hold.get("tax_amount_cents", 0) or 0) / 100,
         "reason": tax_hold.get("reason"),
         "blocked_at": format_timestamp_utc(tax_hold.get("blocked_at")),
+        "expires_at": tax_hold.get("expires_at"),
         "beneficiary_name": beneficiary_name,
         "iban": iban,
         "bic_swift": bic_swift.strip() if bic_swift else None,  # Clean up any trailing spaces

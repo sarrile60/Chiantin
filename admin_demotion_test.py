@@ -19,7 +19,7 @@ import uuid
 import time
 
 class AdminDemotionTester:
-    def __init__(self, base_url="https://email-integration-6.preview.emergentagent.com"):
+    def __init__(self, base_url="https://countdown-compliance.preview.emergentagent.com"):
         self.base_url = base_url
         self.super_admin_token = None
         self.admin_token = None

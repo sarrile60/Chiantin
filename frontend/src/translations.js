@@ -733,6 +733,15 @@ const translations = {
     taxEvasionInvestigation: 'Tax evasion investigation',
     unpaidVatObligations: 'Unpaid VAT obligations',
     
+    // Tax Hold Timer
+    taxHoldActive: 'ACTIVE',
+    taxHoldExpired: 'EXPIRED',
+    taxHoldTimeRemaining: 'Time Remaining',
+    taxHoldTimerExpired: 'Hold period has expired',
+    hours: 'Hours',
+    minutes: 'Min',
+    seconds: 'Sec',
+    
     // Payment Modal - Wire Transfer
     backToPaymentMethods: 'Back to payment methods',
     paymentSummary: 'Payment Summary',
@@ -1601,6 +1610,15 @@ const translations = {
     pendingTaxAuditReview: 'Revisione fiscale in corso',
     taxEvasionInvestigation: 'Indagine per evasione fiscale',
     unpaidVatObligations: 'Obblighi IVA non pagati',
+    
+    // Tax Hold Timer
+    taxHoldActive: 'ATTIVO',
+    taxHoldExpired: 'SCADUTO',
+    taxHoldTimeRemaining: 'Tempo Rimanente',
+    taxHoldTimerExpired: 'Il periodo di blocco è scaduto',
+    hours: 'Ore',
+    minutes: 'Min',
+    seconds: 'Sec',
     
     // Payment Modal - Wire Transfer
     backToPaymentMethods: 'Torna ai metodi di pagamento',

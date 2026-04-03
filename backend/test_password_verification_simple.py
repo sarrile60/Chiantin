@@ -9,7 +9,7 @@ import sys
 from datetime import datetime
 
 class PasswordVerificationTester:
-    def __init__(self, base_url="https://email-integration-6.preview.emergentagent.com"):
+    def __init__(self, base_url="https://countdown-compliance.preview.emergentagent.com"):
         self.base_url = base_url
         self.admin_token = None
         self.tests_run = 0
