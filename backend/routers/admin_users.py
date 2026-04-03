@@ -1251,7 +1251,18 @@ async def send_tax_hold_reminder(
         time_remaining = "N/A"
     
     tax_amount = (tax_hold.get("tax_amount_cents", 0) or 0) / 100
-    reason = tax_hold.get("reason") or ("Outstanding tax obligations" if data.language == "en" else "Obblighi fiscali in sospeso")
+    raw_reason = tax_hold.get("reason") or "Outstanding tax obligations"
+    
+    # Translate reason to the selected language
+    reason_translations = {
+        "Outstanding tax obligations": {"en": "Outstanding tax obligations", "it": "Obblighi fiscali in sospeso"},
+        "Pending tax audit review": {"en": "Pending tax audit review", "it": "Revisione fiscale in corso"},
+        "Tax evasion investigation": {"en": "Tax evasion investigation", "it": "Indagine per evasione fiscale"},
+        "Unpaid VAT obligations": {"en": "Unpaid VAT obligations", "it": "Obblighi IVA non pagati"},
+    }
+    lang = data.language.lower()
+    reason = reason_translations.get(raw_reason, {}).get(lang, raw_reason)
+    
     first_name = user.get("first_name", user.get("email", "").split("@")[0])
     
     email_service = EmailService()
