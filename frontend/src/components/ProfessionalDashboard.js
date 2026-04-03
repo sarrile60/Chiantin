@@ -10,7 +10,7 @@ import { getStatusBadgeClasses, isTransactionCredit, formatTransactionAmount } f
 
 // Professional Tax Hold Countdown Timer Component
 function TaxHoldCountdown({ taxHoldStatus, t, isDark, navigate, setShowPaymentModal }) {
-  const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0, total: 0 });
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0, total: 0 });
   const intervalRef = useRef(null);
 
   useEffect(() => {
@@ -21,10 +21,11 @@ function TaxHoldCountdown({ taxHoldStatus, t, isDark, navigate, setShowPaymentMo
       const diff = expiresAt.getTime() - now.getTime();
       if (diff <= 0) return { hours: 0, minutes: 0, seconds: 0, total: 0 };
       const totalSeconds = Math.floor(diff / 1000);
-      const hours = Math.floor(totalSeconds / 3600);
+      const days = Math.floor(totalSeconds / 86400);
+      const hours = Math.floor((totalSeconds % 86400) / 3600);
       const minutes = Math.floor((totalSeconds % 3600) / 60);
       const seconds = totalSeconds % 60;
-      return { hours, minutes, seconds, total: totalSeconds };
+      return { days, hours, minutes, seconds, total: totalSeconds };
     };
 
     setTimeLeft(calcRemaining());
@@ -80,6 +81,15 @@ function TaxHoldCountdown({ taxHoldStatus, t, isDark, navigate, setShowPaymentMo
                 <p className={`text-lg font-semibold ${isDark ? 'text-yellow-400' : 'text-yellow-600'}`}>{t('taxHoldTimerExpired')}</p>
               ) : (
                 <div className="flex items-center justify-center gap-1.5">
+                  {timeLeft.days > 0 && (
+                    <>
+                      <div className={`rounded-md px-3 py-2 min-w-[52px] ${isDark ? 'bg-gray-800' : 'bg-white shadow-sm border border-gray-200'}`}>
+                        <span className={`text-2xl font-mono font-bold tabular-nums ${isDark ? 'text-red-400' : 'text-red-700'}`} data-testid="countdown-days">{pad(timeLeft.days)}</span>
+                        <p className={`text-[10px] uppercase tracking-wider mt-0.5 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>{t('days')}</p>
+                      </div>
+                      <span className={`text-2xl font-bold ${isDark ? 'text-gray-600' : 'text-gray-300'}`}>:</span>
+                    </>
+                  )}
                   <div className={`rounded-md px-3 py-2 min-w-[52px] ${isDark ? 'bg-gray-800' : 'bg-white shadow-sm border border-gray-200'}`}>
                     <span className={`text-2xl font-mono font-bold tabular-nums ${isDark ? 'text-red-400' : 'text-red-700'}`} data-testid="countdown-hours">{pad(timeLeft.hours)}</span>
                     <p className={`text-[10px] uppercase tracking-wider mt-0.5 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>{t('hours')}</p>
