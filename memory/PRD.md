@@ -53,6 +53,7 @@ A full-stack banking application (React frontend + FastAPI backend + MongoDB) se
 14. **Anti-spam & Google Protection** — Proper semantic HTML, real `href` attributes, GDPR/AML references, structured legal content
 15. **GDPR Cookie Consent Banner** — Professional cookie banner with Accept All, Reject Non-Essential, and Manage Preferences. Remembers choice in localStorage. Fully bilingual (EN/IT).
 16. **Full Italian Translations** — All 8 static pages (About, Careers, Press, Contact, Privacy, Terms, Cookies, Compliance) fully translated to Italian with professional banking/legal terminology. Cookie banner also translated. Grammar verified.
+17. **Admin Edit User Profile** — Admin can edit any user's first name, last name, email, and phone number via a professional modal in the User Details view. Includes email uniqueness validation, audit logging, and error handling.
 
 ## Pending Tasks
 - **P1:** Update old support emails in backend (`support@projectatlas.eu`, `support@chiantin.im`) to `support@chiantin.eu` in:
