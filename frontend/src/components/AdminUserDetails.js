@@ -74,10 +74,10 @@ function AdminUserDetails({
   openDomainChangeModal,
   handleOpenEditProfile
 }) {
-  if (!selectedUser) return null;
-
   const [reminderLang, setReminderLang] = useState('en');
   const [reminderLoading, setReminderLoading] = useState(false);
+
+  if (!selectedUser) return null;
 
   const handleSendReminder = async () => {
     setReminderLoading(true);
