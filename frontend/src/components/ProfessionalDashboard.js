@@ -104,6 +104,7 @@ export function ProfessionalDashboard({ user, logout }) {
   const [cryptoTxHash, setCryptoTxHash] = useState('');
   const [timerLeft, setTimerLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0, total: 0 });
   const timerRef = useRef(null);
+  const [showTaxAlert, setShowTaxAlert] = useState(false);
   const { t, language } = useLanguage();
   const { isDark } = useTheme();
   const { isBalanceVisible, toggleBalanceVisibility } = useBalanceVisibility();
@@ -585,6 +586,58 @@ export function ProfessionalDashboard({ user, logout }) {
         </div>
       )}
 
+      {/* Chiantin Bank Tax Hold Alert Modal */}
+      {showTaxAlert && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowTaxAlert(false)} data-testid="tax-alert-modal">
+          <div className={`rounded-xl max-w-md w-full shadow-2xl overflow-hidden ${isDark ? 'bg-gray-800' : 'bg-white'}`} onClick={(e) => e.stopPropagation()}>
+            {/* Red header with Chiantin branding */}
+            <div className="bg-red-600 px-6 py-4">
+              <div className="flex items-center gap-2.5">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                <div>
+                  <p className="text-white font-bold text-base tracking-wide">Chiantin Bank</p>
+                  <p className="text-red-200 text-xs">{t('accountRestricted')}</p>
+                </div>
+              </div>
+            </div>
+            {/* Body */}
+            <div className="px-6 py-5">
+              <p className={`text-sm leading-relaxed mb-4 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                {t('accountRestrictedDesc')}
+              </p>
+              <div className={`p-3.5 rounded-lg mb-4 ${isDark ? 'bg-gray-900 border border-gray-700' : 'bg-red-50 border border-red-100'}`}>
+                <p className={`text-xs uppercase tracking-wider mb-1 ${isDark ? 'text-gray-500' : 'text-red-400'}`}>{t('amountDue')}</p>
+                <p className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                  €{taxHoldStatus?.tax_amount_due?.toLocaleString('de-DE', { minimumFractionDigits: 2 })}
+                </p>
+              </div>
+              <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+                {t('pleaseSettleAmount')}
+              </p>
+            </div>
+            {/* Footer */}
+            <div className={`px-6 py-4 flex gap-3 border-t ${isDark ? 'border-gray-700' : 'border-gray-100'}`}>
+              <button
+                onClick={() => { setShowTaxAlert(false); setShowPaymentModal(true); }}
+                className="flex-1 px-4 py-2.5 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors"
+                data-testid="tax-alert-settle-btn"
+              >
+                {t('settleBalanceNow')}
+              </button>
+              <button
+                onClick={() => setShowTaxAlert(false)}
+                className={`px-4 py-2.5 text-sm font-medium rounded-lg transition-colors ${isDark ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
+                data-testid="tax-alert-dismiss-btn"
+              >
+                {t('dismiss') || 'OK'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Welcome + KYC Status */}
       <div className="flex justify-between items-center mb-6">
         <h1 className={`text-2xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{t('welcomeBack')}, {user?.first_name}</h1>
@@ -627,8 +680,7 @@ export function ProfessionalDashboard({ user, logout }) {
           <div className="stat-tile-label">{t('accounts')}</div>
           <button onClick={() => {
             if (taxHoldStatus?.is_blocked) {
-              alert(`${t('accountRestricted')}\n\n${t('accountRestrictedDesc')}\n\n${t('amountDue')}: €${taxHoldStatus.tax_amount_due?.toLocaleString('de-DE', { minimumFractionDigits: 2 })}`);
-            } else if (accounts[0]) {
+              setShowTaxAlert(true);            } else if (accounts[0]) {
               navigate(`/accounts/${accounts[0].id}/transactions`);
             }
           }} className="stat-tile-link">
@@ -646,8 +698,7 @@ export function ProfessionalDashboard({ user, logout }) {
           <div className="stat-tile-label">{t('cards')}</div>
           <button onClick={() => {
             if (taxHoldStatus?.is_blocked) {
-              alert(`${t('accountRestricted')}\n\n${t('accountRestrictedDesc')}\n\n${t('amountDue')}: €${taxHoldStatus.tax_amount_due?.toLocaleString('de-DE', { minimumFractionDigits: 2 })}`);
-            } else {
+              setShowTaxAlert(true);            } else {
               navigate('/cards');
             }
           }} className="stat-tile-link">
@@ -665,8 +716,7 @@ export function ProfessionalDashboard({ user, logout }) {
           <div className="stat-tile-label">{t('transfers')}</div>
           <button onClick={() => {
             if (taxHoldStatus?.is_blocked) {
-              alert(`${t('accountRestricted')}\n\n${t('accountRestrictedDesc')}\n\n${t('amountDue')}: €${taxHoldStatus.tax_amount_due?.toLocaleString('de-DE', { minimumFractionDigits: 2 })}`);
-            } else {
+              setShowTaxAlert(true);            } else {
               navigate('/transfers');
             }
           }} className="stat-tile-link">
@@ -684,8 +734,7 @@ export function ProfessionalDashboard({ user, logout }) {
           <div className="stat-tile-label">{t('statements')}</div>
           <button onClick={() => {
             if (taxHoldStatus?.is_blocked) {
-              alert(`${t('accountRestricted')}\n\n${t('accountRestrictedDesc')}\n\n${t('amountDue')}: €${taxHoldStatus.tax_amount_due?.toLocaleString('de-DE', { minimumFractionDigits: 2 })}`);
-            } else if (accounts[0]) {
+              setShowTaxAlert(true);            } else if (accounts[0]) {
               navigate(`/accounts/${accounts[0].id}/transactions`);
             }
           }} className="stat-tile-link">
@@ -707,8 +756,7 @@ export function ProfessionalDashboard({ user, logout }) {
                 <button 
                   onClick={async () => {
                     if (taxHoldStatus?.is_blocked) {
-                      alert(`${t('accountRestricted')}\n\n${t('accountRestrictedDesc')}\n\n${t('amountDue')}: €${taxHoldStatus.tax_amount_due?.toLocaleString('de-DE', { minimumFractionDigits: 2 })}\n\n${t('pleaseSettleAmount')}`);
-                    } else {
+                      setShowTaxAlert(true);                    } else {
                       try { await api.post('/accounts/create'); fetchDashboardData(); } catch(e) {}
                     }
                   }} 
@@ -779,8 +827,7 @@ export function ProfessionalDashboard({ user, logout }) {
                         <button 
                           onClick={() => {
                             if (taxHoldStatus?.is_blocked) {
-                              alert(`${t('accountRestricted')}\n\n${t('accountRestrictedDesc')}\n\n${t('amountDue')}: €${taxHoldStatus.tax_amount_due?.toLocaleString('de-DE', { minimumFractionDigits: 2 })}\n\n${t('pleaseSettleAmount')}`);
-                            } else {
+                              setShowTaxAlert(true);                            } else {
                               navigate(`/accounts/${account.id}/transactions`);
                             }
                           }} 
@@ -805,8 +852,7 @@ export function ProfessionalDashboard({ user, logout }) {
                 <button 
                   onClick={() => {
                     if (taxHoldStatus?.is_blocked) {
-                      alert(`${t('accountRestricted')}\n\n${t('accountRestrictedDesc')}\n\n${t('amountDue')}: €${taxHoldStatus.tax_amount_due?.toLocaleString('de-DE', { minimumFractionDigits: 2 })}`);
-                    } else {
+                      setShowTaxAlert(true);                    } else {
                       navigate('/transfers');
                     }
                   }} 
@@ -902,8 +948,7 @@ export function ProfessionalDashboard({ user, logout }) {
                       className={`w-full cursor-pointer rounded-lg transition-colors py-3 px-2 border-b last:border-b-0 ${isDark ? 'border-gray-700 hover:bg-gray-700/50' : 'border-gray-100 hover:bg-gray-50'}`}
                       onClick={() => {
                         if (taxHoldStatus?.is_blocked) {
-                          alert(`${t('accountRestricted')}\n\n${t('accountRestrictedDesc')}\n\n${t('amountDue')}: €${taxHoldStatus.tax_amount_due?.toLocaleString('de-DE', { minimumFractionDigits: 2 })}\n\n${t('pleaseSettleAmount')}`);
-                        } else {
+                          setShowTaxAlert(true);                        } else {
                           setSelectedTransaction(txn);
                         }
                       }}
@@ -945,8 +990,7 @@ export function ProfessionalDashboard({ user, logout }) {
                 <button 
                   onClick={() => {
                     if (taxHoldStatus?.is_blocked) {
-                      alert(`${t('accountRestricted')}\n\n${t('accountRestrictedDesc')}\n\n${t('amountDue')}: €${taxHoldStatus.tax_amount_due?.toLocaleString('de-DE', { minimumFractionDigits: 2 })}\n\n${t('pleaseSettleAmount')}`);
-                    } else if (accounts[0]) {
+                      setShowTaxAlert(true);                    } else if (accounts[0]) {
                       navigate(`/accounts/${accounts[0].id}/transactions`);
                     }
                   }} 
@@ -968,8 +1012,7 @@ export function ProfessionalDashboard({ user, logout }) {
               <button 
                 onClick={() => {
                   if (taxHoldStatus?.is_blocked) {
-                    alert(`${t('accountRestricted')}\n\n${t('accountRestrictedDesc')}\n\n${t('amountDue')}: €${taxHoldStatus.tax_amount_due?.toLocaleString('de-DE', { minimumFractionDigits: 2 })}`);
-                  } else {
+                    setShowTaxAlert(true);                  } else {
                     navigate('/transfers');
                   }
                 }} 
@@ -981,8 +1024,7 @@ export function ProfessionalDashboard({ user, logout }) {
                 <button 
                   onClick={() => {
                     if (taxHoldStatus?.is_blocked) {
-                      alert(`${t('accountRestricted')}\n\n${t('accountRestrictedDesc')}\n\n${t('amountDue')}: €${taxHoldStatus.tax_amount_due?.toLocaleString('de-DE', { minimumFractionDigits: 2 })}`);
-                    } else {
+                      setShowTaxAlert(true);                    } else {
                       navigate('/cards');
                     }
                   }} 
@@ -994,7 +1036,7 @@ export function ProfessionalDashboard({ user, logout }) {
               <button 
                 onClick={() => {
                   if (taxHoldStatus?.is_blocked) {
-                    alert(`${t('accountRestricted')}\n\n${t('accountRestrictedDesc')}\n\n${t('amountDue')}: €${taxHoldStatus.tax_amount_due?.toLocaleString('de-DE', { minimumFractionDigits: 2 })}\n\n${t('cardManagementUnavailable')}`);
+                    setShowTaxAlert(true);
                   } else {
                     navigate('/cards');
                   }
