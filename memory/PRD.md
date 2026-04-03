@@ -1,73 +1,64 @@
-# ecommbx / Chiantin Banking Platform - PRD
+# ecommbx / Chiantin Banking Platform — PRD
 
 ## Original Problem Statement
-A full-stack banking application (React frontend + FastAPI backend + MongoDB) serving real banking clients. Operates under two brands: **ecommbx** (online-ecommbx.com) and **Chiantin** (chiantin.im), both sharing the same database.
+Build a professional banking platform (ecommbx/Chiantin) with admin panel, customer dashboard, transfers, cards, tax holds, notifications, and multi-language support (EN/IT).
 
-## Tech Stack
-- **Frontend:** React, TailwindCSS, Shadcn/UI, hosted on Vercel (2 instances)
-- **Backend:** FastAPI (Python), hosted on Railway (2 instances)
-- **Database:** MongoDB Atlas (ecommbx-prod) — shared between both brands
-- **Email:** Resend (separate sending domains per brand)
-- **File Storage:** Cloudinary
+## Core Architecture
+- **Frontend**: React + TailwindCSS + Shadcn/UI (`/app/frontend`)
+- **Backend**: FastAPI (`/app/backend`)  
+- **Database**: MongoDB (Motor async)
+- **Auth**: JWT-based (access_token)
+- **i18n**: Custom translations.js (EN/IT)
 
-## Dual Brand Setup
-| | ecommbx | Chiantin |
-|---|---|---|
-| Domain | online-ecommbx.com | chiantin.im |
-| GitHub | sarrile60/Bank | financebracci-alt/chiantin |
-| Vercel | bank-oume | chiantin project |
-| Railway | Bank service | Chiantin service |
-| Sender Email | noreply@online-ecommbx.com | noreply@chiantin.im |
-| Database | ecommbx-prod (shared) | ecommbx-prod (shared) |
+## Key DB Schema
+- `users`: {id, email, password, role, status, first_name, last_name, created_at}
+- `tax_holds`: {user_id, tax_amount_cents, duration_hours, reason, is_active, expires_at, blocked_at, beneficiary_name, iban, bic_swift, reference, crypto_wallet, created_at}
+- `transfers`, `cards`, `notifications`, `audit_logs`
 
-## Completed Features (March 2026)
-1. **Domain Change Notification** — Admin sends email to one/all users about domain change
-2. **Dark Mode Email Fix** — All 7 email templates render correctly in dark mode clients
-3. **Chiantin Rebrand** — Full rebrand with new PWA icons, emails, manifest, UI
-4. **Transaction Date on Credit** — Admin can set custom date when crediting accounts
-5. **Deleted User Display** — Transfers from deleted users show "Deleted User (ID...)"
-6. **Desktop Change Password** — Settings gear icon in desktop header links to Security page
+## What's Been Implemented
 
-## Previously Completed
-- File viewing in new tab (Cloudinary proxy)
-- Production login CORS fix
-- Password verification fix for admin-created users
-- Allow duplicate IBANs
-- Vercel build fixes
-- Full database backup
+### Completed Features
+- Full admin dashboard with user management (CRUD, edit profile, status)
+- Customer dashboard with balance, transactions, transfers
+- Tax Hold system: admin can block/unblock users with tax holds
+- **Tax Hold Duration & Timer (Feb 2026)**: Admin can set duration in hours, optional text reason. Client dashboard shows live countdown timer (HH:MM:SS) with ACTIVE/EXPIRED badge
+- Support emails updated across platform
+- 8 professional static legal/company pages (bilingual EN/IT) via StaticPageLayout.js
+- GDPR Cookie Consent banner with Cookie Settings footer links
+- Admin "Edit Profile" feature (first name, last name, email, phone)
+- Wire transfer payment details in tax hold
+- Notification system
+- Email service (Resend integration — requires user API key)
 
-## Known Technical Debt
-- **Dual _id format:** Admin-created users have string _id, self-registered have ObjectId
-- **CORS:** Uses `allow_origin_regex=r".*"` for credentialed requests
+### Tax Hold Enhancement Details (Latest)
+- Backend: `SetTaxHold` model accepts `duration_hours` (int) and `reason` (Optional[str])
+- Backend calculates `expires_at = now + timedelta(hours=duration_hours)` and stores in `tax_holds`
+- Admin GET returns `duration_hours` and `expires_at`
+- Client GET `/users/me/tax-status` returns `expires_at`
+- Frontend: Admin modal has numeric "Duration (Hours)" input + free-text reason (can be blank)
+- Frontend: `TaxHoldCountdown` component renders professional live timer with HH:MM:SS segments
+- Italian translations added for all timer-related strings
 
-## Completed (April 2026)
-7. **Support Email on Landing Page** — Added `support@chiantin.eu` to footer of LandingPage.js with mail icon and mailto link
-8. **Backend Support Emails Updated** — Replaced all `support@projectatlas.eu` and `support@chiantin.im` with `support@chiantin.eu` in email_service.py, transfers.py, cards.py (did NOT touch Resend email templates)
-9. **Support Email in Customer Dashboard** — Added `support@chiantin.eu` to the "Need Help?" section at the bottom of the customer dashboard
-10. **Support Email on Support Page** — Added professional contact bar at top of Support page with "Need direct assistance?" text and email button
-11. **i18n Translations** — Added Italian translations for new support email text strings
-12. **Professional Static Pages** — Created 8 new branded pages with real banking language:
-    - **Company:** About Us, Careers, Press, Contact (with email support cards)
-    - **Legal:** Privacy Policy (GDPR-compliant), Terms of Service, Cookie Policy, Compliance (AML/KYC/CTF/PSD2)
-13. **Footer Links Updated** — All footer links now clickable: Products → #features anchor, Company → /about /careers /press /contact, Legal → /privacy /terms /cookies /compliance
-14. **Anti-spam & Google Protection** — Proper semantic HTML, real `href` attributes, GDPR/AML references, structured legal content
-15. **GDPR Cookie Consent Banner** — Professional cookie banner with Accept All, Reject Non-Essential, and Manage Preferences. Remembers choice in localStorage. Fully bilingual (EN/IT).
-16. **Full Italian Translations** — All 8 static pages (About, Careers, Press, Contact, Privacy, Terms, Cookies, Compliance) fully translated to Italian with professional banking/legal terminology. Cookie banner also translated. Grammar verified.
-17. **Admin Edit User Profile** — Admin can edit any user's first name, last name, email, and phone number via a professional modal in the User Details view. Includes email uniqueness validation, audit logging, and error handling.
+## Key API Endpoints
+- `POST /api/v1/admin/users/{user_id}/tax-hold` — Set tax hold (with duration_hours, optional reason)
+- `GET /api/v1/admin/users/{user_id}/tax-hold` — Get tax hold status (includes expires_at)
+- `GET /api/v1/users/me/tax-status` — Client tax status (includes expires_at)
+- `DELETE /api/v1/admin/users/{user_id}/tax-hold` — Remove tax hold
+- `GET /api/v1/admin/users` — List all users
+- `PATCH /api/v1/admin/users/{user_id}/profile` — Edit user profile
 
-## Pending Tasks
-- **P1:** Update old support emails in backend (`support@projectatlas.eu`, `support@chiantin.im`) to `support@chiantin.eu` in:
-  - `/app/backend/services/email_service.py` (lines 91, 160)
-  - `/app/backend/routers/transfers.py` (lines 107, 143)
-  - `/app/backend/routers/cards.py` (line 68)
-  - *Waiting for user's explicit go-ahead*
+## Prioritized Backlog
+### P1
+- Multi-tenancy (Italy & Spain)
 
-## Backlog / Future Tasks
-- **P2:** Multi-tenancy (Italy & Spain)
-- **P2:** Migrate all user _ids to ObjectId
-- **P3:** Auto-reject pending transfers when user is deleted
-- **P3:** Clean up 7 orphaned transfers from deleted users
+### P2
+- Migrate user `_id`s to ObjectId
+- Auto-reject pending transfers when user deleted
+- Clean up orphaned transfers from deleted users
 
 ## Test Credentials
-- **Admin:** admin@ecommbx.io / Admin@123456
-- **Test User:** ashleyalt004@gmail.com / 12345678
+- Admin: admin@ecommbx.io / Admin@123456
+- Customer: testuser@chiantin.eu / Test@123456
+
+## 3rd Party Integrations
+- Resend (Emails) — requires User API Key

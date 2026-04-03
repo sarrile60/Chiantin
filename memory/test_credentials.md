@@ -1,12 +1,16 @@
 # Test Credentials
 
-## Admin
-- Email: admin@ecommbx.io
-- Password: Admin@123456
-- Role: SUPER_ADMIN
+## Admin Account
+- **Email:** admin@ecommbx.io
+- **Password:** Admin@123456
+- **Role:** SUPER_ADMIN
 
-## Test Customer
-- Email: testuser@chiantin.eu
-- Password: Test@123456
-- Role: CUSTOMER
-- KYC Status: APPROVED
+## Customer Test Account
+- **Email:** testuser@chiantin.eu
+- **Password:** Test@123456
+- **Role:** CUSTOMER
+- **Note:** Currently has an active tax hold with 48h duration for testing
+
+## Other Test Account
+- **Email:** ashleyalt004@gmail.com
+- **Password:** 12345678
