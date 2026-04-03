@@ -74,7 +74,7 @@ function AdminUserDetails({
   openDomainChangeModal,
   handleOpenEditProfile
 }) {
-  const [reminderLang, setReminderLang] = useState('en');
+  const [reminderLang, setReminderLang] = useState('it');
   const [reminderLoading, setReminderLoading] = useState(false);
 
   if (!selectedUser) return null;
@@ -651,8 +651,8 @@ function AdminUserDetails({
                   className="h-9 px-2 text-sm border border-gray-300 rounded-lg bg-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                   data-testid="reminder-lang-select"
                 >
-                  <option value="en">EN</option>
                   <option value="it">IT</option>
+                  <option value="en">EN</option>
                 </select>
                 <button
                   onClick={handleSendReminder}
