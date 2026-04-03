@@ -71,7 +71,8 @@ function AdminUserDetails({
   handleSaveNotes,
   EnhancedLedgerTools,
   formatCurrency,
-  openDomainChangeModal
+  openDomainChangeModal,
+  handleOpenEditProfile
 }) {
   if (!selectedUser) return null;
 
@@ -95,6 +96,17 @@ function AdminUserDetails({
         <div className="flex justify-between items-start mb-4">
           <h2 className="text-lg font-semibold">User Details</h2>
           <div className="flex space-x-2">
+            {/* Edit Profile Button */}
+            <button
+              onClick={handleOpenEditProfile}
+              className="px-3 py-1 text-sm border border-gray-300 text-gray-700 rounded hover:bg-gray-50 transition flex items-center gap-1"
+              data-testid="edit-profile-btn"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+              Edit Profile
+            </button>
             {/* Verify Email Button - Only show if email is NOT verified */}
             {selectedUser.user.email_verified === false && (
               <button

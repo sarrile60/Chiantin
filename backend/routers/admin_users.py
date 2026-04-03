@@ -75,6 +75,14 @@ class AdminCreateUser(BaseModel):
     skip_kyc: bool = False  # If true, user won't need to do KYC
 
 
+class UpdateUserProfile(BaseModel):
+    """Request model for admin editing a user's profile info."""
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    email: Optional[str] = None
+    phone: Optional[str] = None
+
+
 # ==================== Admin Create User ====================
 
 @router.post("/create")
@@ -497,6 +505,61 @@ async def update_user_status(
         raise HTTPException(status_code=404, detail="User not found")
     
     return {"success": True}
+
+
+
+# ==================== Edit User Profile ====================
+
+@router.patch("/{user_id}/profile")
+async def admin_update_user_profile(
+    user_id: str,
+    data: UpdateUserProfile,
+    current_user: dict = Depends(require_admin),
+    db: AsyncIOMotorDatabase = Depends(get_database)
+):
+    """Admin updates a user's profile information (name, email, phone)."""
+    from bson import ObjectId
+    from bson.errors import InvalidId
+
+    updates = {}
+    if data.first_name is not None:
+        updates["first_name"] = data.first_name.strip()
+    if data.last_name is not None:
+        updates["last_name"] = data.last_name.strip()
+    if data.phone is not None:
+        updates["phone"] = data.phone.strip()
+    if data.email is not None:
+        new_email = data.email.strip().lower()
+        # Check if email is already taken by another user
+        existing = await db.users.find_one({"email": new_email})
+        if existing:
+            existing_id = str(existing.get("_id", ""))
+            if existing_id != user_id:
+                raise HTTPException(status_code=400, detail="Email is already in use by another account")
+        updates["email"] = new_email
+
+    if not updates:
+        raise HTTPException(status_code=400, detail="No fields to update")
+
+    updates["updated_at"] = datetime.now(timezone.utc)
+
+    user_query = {"_id": user_id}
+    try:
+        user_query = {"$or": [{"_id": user_id}, {"_id": ObjectId(user_id)}]}
+    except InvalidId:
+        pass
+
+    result = await db.users.update_one(user_query, {"$set": updates})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    await create_audit_log(
+        db, current_user["id"], "user_profile_updated",
+        f"Admin updated profile for user {user_id}: {', '.join(updates.keys())}",
+        {"user_id": user_id, "updated_fields": list(updates.keys())}
+    )
+
+    return {"success": True, "message": "User profile updated successfully"}
 
 
 # ==================== Email Verification ====================

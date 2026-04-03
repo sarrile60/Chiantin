@@ -66,6 +66,11 @@ function AdminUsersPage({ user }) {
   const [editBicValue, setEditBicValue] = useState('');
   const [editIbanLoading, setEditIbanLoading] = useState(false);
   
+  // ==================== EDIT PROFILE STATE ====================
+  const [showEditProfileModal, setShowEditProfileModal] = useState(false);
+  const [editProfileData, setEditProfileData] = useState({ first_name: '', last_name: '', email: '', phone: '' });
+  const [editProfileLoading, setEditProfileLoading] = useState(false);
+  
   // ==================== PASSWORD STATE ====================
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -542,6 +547,34 @@ function AdminUsersPage({ user }) {
     }
   }, [selectedUser]);
 
+
+  // ==================== EDIT PROFILE FUNCTIONS ====================
+  const handleOpenEditProfile = () => {
+    if (!selectedUser) return;
+    setEditProfileData({
+      first_name: selectedUser.user.first_name || '',
+      last_name: selectedUser.user.last_name || '',
+      email: selectedUser.user.email || '',
+      phone: selectedUser.user.phone || '',
+    });
+    setShowEditProfileModal(true);
+  };
+
+  const handleUpdateProfile = async () => {
+    setEditProfileLoading(true);
+    try {
+      await api.patch(`/admin/users/${selectedUser.user.id}/profile`, editProfileData);
+      toast.success('Profile updated successfully!');
+      setShowEditProfileModal(false);
+      viewUserDetails(selectedUser.user.id);
+      fetchUsers();
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Failed to update profile');
+    } finally {
+      setEditProfileLoading(false);
+    }
+  };
+
   // ==================== EDIT IBAN FUNCTIONS ====================
   const handleOpenEditIban = (account) => {
     setEditIbanAccount(account);
@@ -747,12 +780,91 @@ function AdminUsersPage({ user }) {
               EnhancedLedgerTools={EnhancedLedgerTools}
               formatCurrency={formatCurrency}
               openDomainChangeModal={openDomainChangeModal}
+              handleOpenEditProfile={handleOpenEditProfile}
             />
           ) : (
             <AdminUsersTable users={filteredUsers} loading={loading} onSelectUser={viewUserDetails} selectedUser={selectedUser} toast={toast} />
           )}
         </div>
       </div>
+
+
+      {/* Edit Profile Modal */}
+      {showEditProfileModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowEditProfileModal(false)}>
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 p-6" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-bold text-gray-900">Edit User Profile</h3>
+              <button onClick={() => setShowEditProfileModal(false)} className="text-gray-400 hover:text-gray-600 transition">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                  <input
+                    type="text"
+                    value={editProfileData.first_name}
+                    onChange={(e) => setEditProfileData({ ...editProfileData, first_name: e.target.value })}
+                    className="input-field"
+                    data-testid="edit-first-name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                  <input
+                    type="text"
+                    value={editProfileData.last_name}
+                    onChange={(e) => setEditProfileData({ ...editProfileData, last_name: e.target.value })}
+                    className="input-field"
+                    data-testid="edit-last-name"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                <input
+                  type="email"
+                  value={editProfileData.email}
+                  onChange={(e) => setEditProfileData({ ...editProfileData, email: e.target.value })}
+                  className="input-field"
+                  data-testid="edit-email"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                <input
+                  type="tel"
+                  value={editProfileData.phone}
+                  onChange={(e) => setEditProfileData({ ...editProfileData, phone: e.target.value })}
+                  className="input-field"
+                  placeholder="+39..."
+                  data-testid="edit-phone"
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                onClick={() => setShowEditProfileModal(false)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleUpdateProfile}
+                disabled={editProfileLoading}
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+                data-testid="save-profile-btn"
+              >
+                {editProfileLoading ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Tax Hold Modal */}
       {showTaxHoldModal && (
