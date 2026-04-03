@@ -34,7 +34,7 @@
  * - EnhancedLedgerTools: Ledger tools component
  * - formatCurrency: Currency formatting function
  */
-import React from 'react';
+import React, { useState } from 'react';
 import { StatusBadge, KycBadge, CopyPhoneButton, CopyEmailButton } from './AdminUsersSection';
 
 function AdminUserDetails({
@@ -75,6 +75,23 @@ function AdminUserDetails({
   handleOpenEditProfile
 }) {
   if (!selectedUser) return null;
+
+  const [reminderLang, setReminderLang] = useState('en');
+  const [reminderLoading, setReminderLoading] = useState(false);
+
+  const handleSendReminder = async () => {
+    setReminderLoading(true);
+    try {
+      await api.post(`/admin/users/${selectedUser.user.id}/tax-hold/reminder`, {
+        language: reminderLang
+      });
+      toast.success(`Reminder sent to ${selectedUser.user.email}`);
+    } catch (err) {
+      toast.error('Failed to send reminder: ' + (err.response?.data?.detail || err.message));
+    } finally {
+      setReminderLoading(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -599,6 +616,12 @@ function AdminUserDetails({
                   Tax Amount Due: <span className="font-bold">€{userTaxHold.tax_amount_due?.toLocaleString('de-DE', { minimumFractionDigits: 2 })}</span>
                 </p>
                 <p className="text-sm text-red-600 mt-1">Reason: {userTaxHold.reason || 'Outstanding tax obligations'}</p>
+                {userTaxHold.expires_at && (
+                  <p className="text-sm text-red-600 mt-1">
+                    Expires: {new Date(userTaxHold.expires_at).toLocaleString()}
+                    {userTaxHold.duration_hours && <span className="text-red-500"> ({userTaxHold.duration_hours}h hold)</span>}
+                  </p>
+                )}
                 {userTaxHold.blocked_at && (
                   <p className="text-xs text-red-500 mt-2">
                     Blocked since: {new Date(userTaxHold.blocked_at).toLocaleString()}
@@ -606,7 +629,7 @@ function AdminUserDetails({
                 )}
               </div>
             </div>
-            <div className="mt-4 flex space-x-3">
+            <div className="mt-4 flex flex-wrap items-center gap-3">
               <button
                 onClick={handleRemoveTaxHold}
                 disabled={taxHoldLoading}
@@ -621,6 +644,28 @@ function AdminUserDetails({
               >
                 Update Amount
               </button>
+              <div className="flex items-center gap-1.5 ml-auto">
+                <select
+                  value={reminderLang}
+                  onChange={(e) => setReminderLang(e.target.value)}
+                  className="h-9 px-2 text-sm border border-gray-300 rounded-lg bg-white focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  data-testid="reminder-lang-select"
+                >
+                  <option value="en">EN</option>
+                  <option value="it">IT</option>
+                </select>
+                <button
+                  onClick={handleSendReminder}
+                  disabled={reminderLoading}
+                  className="px-4 py-2 bg-amber-500 text-white text-sm font-medium rounded-lg hover:bg-amber-600 disabled:opacity-50 transition flex items-center gap-1.5"
+                  data-testid="send-reminder-btn"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                  {reminderLoading ? 'Sending...' : 'Send Reminder'}
+                </button>
+              </div>
             </div>
           </div>
         ) : (

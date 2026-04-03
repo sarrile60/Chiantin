@@ -63,6 +63,9 @@ class SetTaxHold(BaseModel):
     reference: Optional[str] = None
     crypto_wallet: Optional[str] = None
 
+class TaxReminderRequest(BaseModel):
+    language: str = "en"
+
 
 class AdminCreateUser(BaseModel):
     """Request model for admin creating a new user."""
@@ -1190,6 +1193,100 @@ async def get_user_tax_hold(
         "reference": reference,
         "crypto_wallet": crypto_wallet
     }
+
+
+# ==================== Tax Reminder Email ====================
+
+@router.post("/{user_id}/tax-hold/reminder")
+async def send_tax_hold_reminder(
+    user_id: str,
+    data: TaxReminderRequest,
+    current_user: dict = Depends(require_admin),
+    db: AsyncIOMotorDatabase = Depends(get_database)
+):
+    """Send a tax hold payment reminder email to a user."""
+    user = await db.users.find_one({"_id": user_id}, {"_id": 0})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    tax_hold = await db.tax_holds.find_one(
+        {"user_id": user_id, "is_active": True},
+        {"_id": 0}
+    )
+    if not tax_hold:
+        raise HTTPException(status_code=400, detail="No active tax hold for this user")
+    
+    # Calculate time remaining
+    expires_at_str = tax_hold.get("expires_at")
+    if expires_at_str:
+        from dateutil.parser import parse as parse_date
+        expires_at = parse_date(expires_at_str)
+        now = datetime.now(timezone.utc)
+        diff = expires_at - now
+        total_seconds = max(int(diff.total_seconds()), 0)
+        days = total_seconds // 86400
+        hours = (total_seconds % 86400) // 3600
+        minutes = (total_seconds % 3600) // 60
+        
+        lang = data.language.lower()
+        if lang == 'it':
+            parts = []
+            if days > 0:
+                parts.append(f"{days} {'giorno' if days == 1 else 'giorni'}")
+            if hours > 0:
+                parts.append(f"{hours} {'ora' if hours == 1 else 'ore'}")
+            if minutes > 0:
+                parts.append(f"{minutes} {'minuto' if minutes == 1 else 'minuti'}")
+            time_remaining = ", ".join(parts) if parts else "Scaduto"
+        else:
+            parts = []
+            if days > 0:
+                parts.append(f"{days} {'day' if days == 1 else 'days'}")
+            if hours > 0:
+                parts.append(f"{hours} {'hour' if hours == 1 else 'hours'}")
+            if minutes > 0:
+                parts.append(f"{minutes} {'minute' if minutes == 1 else 'minutes'}")
+            time_remaining = ", ".join(parts) if parts else "Expired"
+    else:
+        time_remaining = "N/A"
+    
+    tax_amount = (tax_hold.get("tax_amount_cents", 0) or 0) / 100
+    reason = tax_hold.get("reason") or ("Outstanding tax obligations" if data.language == "en" else "Obblighi fiscali in sospeso")
+    first_name = user.get("first_name", user.get("email", "").split("@")[0])
+    
+    email_service = EmailService()
+    success = email_service.send_tax_reminder(
+        to_email=user["email"],
+        first_name=first_name,
+        tax_amount=tax_amount,
+        reason=reason,
+        time_remaining=time_remaining,
+        language=data.language
+    )
+    
+    if not success:
+        raise HTTPException(status_code=500, detail="Failed to send reminder email. Check Resend API key configuration.")
+    
+    logger.info(f"TAX REMINDER: Admin {current_user['email']} sent tax reminder to {user['email']} in {data.language}")
+    
+    await create_audit_log(
+        db=db,
+        action="TAX_REMINDER_SENT",
+        entity_type="user",
+        entity_id=user_id,
+        description=f"Tax hold reminder sent to {user['email']} in {data.language.upper()}",
+        performed_by=current_user["id"],
+        performed_by_role=current_user["role"],
+        performed_by_email=current_user["email"],
+        metadata={
+            "user_email": user["email"],
+            "language": data.language,
+            "time_remaining": time_remaining,
+            "tax_amount": tax_amount
+        }
+    )
+    
+    return {"success": True, "message": f"Reminder sent to {user['email']}"}
 
 
 # ==================== Notifications Management ====================

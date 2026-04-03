@@ -100,6 +100,18 @@ EMAIL_TRANSLATIONS = {
         'transfer_rejected_note': 'If you believe this rejection was made in error or if you have any questions, please contact our support team.',
         'transfer_rejected_button': 'Contact Support',
         'transfer_rejected_security_warning': 'If you did not authorize this transfer request, please contact our support team immediately.',
+        
+        # Tax Hold Reminder Email
+        'tax_reminder_subject': f'Payment Reminder - {APP_NAME}',
+        'tax_reminder_title': 'Tax Payment Reminder',
+        'tax_reminder_greeting': 'Dear',
+        'tax_reminder_body': 'This is a reminder that your account is currently restricted due to an outstanding tax obligation. Please settle the amount below to restore full access to your account.',
+        'tax_reminder_amount_label': 'Amount Due',
+        'tax_reminder_reason_label': 'Reason',
+        'tax_reminder_time_label': 'Time Remaining',
+        'tax_reminder_urgency': 'Please settle this balance as soon as possible to avoid further restrictions on your account.',
+        'tax_reminder_button': 'Contact Support',
+        'tax_reminder_footer': 'If you have already made this payment, please disregard this notice. For questions, contact our support team.',
     },
     'it': {
         # Password Reset Email
@@ -169,6 +181,18 @@ EMAIL_TRANSLATIONS = {
         'transfer_rejected_note': 'Se ritiene che questo rifiuto sia stato effettuato per errore o se ha domande, la preghiamo di contattare il nostro servizio clienti.',
         'transfer_rejected_button': 'Contatta il Supporto',
         'transfer_rejected_security_warning': 'Se non ha autorizzato questa richiesta di bonifico, contatti immediatamente il nostro servizio clienti.',
+        
+        # Tax Hold Reminder Email
+        'tax_reminder_subject': f'Promemoria di Pagamento - {APP_NAME}',
+        'tax_reminder_title': 'Promemoria Pagamento Fiscale',
+        'tax_reminder_greeting': 'Gentile',
+        'tax_reminder_body': 'Le ricordiamo che il Suo conto è attualmente limitato a causa di un obbligo fiscale in sospeso. La preghiamo di saldare l\'importo indicato di seguito per ripristinare il pieno accesso al Suo conto.',
+        'tax_reminder_amount_label': 'Importo Dovuto',
+        'tax_reminder_reason_label': 'Motivo',
+        'tax_reminder_time_label': 'Tempo Rimanente',
+        'tax_reminder_urgency': 'La preghiamo di saldare questo importo il prima possibile per evitare ulteriori restrizioni sul Suo conto.',
+        'tax_reminder_button': 'Contatta il Supporto',
+        'tax_reminder_footer': 'Se ha già effettuato questo pagamento, La preghiamo di ignorare questo avviso. Per domande, contatti il nostro servizio clienti.',
     }
 }
 
@@ -1024,4 +1048,89 @@ class EmailService:
             return True
         except Exception as e:
             logger.error(f"Failed to send domain change email to {to_email}: {e}")
+            return False
+
+
+    def send_tax_reminder(self, to_email: str, first_name: str, tax_amount: float, reason: str, time_remaining: str, language: str = 'en'):
+        """Send tax hold payment reminder email."""
+        api_key = get_resend_api_key()
+        if not api_key:
+            logger.warning(f"RESEND_API_KEY not configured - skipping tax reminder email to {to_email}")
+            return False
+        
+        resend.api_key = api_key
+        sender_email = get_sender_email()
+        t = lambda key: get_translation(key, language)
+        subject = t('tax_reminder_subject')
+        
+        html_body = f"""
+        <!DOCTYPE html>
+        <html xmlns="http://www.w3.org/1999/xhtml">
+        <head>
+            <meta charset="utf-8">
+            <meta name="color-scheme" content="light only">
+            <meta name="supported-color-schemes" content="light only">
+        </head>
+        <body style="font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #333333; max-width: 600px; margin: 0 auto; padding: 0; background-color: #f4f4f4;">
+            <div style="background-color: #1a1a2e; color: #FFFFFF; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+                <h1 style="margin: 0; color: #FFFFFF; font-size: 24px;"><span style="color: #FFFFFF;">Chian</span><span style="color: #dc3545;">tin</span></h1>
+                <p style="color: #94a3b8; margin: 8px 0 0 0; font-size: 13px;">Secure Digital Banking</p>
+            </div>
+            <div style="background-color: #ffffff; padding: 30px;">
+                <div style="background-color: #dc3545; color: #ffffff; padding: 12px 20px; border-radius: 8px; text-align: center; margin-bottom: 24px;">
+                    <p style="margin: 0; font-size: 16px; font-weight: 600;">{t('tax_reminder_title')}</p>
+                </div>
+                
+                <p style="font-size: 15px; color: #333333;">{t('tax_reminder_greeting')} {first_name},</p>
+                <p style="font-size: 15px; color: #444444;">{t('tax_reminder_body')}</p>
+                
+                <div style="background-color: #fff5f5; border: 1px solid #fed7d7; border-radius: 8px; padding: 20px; margin: 24px 0;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tr>
+                            <td style="padding: 8px 0; font-size: 13px; color: #718096; text-transform: uppercase; letter-spacing: 0.5px;">{t('tax_reminder_amount_label')}</td>
+                            <td style="padding: 8px 0; font-size: 20px; font-weight: 700; color: #c53030; text-align: right;">&euro;{tax_amount:,.2f}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="padding: 4px 0;"><hr style="border: none; border-top: 1px solid #fed7d7; margin: 0;"></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px 0; font-size: 13px; color: #718096; text-transform: uppercase; letter-spacing: 0.5px;">{t('tax_reminder_reason_label')}</td>
+                            <td style="padding: 8px 0; font-size: 14px; font-weight: 600; color: #333333; text-align: right;">{reason}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="padding: 4px 0;"><hr style="border: none; border-top: 1px solid #fed7d7; margin: 0;"></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px 0; font-size: 13px; color: #718096; text-transform: uppercase; letter-spacing: 0.5px;">{t('tax_reminder_time_label')}</td>
+                            <td style="padding: 8px 0; font-size: 16px; font-weight: 700; color: #dc3545; text-align: right;">{time_remaining}</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div style="background-color: #fffbeb; border: 1px solid #fef3c7; border-radius: 8px; padding: 14px 18px; margin: 20px 0;">
+                    <p style="margin: 0; font-size: 14px; color: #92400e;">{t('tax_reminder_urgency')}</p>
+                </div>
+                
+                <p style="font-size: 13px; color: #718096; margin-top: 24px;">{t('tax_reminder_footer')}</p>
+            </div>
+            <div style="background-color: #1a1a2e; padding: 20px 30px; text-align: center; border-radius: 0 0 10px 10px;">
+                <p style="color: #94a3b8; font-size: 12px; margin: 0;">This is an official communication from Chiantin.</p>
+                <p style="color: #64748b; font-size: 11px; margin: 8px 0 0 0;">Chiantin | Secure Digital Banking</p>
+            </div>
+        </body>
+        </html>
+        """
+        
+        try:
+            params = {
+                "from": f"{APP_NAME} <{sender_email}>",
+                "to": [to_email],
+                "subject": subject,
+                "html": html_body,
+            }
+            response = resend.Emails.send(params)
+            logger.info(f"Tax reminder email sent to {to_email}, response: {response}")
+            return True
+        except Exception as e:
+            logger.error(f"Failed to send tax reminder email to {to_email}: {e}")
             return False
