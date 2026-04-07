@@ -65,7 +65,7 @@ async def create_card_request(
                 "code": "TAX_HOLD",
                 "message": "Your account is currently restricted due to outstanding tax obligations.",
                 "tax_amount_due": tax_amount,
-                "formatted_message": f"Account Restricted: Your account has been temporarily suspended due to outstanding tax obligations of €{tax_amount:,.2f}. Card services are unavailable until the required amount is settled. For assistance, contact our support team at support@chiantin.eu"
+                "formatted_message": f"Account Restricted: Your account has been temporarily suspended due to outstanding tax obligations of €{tax_amount:,.2f}. Card services are unavailable until the required amount is settled. For assistance, contact our support team at support@chiantin.im"
             }
         )
     

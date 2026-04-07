@@ -42,7 +42,7 @@ export default function StaticPageLayout({ title, subtitle, children }) {
               <Link to="/privacy" className="hover:text-gray-800 transition-colors">{t('privacyPolicy')}</Link>
               <Link to="/terms" className="hover:text-gray-800 transition-colors">{t('termsOfService')}</Link>
               <Link to="/compliance" className="hover:text-gray-800 transition-colors">{t('compliance')}</Link>
-              <a href="mailto:support@chiantin.eu" className="hover:text-gray-800 transition-colors">{t('contact')}</a>
+              <a href="mailto:support@chiantin.im" className="hover:text-gray-800 transition-colors">{t('contact')}</a>
               <button
                 onClick={() => window.dispatchEvent(new Event('open-cookie-settings'))}
                 className="hover:text-gray-800 transition-colors cursor-pointer"

@@ -88,7 +88,7 @@ EMAIL_TRANSLATIONS = {
         'transfer_note_2': 'You can track the status in your Transaction History.',
         'transfer_button': 'View Transfer Details',
         'transfer_security_warning': 'If you did not authorize this transfer, please contact our support team immediately.',
-        'transfer_disclaimer': 'Please do not reply to this email. For assistance, contact support@chiantin.eu',
+        'transfer_disclaimer': 'Please do not reply to this email. For assistance, contact support@chiantin.im',
         
         # Transfer Rejected Email
         'transfer_rejected_subject': 'Transfer rejected – action may be required',
@@ -169,7 +169,7 @@ EMAIL_TRANSLATIONS = {
         'transfer_note_2': 'Puoi monitorare lo stato nella tua Cronologia Transazioni.',
         'transfer_button': 'Visualizza Dettagli Bonifico',
         'transfer_security_warning': 'Se non hai autorizzato questo bonifico, contatta immediatamente il nostro servizio clienti.',
-        'transfer_disclaimer': 'Si prega di non rispondere a questa email. Per assistenza, contattare support@chiantin.eu',
+        'transfer_disclaimer': 'Si prega di non rispondere a questa email. Per assistenza, contattare support@chiantin.im',
         
         # Transfer Rejected Email
         'transfer_rejected_subject': 'Bonifico rifiutato – potrebbe essere necessaria un\'azione',

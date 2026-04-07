@@ -24,8 +24,8 @@ export default function ContactPage() {
               <h3 className="text-base font-semibold text-gray-900">{c.emailSupportTitle}</h3>
             </div>
             <p className="text-sm text-gray-600 mb-3">{c.emailSupportDesc}</p>
-            <a href="mailto:support@chiantin.eu" className="text-sm font-medium text-red-600 hover:text-red-700 transition-colors" data-testid="contact-email-link">
-              support@chiantin.eu
+            <a href="mailto:support@chiantin.im" className="text-sm font-medium text-red-600 hover:text-red-700 transition-colors" data-testid="contact-email-link">
+              support@chiantin.im
             </a>
           </div>
           <div className="border border-gray-200 rounded-xl p-6 bg-gray-50">

@@ -1941,14 +1941,14 @@ function SupportPage() {
             </div>
           </div>
           <a
-            href="mailto:support@chiantin.eu"
+            href="mailto:support@chiantin.im"
             className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isDark ? 'bg-gray-700 text-white hover:bg-gray-600 border border-gray-600' : 'bg-white text-gray-800 hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
             data-testid="support-page-email-link"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
-            support@chiantin.eu
+            support@chiantin.im
           </a>
         </div>
         <SupportTickets />

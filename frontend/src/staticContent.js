@@ -47,7 +47,7 @@ const staticContent = {
         {
           heading: 'Contact Us',
           paragraphs: [
-            'For any enquiries about Chiantin, our services, or partnership opportunities, please reach out to our team at <a href="mailto:support@chiantin.eu">support@chiantin.eu</a>. We are committed to responding to all enquiries within 24 business hours.',
+            'For any enquiries about Chiantin, our services, or partnership opportunities, please reach out to our team at <a href="mailto:support@chiantin.im">support@chiantin.im</a>. We are committed to responding to all enquiries within 24 business hours.',
           ],
         },
       ],
@@ -99,7 +99,7 @@ const staticContent = {
         {
           heading: 'Contattaci',
           paragraphs: [
-            'Per qualsiasi richiesta riguardante Chiantin, i nostri servizi o opportunità di collaborazione, contatta il nostro team all\'indirizzo <a href="mailto:support@chiantin.eu">support@chiantin.eu</a>. Ci impegniamo a rispondere a tutte le richieste entro 24 ore lavorative.',
+            'Per qualsiasi richiesta riguardante Chiantin, i nostri servizi o opportunità di collaborazione, contatta il nostro team all\'indirizzo <a href="mailto:support@chiantin.im">support@chiantin.im</a>. Ci impegniamo a rispondere a tutte le richieste entro 24 ore lavorative.',
           ],
         },
       ],
@@ -142,7 +142,7 @@ const staticContent = {
         {
           heading: 'How to Apply',
           paragraphs: [
-            'If you are interested in joining Chiantin, please send your CV and a brief cover letter to <a href="mailto:support@chiantin.eu">support@chiantin.eu</a> with the subject line "Career Application — [Your Area of Expertise]". We review all applications carefully and will respond within 10 business days.',
+            'If you are interested in joining Chiantin, please send your CV and a brief cover letter to <a href="mailto:support@chiantin.im">support@chiantin.im</a> with the subject line "Career Application — [Your Area of Expertise]". We review all applications carefully and will respond within 10 business days.',
             'Chiantin is an equal opportunity employer. We celebrate diversity and are committed to creating an inclusive environment for all employees.',
           ],
         },
@@ -183,7 +183,7 @@ const staticContent = {
         {
           heading: 'Come candidarsi',
           paragraphs: [
-            'Se desideri entrare a far parte di Chiantin, invia il tuo CV e una breve lettera di presentazione a <a href="mailto:support@chiantin.eu">support@chiantin.eu</a> con oggetto "Candidatura — [La tua area di competenza]". Esaminiamo attentamente tutte le candidature e rispondiamo entro 10 giorni lavorativi.',
+            'Se desideri entrare a far parte di Chiantin, invia il tuo CV e una breve lettera di presentazione a <a href="mailto:support@chiantin.im">support@chiantin.im</a> con oggetto "Candidatura — [La tua area di competenza]". Esaminiamo attentamente tutte le candidature e rispondiamo entro 10 giorni lavorativi.',
             'Chiantin è un datore di lavoro che garantisce pari opportunità. Valorizziamo la diversità e ci impegniamo a creare un ambiente inclusivo per tutti i dipendenti.',
           ],
         },
@@ -200,7 +200,7 @@ const staticContent = {
         { heading: 'Media Resources', paragraphs: ['Members of the press and media professionals may contact our communications team for press kits, brand assets, interview requests, or any media-related enquiries. We are committed to providing timely and accurate information to journalists and media outlets.'] },
         { heading: 'Brand Guidelines', paragraphs: ['When referencing Chiantin in publications, please adhere to the following guidelines:'], list: ['The official company name is <strong>Chiantin</strong> (always capitalised)', 'Please do not alter, abbreviate, or modify our brand name in any way', 'For logo usage, please contact our team to obtain approved brand assets'] },
         { heading: 'Key Facts', list: ['<strong>Industry:</strong> Financial Technology / Digital Banking', '<strong>Services:</strong> Current Accounts, Payment Cards, SEPA Transfers', '<strong>Market:</strong> European Union', '<strong>Founded:</strong> 2024', '<strong>Headquarters:</strong> European Union'] },
-        { heading: 'Press Contact', paragraphs: ['For all press and media enquiries, please contact us at <a href="mailto:support@chiantin.eu">support@chiantin.eu</a> with the subject line "Press Enquiry". We aim to respond to all media requests within 24 hours.', 'Please note that Chiantin does not comment on individual customer accounts or transactions. All press communications are handled exclusively through our official channels.'] },
+        { heading: 'Press Contact', paragraphs: ['For all press and media enquiries, please contact us at <a href="mailto:support@chiantin.im">support@chiantin.im</a> with the subject line "Press Enquiry". We aim to respond to all media requests within 24 hours.', 'Please note that Chiantin does not comment on individual customer accounts or transactions. All press communications are handled exclusively through our official channels.'] },
       ],
     },
     it: {
@@ -211,7 +211,7 @@ const staticContent = {
         { heading: 'Risorse per i media', paragraphs: ['I giornalisti e i professionisti dei media possono contattare il nostro team di comunicazione per cartelle stampa, risorse del marchio, richieste di interviste o qualsiasi richiesta relativa ai media. Ci impegniamo a fornire informazioni tempestive e accurate a giornalisti e testate.'] },
         { heading: 'Linee guida del marchio', paragraphs: ['Quando si fa riferimento a Chiantin nelle pubblicazioni, si prega di rispettare le seguenti linee guida:'], list: ['Il nome ufficiale dell\'azienda è <strong>Chiantin</strong> (sempre con la lettera maiuscola)', 'Si prega di non alterare, abbreviare o modificare in alcun modo il nome del nostro marchio', 'Per l\'utilizzo del logo, si prega di contattare il nostro team per ottenere le risorse approvate del marchio'] },
         { heading: 'Dati principali', list: ['<strong>Settore:</strong> Tecnologia finanziaria / Digital banking', '<strong>Servizi:</strong> Conti correnti, carte di pagamento, bonifici SEPA', '<strong>Mercato:</strong> Unione Europea', '<strong>Anno di fondazione:</strong> 2024', '<strong>Sede:</strong> Unione Europea'] },
-        { heading: 'Contatto stampa', paragraphs: ['Per tutte le richieste relative a stampa e media, contattaci all\'indirizzo <a href="mailto:support@chiantin.eu">support@chiantin.eu</a> con oggetto "Richiesta stampa". Ci impegniamo a rispondere a tutte le richieste dei media entro 24 ore.', 'Si prega di notare che Chiantin non rilascia commenti su conti o transazioni di singoli clienti. Tutte le comunicazioni stampa vengono gestite esclusivamente attraverso i nostri canali ufficiali.'] },
+        { heading: 'Contatto stampa', paragraphs: ['Per tutte le richieste relative a stampa e media, contattaci all\'indirizzo <a href="mailto:support@chiantin.im">support@chiantin.im</a> con oggetto "Richiesta stampa". Ci impegniamo a rispondere a tutte le richieste dei media entro 24 ore.', 'Si prega di notare che Chiantin non rilascia commenti su conti o transazioni di singoli clienti. Tutte le comunicazioni stampa vengono gestite esclusivamente attraverso i nostri canali ufficiali.'] },
       ],
     },
   },
@@ -226,9 +226,9 @@ const staticContent = {
       responseTimeDesc: 'We aim to respond to all enquiries within <strong>24 business hours</strong>. For urgent account security matters, please include "URGENT" in your subject line.',
       sections: [
         { heading: 'Before You Contact Us', paragraphs: ['To help us assist you as quickly as possible, please include the following information in your message:'], list: ['Your full name as registered on your Chiantin account', 'The email address associated with your account', 'A clear description of your enquiry or issue', 'Any relevant transaction references or dates'], afterList: '<strong>Important:</strong> For your security, never include your full password, PIN, or card number in email communications. Our team will never ask you for this information via email.' },
-        { heading: 'Account Security Concerns', paragraphs: ['If you suspect any unauthorised activity on your account, please contact us immediately at <a href="mailto:support@chiantin.eu">support@chiantin.eu</a> with the subject line "URGENT: Security Concern". Our security team will prioritise your case and respond as quickly as possible.'] },
-        { heading: 'Complaints', paragraphs: ['We take all complaints seriously and are committed to resolving them fairly and promptly. If you are not satisfied with any aspect of our service, please email us at <a href="mailto:support@chiantin.eu">support@chiantin.eu</a> with the subject line "Formal Complaint". We will acknowledge your complaint within 2 business days and aim to provide a full resolution within 15 business days.', 'If you are not satisfied with our response, you may have the right to escalate your complaint to the relevant national financial ombudsman or regulatory authority in your country of residence.'] },
-        { heading: 'Regulatory & Legal Enquiries', paragraphs: ['For regulatory, compliance, or legal enquiries, including law enforcement requests and data protection matters, please contact us at <a href="mailto:support@chiantin.eu">support@chiantin.eu</a> with the subject line "Legal / Regulatory Enquiry". These requests are handled by our compliance team and are treated with the utmost confidentiality.'] },
+        { heading: 'Account Security Concerns', paragraphs: ['If you suspect any unauthorised activity on your account, please contact us immediately at <a href="mailto:support@chiantin.im">support@chiantin.im</a> with the subject line "URGENT: Security Concern". Our security team will prioritise your case and respond as quickly as possible.'] },
+        { heading: 'Complaints', paragraphs: ['We take all complaints seriously and are committed to resolving them fairly and promptly. If you are not satisfied with any aspect of our service, please email us at <a href="mailto:support@chiantin.im">support@chiantin.im</a> with the subject line "Formal Complaint". We will acknowledge your complaint within 2 business days and aim to provide a full resolution within 15 business days.', 'If you are not satisfied with our response, you may have the right to escalate your complaint to the relevant national financial ombudsman or regulatory authority in your country of residence.'] },
+        { heading: 'Regulatory & Legal Enquiries', paragraphs: ['For regulatory, compliance, or legal enquiries, including law enforcement requests and data protection matters, please contact us at <a href="mailto:support@chiantin.im">support@chiantin.im</a> with the subject line "Legal / Regulatory Enquiry". These requests are handled by our compliance team and are treated with the utmost confidentiality.'] },
       ],
     },
     it: {
@@ -240,9 +240,9 @@ const staticContent = {
       responseTimeDesc: 'Ci impegniamo a rispondere a tutte le richieste entro <strong>24 ore lavorative</strong>. Per questioni urgenti relative alla sicurezza del conto, inserisci "URGENTE" nell\'oggetto del messaggio.',
       sections: [
         { heading: 'Prima di contattarci', paragraphs: ['Per aiutarci ad assisterti nel modo più rapido possibile, ti chiediamo di includere le seguenti informazioni nel tuo messaggio:'], list: ['Il tuo nome completo così come registrato sul tuo conto Chiantin', 'L\'indirizzo e-mail associato al tuo conto', 'Una descrizione chiara della tua richiesta o del problema riscontrato', 'Eventuali riferimenti a transazioni o date pertinenti'], afterList: '<strong>Importante:</strong> Per la tua sicurezza, non includere mai la tua password completa, il PIN o il numero della carta nelle comunicazioni via e-mail. Il nostro team non ti chiederà mai queste informazioni tramite e-mail.' },
-        { heading: 'Problemi di sicurezza del conto', paragraphs: ['Se sospetti attività non autorizzate sul tuo conto, contattaci immediatamente all\'indirizzo <a href="mailto:support@chiantin.eu">support@chiantin.eu</a> con oggetto "URGENTE: problema di sicurezza". Il nostro team di sicurezza darà priorità al tuo caso e risponderà nel più breve tempo possibile.'] },
-        { heading: 'Reclami', paragraphs: ['Prendiamo tutti i reclami molto seriamente e ci impegniamo a risolverli in modo equo e tempestivo. Se non sei soddisfatto di un qualsiasi aspetto del nostro servizio, inviaci un\'e-mail all\'indirizzo <a href="mailto:support@chiantin.eu">support@chiantin.eu</a> con oggetto "Reclamo formale". Confermeremo la ricezione del tuo reclamo entro 2 giorni lavorativi e ci impegneremo a fornire una risoluzione completa entro 15 giorni lavorativi.', 'Se non sei soddisfatto della nostra risposta, potresti avere il diritto di sottoporre il reclamo al difensore civico finanziario nazionale competente o all\'autorità di regolamentazione del tuo Paese di residenza.'] },
-        { heading: 'Richieste normative e legali', paragraphs: ['Per richieste di natura normativa, di conformità o legale, incluse le richieste delle forze dell\'ordine e le questioni relative alla protezione dei dati, contattaci all\'indirizzo <a href="mailto:support@chiantin.eu">support@chiantin.eu</a> con oggetto "Richiesta legale / normativa". Queste richieste vengono gestite dal nostro team di conformità e trattate con la massima riservatezza.'] },
+        { heading: 'Problemi di sicurezza del conto', paragraphs: ['Se sospetti attività non autorizzate sul tuo conto, contattaci immediatamente all\'indirizzo <a href="mailto:support@chiantin.im">support@chiantin.im</a> con oggetto "URGENTE: problema di sicurezza". Il nostro team di sicurezza darà priorità al tuo caso e risponderà nel più breve tempo possibile.'] },
+        { heading: 'Reclami', paragraphs: ['Prendiamo tutti i reclami molto seriamente e ci impegniamo a risolverli in modo equo e tempestivo. Se non sei soddisfatto di un qualsiasi aspetto del nostro servizio, inviaci un\'e-mail all\'indirizzo <a href="mailto:support@chiantin.im">support@chiantin.im</a> con oggetto "Reclamo formale". Confermeremo la ricezione del tuo reclamo entro 2 giorni lavorativi e ci impegneremo a fornire una risoluzione completa entro 15 giorni lavorativi.', 'Se non sei soddisfatto della nostra risposta, potresti avere il diritto di sottoporre il reclamo al difensore civico finanziario nazionale competente o all\'autorità di regolamentazione del tuo Paese di residenza.'] },
+        { heading: 'Richieste normative e legali', paragraphs: ['Per richieste di natura normativa, di conformità o legale, incluse le richieste delle forze dell\'ordine e le questioni relative alla protezione dei dati, contattaci all\'indirizzo <a href="mailto:support@chiantin.im">support@chiantin.im</a> con oggetto "Richiesta legale / normativa". Queste richieste vengono gestite dal nostro team di conformità e trattate con la massima riservatezza.'] },
       ],
     },
   },

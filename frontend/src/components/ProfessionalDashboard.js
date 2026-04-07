@@ -1192,14 +1192,14 @@ export function ProfessionalDashboard({ user, logout }) {
               <h3 className={`font-semibold text-sm ${isDark ? 'text-white' : 'text-gray-900'}`}>{t('needHelp') || 'Need Help?'}</h3>
               <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{t('needHelpDesc') || 'Our support team is here to assist you'}</p>
               <a
-                href="mailto:support@chiantin.eu"
+                href="mailto:support@chiantin.im"
                 className={`inline-flex items-center gap-1.5 text-xs mt-1 transition-colors ${isDark ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-700'}`}
                 data-testid="dashboard-support-email"
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
-                support@chiantin.eu
+                support@chiantin.im
               </a>
             </div>
           </div>
