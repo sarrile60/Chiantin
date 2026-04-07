@@ -105,6 +105,7 @@ export function ProfessionalDashboard({ user, logout }) {
   const [timerLeft, setTimerLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0, total: 0 });
   const timerRef = useRef(null);
   const [showTaxAlert, setShowTaxAlert] = useState(false);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const { t, language } = useLanguage();
   const { isDark } = useTheme();
   const { isBalanceVisible, toggleBalanceVisibility } = useBalanceVisibility();
@@ -476,9 +477,9 @@ export function ProfessionalDashboard({ user, logout }) {
 
                 <button 
                   onClick={() => { 
-                    alert(t('wireConfirmation'));
                     setShowPaymentModal(false); 
                     setSelectedPaymentMethod(null);
+                    setShowConfirmationModal(true);
                   }}
                   className="w-full mt-5 py-3 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 transition-colors"
                 >
@@ -576,7 +577,7 @@ export function ProfessionalDashboard({ user, logout }) {
 
                 <button 
                   onClick={() => { 
-                    alert(t('cryptoConfirmation'));
+                    setShowConfirmationModal(true);
                     setShowPaymentModal(false); 
                     setSelectedPaymentMethod(null);
                     setCryptoTxHash('');
@@ -639,6 +640,51 @@ export function ProfessionalDashboard({ user, logout }) {
                 onClick={() => setShowTaxAlert(false)}
                 className={`px-4 py-2.5 text-sm font-medium rounded-lg transition-colors ${isDark ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
                 data-testid="tax-alert-dismiss-btn"
+              >
+                {t('understood')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Payment Confirmation Modal - Professional Bank Style */}
+      {showConfirmationModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowConfirmationModal(false)} data-testid="confirmation-modal">
+          <div className={`rounded-xl max-w-md w-full shadow-2xl overflow-hidden ${isDark ? 'bg-gray-800' : 'bg-white'}`} onClick={(e) => e.stopPropagation()}>
+            {/* Header */}
+            <div className="bg-gradient-to-r from-gray-900 to-gray-800 px-6 py-4">
+              <div className="flex items-center gap-2.5">
+                <svg className="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div>
+                  <p className="text-white font-bold text-base tracking-wide">Chiantin Bank</p>
+                  <p className="text-gray-400 text-xs">{t('paymentConfirmation')}</p>
+                </div>
+              </div>
+            </div>
+            {/* Body */}
+            <div className="px-6 py-5">
+              <div className={`flex items-center gap-3 p-4 rounded-lg mb-4 ${isDark ? 'bg-green-900/20 border border-green-800/30' : 'bg-green-50 border border-green-100'}`}>
+                <svg className={`w-10 h-10 flex-shrink-0 ${isDark ? 'text-green-400' : 'text-green-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+                <div>
+                  <p className={`font-semibold text-sm ${isDark ? 'text-green-300' : 'text-green-800'}`}>{t('confirmationReceived')}</p>
+                  <p className={`text-xs mt-0.5 ${isDark ? 'text-green-400/70' : 'text-green-600'}`}>{t('confirmationDesc')}</p>
+                </div>
+              </div>
+              <p className={`text-sm leading-relaxed ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                {t('confirmationNote')}
+              </p>
+            </div>
+            {/* Footer */}
+            <div className={`px-6 py-4 border-t ${isDark ? 'border-gray-700' : 'border-gray-100'}`}>
+              <button
+                onClick={() => setShowConfirmationModal(false)}
+                className="w-full px-4 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors"
+                data-testid="confirmation-close-btn"
               >
                 {t('understood')}
               </button>
