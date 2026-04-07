@@ -1515,8 +1515,33 @@ function CustomerDashboard() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [taxBlocked, setTaxBlocked] = useState(false);
+  const [showTaxPopup, setShowTaxPopup] = useState(false);
   const { t, language, setLanguage } = useLanguage();
   const { isDark, toggleTheme } = useTheme();
+
+  // Check tax hold status
+  useEffect(() => {
+    const checkTax = async () => {
+      if (user?.role === 'CUSTOMER') {
+        try {
+          const res = await api.get('/users/me/tax-status');
+          setTaxBlocked(res.data?.is_blocked || false);
+        } catch {}
+      }
+    };
+    checkTax();
+  }, [user]);
+
+  // Guarded navigation for tax-blocked users
+  const guardedNav = (path) => {
+    if (taxBlocked && path !== '/dashboard' && path !== '/support') {
+      setShowTaxPopup(true);
+      setShowUserMenu(false);
+      return;
+    }
+    navigate(path);
+  };
 
   // Get user initials
   const getInitials = () => {
@@ -1573,7 +1598,7 @@ function CustomerDashboard() {
             
             {/* Desktop: Settings & Logout */}
             <button
-              onClick={() => navigate('/security')}
+              onClick={() => guardedNav('/security')}
               className={`hidden sm:block p-2 rounded-lg transition ${isDark ? 'hover:bg-gray-800 text-gray-400 hover:text-white' : 'hover:bg-gray-100 text-gray-600 hover:text-gray-900'}`}
               title={t('securitySettings')}
               data-testid="desktop-settings-btn"
@@ -1625,7 +1650,7 @@ function CustomerDashboard() {
                           key={index}
                           onClick={() => {
                             setShowUserMenu(false);
-                            navigate(item.path);
+                            guardedNav(item.path);
                           }}
                           className={`w-full px-4 py-3 flex items-center space-x-3 transition-colors text-left ${isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}
                         >
@@ -1668,6 +1693,44 @@ function CustomerDashboard() {
       {/* Professional Dashboard Content */}
       <ProfessionalDashboard user={user} logout={logout} />
       
+      {/* Tax Hold Block Popup */}
+      {showTaxPopup && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowTaxPopup(false)}>
+          <div className={`rounded-xl max-w-md w-full shadow-2xl overflow-hidden ${isDark ? 'bg-gray-800' : 'bg-white'}`} onClick={(e) => e.stopPropagation()}>
+            <div className="bg-red-600 px-6 py-4">
+              <div className="flex items-center gap-2.5">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                <div>
+                  <p className="text-white font-bold text-base tracking-wide">Chiantin Bank</p>
+                  <p className="text-red-200 text-xs">{t('accountRestricted')}</p>
+                </div>
+              </div>
+            </div>
+            <div className="px-6 py-5">
+              <p className={`text-sm leading-relaxed ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                {t('accountRestrictedDesc')}
+              </p>
+            </div>
+            <div className={`px-6 py-4 flex gap-3 border-t ${isDark ? 'border-gray-700' : 'border-gray-100'}`}>
+              <button
+                onClick={() => { setShowTaxPopup(false); navigate('/dashboard'); }}
+                className="flex-1 px-4 py-2.5 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors"
+              >
+                {t('settleBalanceNow')}
+              </button>
+              <button
+                onClick={() => setShowTaxPopup(false)}
+                className={`px-4 py-2.5 text-sm font-medium rounded-lg transition-colors ${isDark ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
+              >
+                {t('understood')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Mobile Bottom Tabs */}
       <MobileBottomTabs />
     </div>
